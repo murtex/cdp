@@ -27,5 +27,5 @@ Plots
 - `plot.landmark`: landmark detection accuracies
 - `plot.trial_glottis`: glottis detection internals
 - `plot.trial_burst`: burst detection internals
-- `plot.timing`: timings
+- `plot.timing`: landmark timings
 
