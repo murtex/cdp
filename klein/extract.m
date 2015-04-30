@@ -5,17 +5,17 @@ clear( 'all' );
 
 addpath( '../' ); % set path to cue-distractor package
 
-logger = xis.hLogger.instance( 'extract.log' ); % start logging
+logger = xis.hLogger.instance( '../data/klein/extract.log' ); % start logging
 
 	% prepare directories
-indir = 'cdf/sync/';
+indir = '../data/klein/cdf/sync/';
 
-outdir = 'cdf/extract/';
+outdir = '../data/klein/cdf/extract/';
 if exist( outdir, 'dir' ) ~= 7
 	mkdir( outdir );
 end
 
-plotdir = 'plot/extract/';
+plotdir = '../data/klein/plot/extract/';
 if exist( plotdir, 'dir' ) ~= 7
 	mkdir( plotdir );
 end

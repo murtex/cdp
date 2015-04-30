@@ -5,12 +5,12 @@ clear( 'all' );
 
 addpath( '../' ); % set path to cue-distractor package
 
-logger = xis.hLogger.instance( 'convert.log' ); % start logging
+logger = xis.hLogger.instance( '../data/klein/convert.log' ); % start logging
 
 	% prepare directories
-indir = 'raw/';
+indir = '../data/klein/raw/';
 
-outdir = 'cdf/convert/';
+outdir = '../data/klein/cdf/convert/';
 if exist( outdir, 'dir' ) ~= 7
 	mkdir( outdir );
 end
