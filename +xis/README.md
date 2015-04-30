@@ -1,6 +1,6 @@
-convenience
+Convenience
 ===========
 
-- hLogger: hierarchic logging
-- hStyle: uniform styling
+- `hLogger`: hierarchic logging
+- `hStyle`: uniform styling
 

@@ -6,6 +6,6 @@ Short-time analysis
 - `banding`: frequency banding
 - `unframe`: un-framing/smoothing
 
-- `unframe_v1': slow smoothing
-- 'unframe_v2': fast smoothing
+- `unframe_v1`: slow accurate version
+- `unframe_v2`: fast approximate version
 
