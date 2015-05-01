@@ -48,11 +48,11 @@ function landmark( run, cfg )
 			% get subband fft
 		frame = dsp.msec2smp( cfg.sta_frame, run.audiorate );
 
-		noift = sta.framing( noiser, frame, cfg.sta_wnd ); % noisy
+		noift = sta.framing( noiser, frame, cfg.sta_wnd );
 		[noift, noifreqs] = sta.fft( noift, run.audiorate );
 		[noift, noifreqs] = sta.banding( noift, noifreqs, cfg.glottis_band );
 
-		respft = sta.framing( respser, frame, cfg.sta_wnd ); % clean
+		respft = sta.framing( respser, frame, cfg.sta_wnd );
 		[respft, respfreqs] = sta.fft( respft, run.audiorate );
 		[respft, respfreqs] = sta.banding( respft, respfreqs, cfg.glottis_band );
 

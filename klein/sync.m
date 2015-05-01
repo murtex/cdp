@@ -44,6 +44,7 @@ for id = ids
 		% sync timing
 	offs = cdf.sync( run, cfg, false );
 
+		% plot sync marker offsets
 	cdf.plot.sync( run, offs, fullfile( plotdir, sprintf( '%d_sync', run.id ) ) );
 
 		% write data

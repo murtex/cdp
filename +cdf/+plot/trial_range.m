@@ -46,7 +46,7 @@ function trial_range( run, cfg, trial, range, rzp, plotfile )
 	distser = run.audiodata(range(1):range(2), 2);
 	respser = run.audiodata(range(1):range(2), 1);
 
-		% get fullband fft
+		% get full bandwidth fft
 	frame = dsp.msec2smp( cfg.sta_frame, run.audiorate );
 
 	respft = sta.framing( respser, frame, cfg.sta_wnd );
@@ -141,13 +141,13 @@ function trial_range( run, cfg, trial, range, rzp, plotfile )
 	l = legend( h );
 	set( l, 'Color', style.color( 'grey', 0.96 ) );
 
-		% plot fullband spectrogram
+		% plot full bandwidth spectrogram
 	subplot( 4, 1, 3:4 );
 	xlabel( 'milliseconds' );
-	ylabel( 'fullband' );
+	ylabel( 'full bandwidth' );
 
 	xlim( xl );
-	ylim( [min( freqs ), max( freqs )] );
+	ylim( [freqs(1), freqs(end)] );
 
 	colormap( style.gradient( 64, [1, 1, 1], style.color( 'neutral', -0.5 ) ) ); % spectrogram
 	imagesc( dsp.smp2msec( 0:size( respft, 1 )-1, run.audiorate ), freqs, log( respft' ) );

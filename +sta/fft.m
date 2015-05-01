@@ -25,7 +25,7 @@ function [frser, freqs] = fft( frser, rate )
 
 	frser = fft( frser, l, 2 );
 	frser = frser(:, 1:l/2+1, :); % one-sided
-	frser = (frser .* conj( frser )) / (l^2); % normalized powers
+	frser = (frser .* conj( frser )) / (l*l); % normalized powers
 
 	freqs = rate/2 * linspace( 0, 1, l/2+1 );
 

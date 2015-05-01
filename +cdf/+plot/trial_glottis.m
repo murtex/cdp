@@ -39,11 +39,11 @@ function trial_glottis( run, cfg, trial, plotfile )
 		% get subband fft
 	frame = dsp.msec2smp( cfg.sta_frame, run.audiorate );
 
-	noift = sta.framing( noiser, frame, cfg.sta_wnd ); % noisy
+	noift = sta.framing( noiser, frame, cfg.sta_wnd );
 	[noift, noifreqs] = sta.fft( noift, run.audiorate );
 	[noift, noifreqs] = sta.banding( noift, noifreqs, cfg.glottis_band );
 
-	respft = sta.framing( respser, frame, cfg.sta_wnd ); % clean
+	respft = sta.framing( respser, frame, cfg.sta_wnd );
 	[respft, respfreqs] = sta.fft( respft, run.audiorate );
 	[respft, respfreqs] = sta.banding( respft, respfreqs, cfg.glottis_band );
 
@@ -89,7 +89,7 @@ function trial_glottis( run, cfg, trial, plotfile )
 	ylabel( 'subband' );
 
 	xlim( xl );
-	ylim( [min( respfreqs ), max( respfreqs )] );
+	ylim( [respfreqs(1), respfreqs(end)] );
 
 	colormap( style.gradient( 64, [1, 1, 1], style.color( 'neutral', -0.5 ) ) );
 	imagesc( dsp.smp2msec( 0:size( respft, 1 )-1, run.audiorate ), respfreqs, log( respft' ) );
