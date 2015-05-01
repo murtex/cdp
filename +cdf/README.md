@@ -11,11 +11,10 @@ Data structures
 Functions
 ---------
 
-in order of execution
-
-1. `sync`: sync timings
-2. `extract`: extract responses
-3. `landmark`: detect landmarks
+- `sync`: sync timings
+- `extract`: extract responses
+- `landmark`: detect landmarks
+- `babbling`: get speech-weighted noise
 
 Plots
 -----
@@ -28,4 +27,5 @@ Plots
 - `plot.trial_glottis`: glottis detection internals
 - `plot.trial_burst`: burst detection internals
 - `plot.timing`: landmark timings
+- `plot.babbling`: babbling spectra
 
