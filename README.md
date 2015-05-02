@@ -13,11 +13,13 @@ Essentials
 Framework
 ---------
 
-- the very first **starting point**
+- a very first **starting point** is the [`cdf`](https://github.com/murtex/cdp/tree/master/%2Bcdf "cdf") submodule
 
 Applications
 ------------
 
+Data
+----
 
 Modules/Namespaces
 ------------------
