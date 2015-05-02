@@ -17,7 +17,7 @@ Framework
 - that module provides **high-level** structures and functions to get [Psychtoolbox](http://psychtoolbox.org/ "Psychtoolbox")-styled data conveniently processed (but is not exclusively dependent on that format)
 - more fundamental, **low-level** functions are given by the modules [`dsp`](https://github.com/murtex/cdp/tree/master/%2Bdsp "dsp") (Digital signal processing) and [`sta`](https://github.com/murtex/cdp/tree/master/%2Bsta "sta") (Short-time analysis)
 - the last two relying only on the notion of (multi-dimensional) time series
-- for command and process logging, uniform and coherent plots consider using parts of the [`xis`](https://github.com/murtex/cdp/tree/master/%2Bxis "xis") module
+- for command and process **logging**, uniform and coherent **plots** parts of the [`xis`](https://github.com/murtex/cdp/tree/master/%2Bxis "xis") module can be used
 
 Applications
 ------------
