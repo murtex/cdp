@@ -1,4 +1,4 @@
-% babbling test
+% mix babbling noise
 
 	% init
 clear( 'all' );
@@ -12,7 +12,7 @@ filename = '../data/klein/cdf/babbling/global.mat';
 logger.log( 'read babbling spectrum ''%s''...', filename );
 load( filename, 'global_pows', 'global_freqs' );
 
-	% prepare for at least 1s noise
+	% prepare for at least 1s of noise
 rate = 2*global_freqs(end);
 lsrc = 2*(numel( global_pows )-1);
 ldst = 2^nextpow2( rate );
@@ -35,7 +35,7 @@ noi = noi / (1.05 * max( abs( noi ) )); % ~95% normalization
 
 	% store noise wave file 
 filename = '../data/dists/babbling.wav';
-logger.log( 'write babbling ''%s''...', filename );
+logger.log( 'write babbling noise ''%s''...', filename );
 wavwrite( noi, rate, filename );
 
 	% mix distractors
