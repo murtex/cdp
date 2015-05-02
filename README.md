@@ -13,10 +13,10 @@ Essentials
 Framework
 ---------
 
-- the very **first start** should be a visit to the [`cdf`](https://github.com/murtex/cdp/tree/master/%2Bcdf "cdf") submodule
+- a very **first start** could be a visit to the [`cdf`](https://github.com/murtex/cdp/tree/master/%2Bcdf "cdf") submodule
 - that module provides **high-level** structures and functions to easily get [Psychtoolbox](http://psychtoolbox.org/ "Psychtoolbox")-styled data processed (but is not exclusively dependent on that format)
-- fundamental, **low-level** functionality is given by the modules [`dsp`](https://github.com/murtex/cdp/tree/master/%2Bdsp "dsp") (Digital signal processing) and [`sta`](https://github.com/murtex/cdp/tree/master/%2Bsta "sta") (Short-time analysis), both modules only rely on the concept of (multi-dimensional) **time series**
-- for process logging and coherent plots consider using parts of the [`xis`](https://github.com/murtex/cdp/tree/master/%2Bxis "xis") module
+- fundamental, **low-level** functionality is given by the modules [`dsp`](https://github.com/murtex/cdp/tree/master/%2Bdsp "dsp") (Digital signal processing) and [`sta`](https://github.com/murtex/cdp/tree/master/%2Bsta "sta") (Short-time analysis), both of them only rely on the concept of (multi-dimensional) **time series**
+- for process logging, uniform and coherent plots consider using parts of the [`xis`](https://github.com/murtex/cdp/tree/master/%2Bxis "xis") module
 
 Applications
 ------------
