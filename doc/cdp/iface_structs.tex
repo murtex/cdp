@@ -1,0 +1,99 @@
+\subsection{Structures}
+
+\begin{itemize*}
+	\item experimental data are kept in \code{hRun} and \code{hTrial} structures
+	\item structure \code{hConfig} holds tuning parameters and controls framework bevaviour
+	\item all structures are handle classes (derived from \code{matlab.mixin.Copyable}), so they are passed by reference(!), clones can be created by invoking their \code{copy()} method
+\end{itemize*}
+
+\paragraph{Run}
+\begin{itemize*}
+	\item for each subject and recording there is a single \code{hRun} structure
+	\item all of its fields need to be set by application
+	\item format of \code{hRun.audiodata} is normalized, two-channel (response in first), time along rows as returned by matlab's \code{wavread} function
+	\item \code{hRun.audiolen} needs to be specified in units of samples
+\end{itemize*}
+\begin{tabular}{llll}
+	\hline
+	field&type&default&description\\
+	\hline
+	\code{hRun.id}&scalar numeric&\code{NaN}&subject identifier\\
+	\noalign{\smallskip}
+	\code{hRun.audiofile}&row char&\code{''}&audio filename\\
+	\code{hRun.audiodata}&matrix numeric&\code{[]}&audio data\\
+	\code{hRun.audiolen}&scalar numeric&\code{NaN}&audio length\\
+	\code{hRun.audiorate}&scalar numeric&\code{NaN}&sampling rate\\
+	\noalign{\smallskip}
+	\code{hRun.trials}&row object&\code{[]}&vector of trials\\
+	\hline
+\end{tabular}
+
+\paragraph{Trial}
+\begin{itemize*}
+	\item \code{hTrial} structure holds information about trial conditions and subject's response
+	\item trial conditions need to be set by application
+	\item there a two sets of response information: \code{hTrial.detected} and \code{hTrial.labeled}
+	\item former one is set by framework during detection passes
+	\item latter one needs to be set by application if annotation data are available
+	\item time values (ranges, positions, \etc) need to be specified in units of samples and are used as global(!) indices of audio data
+	\item empty labels (\code{''}) are invalid ones, none labels should be encoded as \code{'none'}
+\end{itemize*}
+\begin{tabular}{llll}
+	\hline
+	field&type&default&description\\
+	\hline
+	\code{hTrial.id}&scalar numeric&\code{NaN}&trial identifier\\
+	\noalign{\smallskip}
+	\code{hTrial.range}&row numeric&\code{[NaN, NaN]}&trial range\\
+	\noalign{\smallskip}
+	\code{hTrial.cuelabel}&row char&\code{''}&cue label\\
+	\code{hTrial.distlabel}&row char&\code{''}&distractor label\\
+	\noalign{\smallskip}
+	\code{hTrial.cue}&scalar numeric&\code{NaN}&cue position\\
+	\code{hTrial.soa}&scalar numeric&\code{NaN}&stimulus-onset asynchrony\\
+	\noalign{\smallskip}
+	\code{hTrial.distbo}&scalar numeric&\code{NaN}&distractor burst-onset\\
+	\code{hTrial.distvo}&scalar numeric&\code{NaN}&distractor voice-onset\\
+	\noalign{\smallskip}
+	\code{hTrial.detected.range}&row numeric&\code{[NaN, NaN]}&response range\\
+	\code{hTrial.detected.label}&row char&\code{''}&response label\\
+	\code{hTrial.detected.bo}&scalar numeric&\code{NaN}&response burst-onset\\
+	\code{hTrial.detected.vo}&scalar numeric&\code{NaN}&response voice-onset\\
+	\code{hTrial.detected.vr}&scalar numeric&\code{NaN}&response voice-release\\
+	\noalign{\smallskip}
+	\code{hTrial.labeled}&&&same as \code{hTrial.detected}\\
+	\hline
+\end{tabular}
+
+\paragraph{Configuration}
+\begin{itemize*}
+	\item \code{hConfig} structure holds everything related to controlling framework behaviour
+	\item default values are tuned and should work out of box
+	\item refer to internals section for specific meaning and effects
+	\item time values need to be specified in milliseconds(!), powers in decibels and frequencies in hertz
+\end{itemize*}
+\begin{tabular}{llll}
+	\hline
+	field&type&default&description\\
+	\hline
+	\code{hConfig.sync\_mrklen}&scalar numeric&\code{1}&sync marker length\\
+	\code{hConfig.sync\_thresh}&scalar numeric&\code{3}&sync detection threshold\\
+	\code{hConfig.sync\_range}&scalar numeric&\code{[-25, 5]}&sync detection range\\
+	\noalign{\smallskip}
+	\code{hConfig.sta\_frame}&row numeric&\code{[15, 5]}&short-time frame\\
+	\code{hConfig.sta\_wnd}&scalar object&\code{@hann}&window function\\
+	\code{hConfig.sta\_band}&row numeric&\code{[100, 8000]}&frequency band limits\\
+	\noalign{\smallskip}
+	\code{hConfig.glottis\_band}&row numeric&\code{[100, 500]}&glottis band limits\\
+	\code{hConfig.glottis\_rordt}&scalar numeric&\code{10}&rate-of-rise delta\\
+	\code{hConfig.glottis\_rorpeak}&scalar numeric&\code{6}&ror peak power threshold\\
+	\noalign{\smallskip}
+	\code{hConfig.schwa\_length}&scalar numeric&\code{20}&schwa vowel length\\
+	\code{hConfig.schwa\_power}&scalar numeric&\code{-20}&relative schwa power\\
+	\noalign{\smallskip}
+	\code{hConfig.plosion\_threshs}&row numeric&\code{[20, 10]}&plosion thresholds\\
+	\code{hConfig.plosion\_delta}&scalar numeric&\code{1}&plosion delta\\
+	\code{hConfig.plosion\_width}&scalar numeric&\code{10}&plosion width\\
+	\hline
+\end{tabular}
+

@@ -1,0 +1,44 @@
+\subsection{Functions}
+
+\paragraph{Syncing}\hspace{0pt}\\*\\*
+\begin{tabular}{l}
+	\hline
+	\code{offs = \textbf{sync}( run, cfg, sync\_resp )}\\
+	\hline
+\end{tabular}
+\begin{itemize*}
+	\item this function syncs trial timings to fit with sync markers positions
+	\item experimental data are specified through input \code{run} of type \code{hRun}
+	\item marker detection parameters are given through input \code{cfg} of type \code{hConfig} (using \code{.sync\_*})
+	\item if \code{sync\_resp} is set to \code{false} response timings will not be synced (useful if annotation data are wrongly synced)
+	\item after execution trial timings are adjusted and sync marker offsets in number of samples are returned in vector \code{offs}
+\end{itemize*}
+
+\paragraph{Response extraction}\hspace{0pt}\\*\\*
+\begin{tabular}{l}
+	\hline
+	\code{\textbf{extract}( run, cfg )}\\
+	\hline
+\end{tabular}
+\begin{itemize*}
+	\item this function extracts subject's speech parts
+	\item experimental data are specified via input \code{run} of type \code{hRun}
+	\item extraction is controlled by input \code{cfg} of type \code{hConfig} (using \code{.sta\_*})
+	\item after execution detected response ranges (\code{hTrial.detected.range}) are properly set
+	\item if no valid range is found corresponding range is set to default \code{[NaN, NaN]}
+\end{itemize*}
+
+\paragraph{Landmark detection}\hspace{0pt}\\*\\*
+\begin{tabular}{l}
+	\hline
+	\code{\textbf{landmark}( run, cfg )}\\
+	\hline
+\end{tabular}
+\begin{itemize*}
+	\item this function detects landmarks ($+$b, $\pm$g) in response
+	\item experimental data are specified via input \code{run} of type \code{hRun}
+	\item extraction is controlled by input \code{cfg} of type \code{hConfig} (using \code{.glottis\_*}, \code{.schwa\_*} and \code{.plosion\_*})
+	\item after execution response landmarks (\code{hTrial.detected.bo}, \code{.vo} and \code{.vr}) are set
+	\item landmarks which are not detected are set to default \code{NaN}
+\end{itemize*}
+

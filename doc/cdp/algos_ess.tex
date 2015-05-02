@@ -1,0 +1,64 @@
+\subsection{Essentials}
+
+\paragraph{Time series/Multi-dimensional arrays}
+\begin{itemize*}
+	\item a time series is a $N$-tuple $x=(x_0, \ldots, x_{N-1})$ where $x_i\in X$
+	\item let its components be real-valued, $d$-dimensional arrays $X=\mathbb R^{n_1\times\cdots\times n_d}$
+	\item some specific arrays are scalars $\mathbb R$, vectors $\mathbb R^n$ and matrices $\mathbb R^{n\times m}$
+	\item use shorthand notation $\mathbb R^{(d)}=\mathbb R^{n_1\times\cdots\times n_d}$ if size of dimensions is not important
+	\item time series itself are multi-dimensional arrays: $x\in\mathbb R^{N\times n_1\times\cdots\times n_d}=\mathbb R^{(d+1)}$
+\end{itemize*}
+
+\paragraph{Basic operations}
+\begin{itemize*}
+	\item operations reducing dimensionality (like $\mean$, $\min$, \etc) act on first dimension, \eg
+		\begin{eqnarray*}
+			\mean:\mathbb R^{N\times n_1\times\cdots}\rightarrow\mathbb R^{n_1\times\cdots},(x_0,\ldots,x_{N-1})\mapsto\frac1N\sum_{i=0}^{N-1}x_i
+		\end{eqnarray*}
+	\item successive application might reduce dimensionality down to scalars
+	\item other unary operations act component-by-component and recursively, \eg
+		\begin{eqnarray*}
+			\log:\mathbb R^{N\times\cdots}\rightarrow\mathbb R^{N\times\cdots},(x_0,\ldots,x_{N-1})\mapsto(\log x_0,\ldots\log x_{N-1})
+		\end{eqnarray*}
+	\item basic arithmetic operations also act element-wise
+	\item in general: mutli-dimensional arrays form a vector space and therefor inherit properties of their underlying field $X$ as usual
+\end{itemize*}
+
+\paragraph{Short-time framing}
+\begin{itemize*}
+	\item let $x=(x_0,\ldots,x_{N-1})$ be a time series with $x\in X^{(d)}$ and $x_i\in X^{(d-1)}$
+	\item denote $^L_Sy=(y_0,\ldots,y_{M-1})$ as a series of sliding frames with length $L$ and stride $S$, where
+		\begin{itemize*}
+			\item individual frames are given by $y_i=(x_{iS},\ldots,x_{iS+L-1})$
+			\item $x$ is zero padded appropriately, means $\forall i\ge N:x_i=0$
+			\item the number of frames is given by $M=\lceil N/S\rceil$ (ceiling)
+		\end{itemize*}
+	\item $y\in X^{(d+1)}$ itself is a multi-dimensional array of short-time frames
+	\item apodization with window $w\in\mathbb R^L$ is done by ordinary scalar multiplication
+		\begin{eqnarray*}
+			y^w=(y_0^w,\ldots,y_{M-1}^w),\quad y_i^w=(w_0y_{i,0},\ldots,w_{L-1}y_{i,L-1})
+		\end{eqnarray*}
+\end{itemize*}
+
+\paragraph{Short-time fourier tranform/Spectrogram}
+\begin{itemize*}
+	\item given a time series $x\in X^{(d)}$ with short-time representation $^L_Sy=(y_0,\ldots,y_{M-1})\in X^{(d+1)}$
+	\item denote $^L_S\tilde x=(\tilde x_0\ldots,\tilde x_{M-1})\in X^{(d+1)}$ as the short-time fourier transform/spectrogram of $x$, where
+		\begin{itemize*}
+			\item spectral frames $\tilde x_i$ are given by the fourier transform of temporal frames $y_i$:
+				\begin{eqnarray*}
+					\tilde x_i=(\tilde x_{i,0},\ldots,\tilde x_{i,K-1}),\quad \tilde x_{i,j}=\sum_{k=0}^{K-1}y_{i,k}e^{-2\pi\textnormal{i}\frac{jk}K}
+				\end{eqnarray*}
+			\item $K$ is chosen to be the next power of two greater or equal than $L$, temporal frames are zero padded accordingly $\forall k\ge L:y_{i,k}=0$
+		\end{itemize*}
+	\item exploiting the symmetry for real-valued times series $\tilde x_{i,j}=\overline{\tilde x_{i,K-j}}$ leads to one-sided spectrogram
+	\item spectral powers are given by $(\tilde x/K)^2$, TODO: shouldn't it be $(\tilde x/\sqrt{K})^2$?
+\end{itemize*}
+
+\paragraph{Short-time unframing/Smoothing}
+\begin{itemize*}
+	\item let $^L_Sy=(y_0,\ldots,y_{M-1})\in X^{(d)}$ be an arbitrary short-time frame series
+	\item denote $^L_S\hat y=(\hat y_0,\ldots,\hat y_{N-1})\in X^{(d)}$ as the unframed and smoothed version of $y$
+	\item TODO\ldots
+\end{itemize*}
+
