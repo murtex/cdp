@@ -16,11 +16,13 @@ Framework
 - a very **first start** could be a visit to the [`cdf`](https://github.com/murtex/cdp/tree/master/%2Bcdf "cdf") submodule
 - this module provides **high-level** structures and functionality to get [Psychtoolbox](http://psychtoolbox.org/ "Psychtoolbox")-styled data conveniently processed (but is not exclusively dependent on that format)
 - more fundamental, **low-level** functions are given by the modules [`dsp`](https://github.com/murtex/cdp/tree/master/%2Bdsp "dsp") (Digital signal processing) and [`sta`](https://github.com/murtex/cdp/tree/master/%2Bsta "sta") (Short-time analysis)
-- these two modules rely only on the basic notion of multi-dimensional time series
-- command and progress **logging**, uniform and coherent **plotting** are parts of the [`xis`](https://github.com/murtex/cdp/tree/master/%2Bxis "xis") module
+- these two modules rely only on the basic notion of (multi-dimensional) time series
+- command and progress **logging**, uniform and coherent **plotting** are parts of the [`xis`](https://github.com/murtex/cdp/tree/master/%2Bxis "xis") submodule
 
 Applications
 ------------
+
+- the [klein]()-application, as the refrence application, TODO...
 
 Data
 ----
