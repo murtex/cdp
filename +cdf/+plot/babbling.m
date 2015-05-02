@@ -28,7 +28,7 @@ function babbling( pows, freqs, plotfile )
 	fig = style.figure();
 
 		% linear power fits
-	mask_lo = freqs > 0 & freqs <= 1000;
+	mask_lo = freqs >= 100 & freqs <= 1000;
 	coeffs_lo = polyfit( log10( freqs(mask_lo) ), pow2db( pows(mask_lo) ), 1 );
 
 	mask_med = freqs >= 1000 & freqs <= 10000;

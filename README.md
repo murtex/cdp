@@ -10,4 +10,5 @@ Modules/Namespaces
 - `sta`: short-time analysis
 - `xis`: convenience functionality
 - `klein`: reference application
+- `dists`: distractor generation
 

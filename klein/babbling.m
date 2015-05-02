@@ -51,7 +51,7 @@ for id = ids
 		% get babbling spectrum
 	[pows, freqs] = cdf.babbling( run, cfg );
 
-		% plot babbling spectra
+		% plot spectra
 	cdf.plot.babbling( pows, freqs, fullfile( plotdir, sprintf( '%d_babbling', run.id ) ) );
 
 	ns = ns + 1;
