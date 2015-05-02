@@ -14,8 +14,8 @@ Framework
 ---------
 
 - the very first **starting point** should be to take a look at the [`cdf`](https://github.com/murtex/cdp/tree/master/%2Bcdf "cdf") submodule
-- this module provides convenient **high-level** structures and functions to get [Psychtoolbox](http://psychtoolbox.org/ "Psychtoolbox")-styled data processed
-- **low-level** functionality
+- this module provides convenient **high-level** structures and functions to get [Psychtoolbox](http://psychtoolbox.org/ "Psychtoolbox")-styled data processed, but is not exclusively related to this format
+- **low-level** functionality is given in modules [`dsp`](https://github.com/murtex/cdp/tree/master/%2Bdsp "dsp") (digital signal processing) and [`sta`](https://github.com/murtex/cdp/tree/master/%2Bsta "sta") (short-time analysis)
 
 Applications
 ------------
