@@ -1,7 +1,7 @@
 Cue-distractor package
 ======================
 
-A more detailed package documentation can be found [here](https://github.com/murtex/cdp/blob/master/doc/cdp/cdp.pdf "package documentation").
+- more detailed package documentation can be found [here](https://github.com/murtex/cdp/blob/master/doc/cdp/cdp.pdf "package documentation")
 
 Modules/Namespaces
 ------------------
