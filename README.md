@@ -15,7 +15,7 @@ Framework
 
 - a very **first start** could be a visit to the [`cdf`](https://github.com/murtex/cdp/tree/master/%2Bcdf "cdf") submodule
 - that module provides **high-level** structures and functions to get [Psychtoolbox](http://psychtoolbox.org/ "Psychtoolbox")-styled data conveniently processed (but is not exclusively dependent on that format)
-- more fundamental, **low-level** functionality is given by the modules [`dsp`](https://github.com/murtex/cdp/tree/master/%2Bdsp "dsp") (Digital signal processing) and [`sta`](https://github.com/murtex/cdp/tree/master/%2Bsta "sta") (Short-time analysis), both of them only rely on the concept of (multi-dimensional) **time series**
+- more fundamental, **low-level** functions are given by the modules [`dsp`](https://github.com/murtex/cdp/tree/master/%2Bdsp "dsp") (Digital signal processing) and [`sta`](https://github.com/murtex/cdp/tree/master/%2Bsta "sta") (Short-time analysis), both of them only relying on the concept of (multi-dimensional) **time series**
 - for process logging, uniform and coherent plots consider using parts of the [`xis`](https://github.com/murtex/cdp/tree/master/%2Bxis "xis") module
 
 Applications
