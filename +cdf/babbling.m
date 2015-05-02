@@ -21,7 +21,7 @@ function [pows, freqs] = babbling( run, cfg )
 	end
 
 	logger = xis.hLogger.instance();
-	logger.progress( 'get babbling...' );
+	logger.progress( 'estimate babbling noise...' );
 
 		% proceed trials
 	n = numel( run.trials );
