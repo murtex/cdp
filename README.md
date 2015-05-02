@@ -13,8 +13,9 @@ Essentials
 Framework
 ---------
 
-- a very first **starting point** should be the [`cdf`](https://github.com/murtex/cdp/tree/master/%2Bcdf "cdf") submodule
-- this module provides **high-level** structures and functions to get experimental data processed
+- the very first **starting point** should be to take a look at the [`cdf`](https://github.com/murtex/cdp/tree/master/%2Bcdf "cdf") submodule
+- this module provides convenient **high-level** structures and functions to get [Psychtoolbox](http://psychtoolbox.org/ "Psychtoolbox")-styled data processed
+- **low-level** functionality
 
 Applications
 ------------
