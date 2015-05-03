@@ -20,7 +20,7 @@ classdef hConfig < matlab.mixin.Copyable
 		glottis_rorpeak = 6; % glottis ror peak power (scalar numeric)
 
 		schwa_length = 20; % schwa vowel length (scalar numeric)
-		schwa_power = -20; % relative schwa vowel power (scalar nueric)
+		schwa_power = -20; % relative schwa vowel power (scalar numeric)
 
 		plosion_threshs = [20, 10]; % plosion index thresholds (row numeric)
 		plosion_delta = 1; % plosion delta (scalar numeric)
