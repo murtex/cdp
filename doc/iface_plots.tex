@@ -4,7 +4,6 @@
 	\item all of these functions do not show any plots, instead they write images to disk
 \end{itemize*}
 
-\paragraph{Detection tests}\hspace{0pt}\\*\\*
 \begin{tabular}{l}
 	\hline
 	\code{\textbf{plot.sync}( run, offs, plotfile )}\\
@@ -105,8 +104,14 @@
 \end{itemize*}
 \medskip
 
-\paragraph{Statistics}
+\begin{tabular}{l}
+	\hline
+	\code{\textbf{plot.babbling}( pows, freqs, plotfile )}\\
+	\hline
+\end{tabular}
 \begin{itemize*}
-	\item TODO
+	\item this function plots babbling power spectrum to \code{plotfile}
+	\item spectrum data are specified by input vectors \code{pows} and \code{freqs} as returned by \code{babbling}
 \end{itemize*}
+\medskip
 

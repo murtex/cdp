@@ -1,11 +1,13 @@
-function [pows, freqs] = babbling( run, cfg )
+function [pows, freqs] = babbling( run, cfg, labeled, landmarks )
 % get speech-weighted noise (babbling) spectrum
 %
-% [pows, freqs] = BABBLING( run, cfg )
+% [pows, freqs] = BABBLING( run, cfg, labeled, landmarks )
 % 
 % INPUT
 % run : run (scalar object)
 % cfg : configuration (scalar object)
+% labeled : use labeled response (scalar logical)
+% landmarks : use landmarks (scalar logical)
 %
 % OUTPUT
 % pows : spectral powers (row numeric)
@@ -20,6 +22,14 @@ function [pows, freqs] = babbling( run, cfg )
 		error( 'invalid argument: cfg' );
 	end
 
+	if nargin < 3 || ~isscalar( labeled ) || ~islogical( labeled )
+		error( 'invalid argument: labeled' );
+	end
+
+	if nargin < 4 || ~isscalar( landmarks ) || ~islogical( landmarks )
+		error( 'invalid argument: landmarks' );
+	end
+
 	logger = xis.hLogger.instance();
 	logger.progress( 'estimate babbling noise...' );
 
@@ -32,17 +42,31 @@ function [pows, freqs] = babbling( run, cfg )
 
 	for i = 1:n
 
-			% skip unlabeled trials
+			% skip invalid trials
 		trial = run.trials(i);
 
-		if any( isnan( trial.labeled.range ) )
+		if labeled
+			if landmarks
+				range = [trial.labeled.bo, trial.labeled.vr];
+			else
+				range = trial.labeled.range;
+			end
+		else
+			if landmarks
+				range = [trial.detected.bo, trial.detected.vr];
+			else
+				range = trial.detected.range;
+			end
+		end
+
+		if any( isnan( range ) )
 			logger.progress( i, n );
 			continue;
 		end
 
 			% set signal
 		noiser = run.audiodata(trial.cue + (0:trial.soa-1), 1);
-		respser = run.audiodata(trial.labeled.range(1):trial.labeled.range(2), 1);
+		respser = run.audiodata(range(1):range(2), 1);
 
 			% get full bandwidth fft
 		frame = dsp.msec2smp( cfg.sta_frame, run.audiorate );

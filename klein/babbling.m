@@ -49,7 +49,7 @@ for id = ids
 	read_audio( run, run.audiofile, false );
 
 		% get babbling spectrum
-	[pows, freqs] = cdf.babbling( run, cfg );
+	[pows, freqs] = cdf.babbling( run, cfg, true, true );
 
 		% plot spectra
 	cdf.plot.babbling( pows, freqs, fullfile( plotdir, sprintf( '%d_babbling', run.id ) ) );

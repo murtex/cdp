@@ -42,3 +42,18 @@
 	\item landmarks which are not detected are set to default \code{NaN}
 \end{itemize*}
 
+\paragraph{Babbling spectrum}\hspace{0pt}\\*\\*
+\begin{tabular}{l}
+	\hline
+	\code{[pows, freqs] = \textbf{babbling}( run, cfg, labeled, landmarks )}\\
+	\hline
+\end{tabular}
+\begin{itemize*}
+	\item this function estimates the average power spectrum of response speech parts
+	\item experimental data are specified via input \code{run} of type \code{hRun}
+	\item if input flag \code{labeled} is set to \code{true} annotated data will be analyzed
+	\item input flag \code{landmarks} controls whether to use landmarks or extraction ranges for spectral analysis
+	\item analysis is controlled by input \code{cfg} of type \code{hConfig} (using \code{.sta\_*})
+	\item after execution the function returns vectors \code{pows} and \code{freqs} containing spectral powers and frequency bins of the average spectrum
+\end{itemize*}
+
