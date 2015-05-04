@@ -60,6 +60,7 @@
 	\code{hTrial.detected.bo}&scalar numeric&\code{NaN}&response burst-onset\\
 	\code{hTrial.detected.vo}&scalar numeric&\code{NaN}&response voice-onset\\
 	\code{hTrial.detected.vr}&scalar numeric&\code{NaN}&response voice-release\\
+	\code{hTrial.detected.featfile}&row char&\code{''}&feature filename\\
 	\noalign{\smallskip}
 	\code{hTrial.labeled}&&&same as \code{hTrial.detected}\\
 	\hline
@@ -94,6 +95,9 @@
 	\code{hConfig.plosion\_threshs}&row numeric&\code{[20, 10]}&plosion thresholds\\
 	\code{hConfig.plosion\_delta}&scalar numeric&\code{1}&plosion delta\\
 	\code{hConfig.plosion\_width}&scalar numeric&\code{10}&plosion width\\
+	\noalign{\smallskip}
+	\code{hConfig.feat\_intcount}&scalar numeric&10&subsequences interval count\\
+	\code{hConfig.feat\_intlen}&scalar numeric&5&minimum interval length\\
 	\hline
 \end{tabular}
 

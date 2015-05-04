@@ -22,14 +22,16 @@ classdef hTrial < matlab.mixin.Copyable
 			'label', '', ... % label (row char)
 			'bo', NaN, ... % burst-onset position (scalar numeric)
 			'vo', NaN, ... % voice-onset position (scalar numeric)
-			'vr', NaN ); % voice-release position (scalar numeric)
+			'vr', NaN, ... % voice-release position (scalar numeric)
+			'featfile', '' ); % feature filename (row char)
 
 		labeled = struct( ... % labeled response
 			'range', [NaN, NaN], ... % range (row numeric)
 			'label', '', ... % label (row char)
 			'bo', NaN, ... % burst-onset position (scalar numeric)
 			'vo', NaN, ... % voice-onset position (scalar numeric)
-			'vr', NaN ); % voice-release position (scalar numeric)
+			'vr', NaN, ... % voice-release position (scalar numeric)
+			'featfile', '' ); % feature filename (row char)
 
 	end
 

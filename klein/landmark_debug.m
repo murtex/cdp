@@ -5,12 +5,12 @@ clear( 'all' );
 
 addpath( '../' ); % set path to cue-distractor package
 
-logger = xis.hLogger.instance( 'landmark_debug.log' ); % start logging
+logger = xis.hLogger.instance( '../data/klein/landmark_debug.log' ); % start logging
 
 	% prepare directories
-indir = 'cdf/landmark/';
+indir = '../data/klein/cdf/landmark/';
 
-plotdir = 'plot/landmark_debug/';
+plotdir = '../data/klein/plot/landmark_debug/';
 if exist( plotdir, 'dir' ) ~= 7
 	mkdir( plotdir );
 end
@@ -19,7 +19,7 @@ end
 cfg = cdf.hConfig(); % use defaults
 
 	% proceed subjects
-ids = 1:47;
+ids = 17;
 
 for id = ids
 	logger.tab( 'subject: %d', id );

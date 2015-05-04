@@ -6,7 +6,7 @@ function [pows, freqs] = babbling( run, cfg, labeled, landmarks )
 % INPUT
 % run : run (scalar object)
 % cfg : configuration (scalar object)
-% labeled : use labeled response (scalar logical)
+% labeled : use labeled responses (scalar logical)
 % landmarks : use landmarks (scalar logical)
 %
 % OUTPUT
