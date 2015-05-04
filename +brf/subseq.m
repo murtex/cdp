@@ -48,25 +48,28 @@ function subser = subseq( featser, intlen, intcount )
 			% set sequence features
 		subser(i, 1, :) = (t1-1)/(m-1) * ones( 1, n ); % relative endpoints
 		subser(i, 2, :) = (t2-1)/(m-1) * ones( 1, n );
-		subser(i, 3, :) = mean( featser(t1:t2, :) ); % statistics
-		subser(i, 4, :) = var( featser(t1:t2, :) );
+		subser(i, 3, :) = mean( featser(t1:t2, :), 1 ); % statistics
+		subser(i, 4, :) = var( featser(t1:t2, :), 1, 1 );
 
 			% proceed intervals
+		vand = [ones( rndintlen, 1 ), (1:rndintlen)'];
+
 		starts = t1:rndintlen:t2;
 		stops = t1+rndintlen-1:rndintlen:t2;
 
 		for j = 1:intcount
+			ji = 4 + 3*(j-1);
 
 				% set interval features
 			intser = featser(starts(j):stops(j), :);
 
-			subser(i, 4 + 3*(j-1) + 1, :) = mean( intser ); % statistics
-			subser(i, 4 + 3*(j-1) + 2, :) = var( intser );
+			subser(i, ji+1, :) = mean( intser, 1 ); % statistics
+			subser(i, ji+2, :) = var( intser, 1, 1 );
 
-				% relative slopes, TODO: relativity!
+				% absolute slopes
 			for k = 1:n
-				p = [ones( rndintlen, 1 ), (1:rndintlen)'] \ intser(:, k);
-				subser(i, 4 + 3*(j-1) + 3, k) = p(2);
+				p = vand \ intser(:, k);
+				subser(i, ji+3, k) = p(2);
 			end
 
 		end

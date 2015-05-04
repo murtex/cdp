@@ -19,7 +19,7 @@ end
 cfg = cdf.hConfig(); % use defaults
 
 	% proceed subjects
-ids = 17;
+ids = 16;
 
 for id = ids
 	logger.tab( 'subject: %d', id );
@@ -42,14 +42,7 @@ for id = ids
 		rmdir( subjectdir, 's' );
 	end
 	mkdir( subjectdir );
-	cdf.features( run, cfg, false, false, subjectdir );
-
-	%subjectdir = fullfile( outdir, sprintf( '%d_labeled', run.id ) );
-	%if exist( subjectdir, 'dir' ) == 7
-		%rmdir( subjectdir, 's' );
-	%end
-	%mkdir( subjectdir );
-	%cdf.features( run, cfg, true, false, subjectdir );
+	cdf.features( run, cfg, false, true, subjectdir );
 
 		% write data
 	run.audiodata = []; % do not write audio data

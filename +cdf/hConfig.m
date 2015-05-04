@@ -9,7 +9,7 @@ classdef hConfig < matlab.mixin.Copyable
 		sync_thresh = 3; % sync detection threshold (scalar numeric)
 		sync_range = [-25, 5]; % sync detection range (row numeric)
 
-			% response extraction
+			% extraction
 		sta_frame = [15, 5]; % short-time frame length and stride (row numeric)
 		sta_wnd = @hann; % short-time window function (scalar object)
 		sta_band = [150, 8000]; % short-time frequency band (row numeric)
@@ -26,7 +26,7 @@ classdef hConfig < matlab.mixin.Copyable
 		plosion_delta = 1; % plosion delta (scalar numeric)
 		plosion_width = 10; % plosion width (scalar numeric)
 
-			% feature extraction
+			% classification
 		feat_intcount = 10; % number of intervals (scalar numeric)
 		feat_intlen = 5; % minimum interval length (scalar numeric)
 
