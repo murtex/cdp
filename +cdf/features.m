@@ -47,11 +47,12 @@ function features( run, cfg, labeled, landmarks, outdir )
 		trial = run.trials(i);
 
 		if labeled % set response
+			trial.labeled.featfile = '';
 			resp = trial.labeled;
 		else
+			trial.detected.featfile = '';
 			resp = trial.detected;
 		end
-		resp.featfile = '';
 
 		if landmarks % set response range
 			resprange = [resp.bo, resp.vr];
@@ -87,20 +88,16 @@ function features( run, cfg, labeled, landmarks, outdir )
 		end
 		respft(respft < eps) = eps;
 
-			% set feature time series
-		respfeat = NaN( size( respft, 1 ), 2 ); % pre-allocation
+			% set prime features
+		respfeat = NaN( size( respft, 1 ), 0 ); % pre-allocation
 
-		respfeat(:, 1) = sum( respft, 2 ); % total power 
-		respfeat(:, 2) = sum( repmat( respfreqs, size( respft, 1 ), 1 ) .* respft, 2 ) ./ sum( respft, 2 ); % spectral centroid
+		respfeat(:, end+1) = sum( respft, 2 ); % total power 
+		respfeat(:, end+1) = sum( repmat( respfreqs, size( respft, 1 ), 1 ) .* respft, 2 ) ./ sum( respft, 2 ); % spectral centroid
 
 		respfeat = sta.unframe( respfeat, frame ); % smoothing
-		respfeat = zscore( respfeat ); % standardization
+		respfeat = zscore( respfeat, 1, 1 ); % standardization
 
-		if any( isnan( respfeat(:) ) ) || any( isinf( respfeat(:) ) )
-			warning( 'NAN/INF' );
-		end
-
-			% generate subsequential features
+			% get subsequence features
 		subfeat = brf.subseq( respfeat, dsp.msec2smp( cfg.feat_intlen, run.audiorate ), cfg.feat_intcount );
 
 		if isempty( subfeat )
@@ -111,9 +108,16 @@ function features( run, cfg, labeled, landmarks, outdir )
 		trials = trials + 1;
 		subs = subs + size( subfeat, 1 );
 
-			% write features
-		resp.featfile = fullfile( outdir, sprintf( '%d.mat', trial.id ) );
-		save( resp.featfile, 'subfeat' );
+			% set and write feature file
+		outfile = fullfile( outdir, sprintf( '%d.mat', trial.id ) );
+
+		if labeled
+			trial.labeled.featfile = outfile;
+		else
+			trial.detected.featfile = outfile;
+		end
+
+		save( outfile, 'subfeat', '-v7.3' ); % hdf5-format
 
 		logger.progress( i, n );
 	end
