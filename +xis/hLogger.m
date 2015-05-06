@@ -98,12 +98,35 @@ classdef (Sealed = true) hLogger < handle
 				error( 'invalid argument: msg' );
 			end
 
+				% extract caller module
+			mod = '';
+
+			st = dbstack( 1, '-completenames' );
+			nst = size( st, 1 );
+
+			for i = 1:nst
+				[path, name, ext] = fileparts( st(i).file );
+
+				r = path;
+				while true
+					[mod, r] = strtok( r, filesep() );
+					if isempty( r )
+						break;
+					end
+				end
+
+				if ~strcmp( mod, '+xis' )
+					break;
+				end
+			end
+
 				% log header and message
 			tic = sprintf( '[%10.3f]', toc( this.tics(1) ) );
 			ind = repmat( '..', 1, this.hierarchy );
+			mod = sprintf( '[%s]', mod );
 			msg = sprintf( msg, varargin{:} );
 
-			fprintf( '%s %s%s\n', tic, ind, msg );
+			fprintf( '%s %s%s %s\n', tic, ind, mod, msg );
 
 		end
 

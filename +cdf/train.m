@@ -149,6 +149,8 @@ function train( runs, cfg, labeled )
 	logger.untab();
 
 		% TODO
+	size( subs )
+	numel( subs(:, :, 1) )
 
 	logger.untab();
 end
