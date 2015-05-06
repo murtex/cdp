@@ -6,7 +6,7 @@ function train( runs, cfg, labeled )
 % INPUT
 % runs : runs (row object)
 % cfg : configuration (scalar object)
-% labeled : use labeled responses (scalar logical)
+% labeled : use labeled response features (scalar logical)
 
 		% safeguard
 	if nargin < 1 || ~isrow( runs ) || ~isa( runs(1), 'cdf.hRun' )
@@ -101,8 +101,8 @@ function train( runs, cfg, labeled )
 		% build subsequence dataset
 	logger.tab( 'build subsequence dataset...' );
 
-	nmaxsubs = min( nsubs(:) );
-	subs = NaN( nclasses, nruns*nmaxsubs, sublen ); % pre-allocation
+	nmaxsubs = min( nsubs(:) ); % pre-allocation
+	subs = NaN( nclasses, nruns*nmaxsubs, sublen );
 
 	logger.progress();
 	for i = 1:nruns
@@ -137,7 +137,7 @@ function train( runs, cfg, labeled )
 
 			end
 
-				% sample subsequences
+				% sample subsequences from pool
 			si = randi( size( subpool, 1 ), nmaxsubs, 1 );
 			subs(j, (i-1)*nmaxsubs+1:i*nmaxsubs, :) = subpool(si, :);
 

@@ -30,8 +30,6 @@ classdef hConfig < matlab.mixin.Copyable
 		feat_intcount = 10; % number of intervals (scalar numeric)
 		feat_intlen = 5; % minimum interval length (scalar numeric)
 
-		train_ratio = 0.8; % train/test ratio (scalar numeric)
-
 	end
 
 end % classdef
