@@ -5,6 +5,7 @@ classdef (Sealed = true) hLogger < handle
 	properties (GetAccess = public, SetAccess = private)
 
 		hierarchy = 0; % hierarchy (scalar numeric)
+		hierarchymax = 8;
 
 		tics = tic(); % timing (row numeric)
 
@@ -98,6 +99,10 @@ classdef (Sealed = true) hLogger < handle
 				error( 'invalid argument: msg' );
 			end
 
+			if this.hierarchy > this.hierarchymax
+				return;
+			end
+
 				% extract caller module
 			%mod = '';
 
@@ -166,11 +171,13 @@ classdef (Sealed = true) hLogger < handle
 					this.tab();
 				end
 
-				tic = sprintf( '[%10.3f]', toc( this.tics(1) ) );
-				ind = repmat( '..', 1, this.hierarchy );
-				msg = '0%..';
+				if this.hierarchy <= this.hierarchymax
+					tic = sprintf( '[%10.3f]', toc( this.tics(1) ) );
+					ind = repmat( '..', 1, this.hierarchy );
+					msg = '0%..';
 
-				fprintf( '%s %s%s', tic, ind, msg );
+					fprintf( '%s %s%s', tic, ind, msg );
+				end
 
 				decile_last = 0;
 
@@ -191,10 +198,12 @@ classdef (Sealed = true) hLogger < handle
 					% continue logging
 				decile_cur = floor( 10 * step / n );
 
-				for i = decile_last+1:decile_cur
-					fprintf( '%d%%', 10 * i );
-					if i ~= 10
-						fprintf( '..' );
+				if this.hierarchy <= this.hierarchymax
+					for i = decile_last+1:decile_cur
+						fprintf( '%d%%', 10 * i );
+						if i ~= 10
+							fprintf( '..' );
+						end
 					end
 				end
 
@@ -202,7 +211,9 @@ classdef (Sealed = true) hLogger < handle
 
 					% stop logging
 				if step == n
-					fprintf( '\n' );
+					if this.hierarchy <= this.hierarchymax
+						fprintf( '\n' );
+					end
 					this.untab();
 				end
 

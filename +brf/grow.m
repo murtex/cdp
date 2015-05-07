@@ -42,10 +42,10 @@ function grow( node, features, labels, nclasses )
 
 	splits = NaN( 0, 3 ); % pre-allocation (impurity, feature, value )
 
-	logger.progress( 'find best split...' );
+	logger.progress( 'find best splits...' );
 	for i = 1:nfis
 
-			% set split impurities
+			% get split impurities
 		[fvals, order] = sort( features(:, fi(i)) ); % all possible splits
 		labelset = labels(order);
 
