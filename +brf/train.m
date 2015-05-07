@@ -37,16 +37,35 @@ function train( features, labels, nclasses, ntrees )
 	logger.log( 'features: %d', nfeatures );
 	logger.log( 'samples: %d', nsamples );
 
-	for i = 1:ntrees
+	roots(1, ntrees) = brf.hNode();
 
-			% bootstrap samples
-		bi = randsample( nsamples, nsamples, true );
+	for i = 1:ntrees
+		logger.tab( 'grow tree %d/%d...', i, ntrees );
+
+			% bootstrap aggregation
+		bagi = randsample( nsamples, nsamples, true );
+		oobi = setdiff( 1:nsamples, bagi );
 
 			% grow tree from root node
-		root = brf.hNode();
+		hiermax = logger.hierarchymax;
+		logger.hierarchymax = logger.hierarchy + 1; % limit logging depth
 
-		brf.split( root, features(bi, :), labels(bi), nclasses );
+		roots(i) = brf.hNode(); % grow tree
+		brf.split( roots(i), features(bagi, :), labels(bagi), nclasses );
 
+		logger.hierarchymax = hiermax; % restore logging depth
+
+			% test tree and present forest
+		[treelabels, treeerrs] = brf.classify( roots(i), features(oobi, :) ); % tree error
+		labels(oobi) % DEBUG
+
+		[forestlabels, foresterrs] = brf.classify( roots(1:i), features(oobi, :) ); % forest error
+		labels(oobi) % DEBUG
+
+		logger.log( 'tree error: %.6f', NaN );
+		logger.log( 'forest error: %.6f', NaN );
+
+		logger.untab();
 	end
 
 	logger.untab();

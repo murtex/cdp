@@ -154,10 +154,10 @@ function train( runs, cfg, labeled )
 	logger.untab();
 
 		% train random forest
-	%rsi = randi( size( subs, 1 ), 10, 1 );
-	%brf.train( subs(rsi, :), sublabels(rsi), nclasses, 1 );
+	rsi = randi( size( subs, 1 ), 10, 1 );
+	brf.train( subs(rsi, :), sublabels(rsi), nclasses, cfg.train_trees );
 
-	brf.train( subs, sublabels, nclasses, 1 );
+	%brf.train( subs, sublabels, nclasses, 1 );
 
 	logger.untab();
 end

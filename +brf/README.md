@@ -1,5 +1,7 @@
 Time series classification
 ==========================
 
-TODO
+- gini impurity index for splitting
+- mismatch error for classification
+- TODO
 

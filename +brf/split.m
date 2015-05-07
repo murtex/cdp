@@ -22,41 +22,63 @@ function split( node, features, labels, nclasses )
 		error( 'invalid arguments: labels' );
 	end
 
-	if nargin < 4 || ~isscalar( nclasses ) || ~isnumeric( nclasses )
+	if nargin < 4 || ~isscalar( nclasses ) || ~isnumeric( nclasses ) || nclasses < 1
 		error( 'invalid argument: nclasses' );
 	end
 
 	logger = xis.hLogger.instance();
-	logger.tab( 'split node (samples: %d)...', size( features, 1 ) );
+	logger.tab( 'grow node (samples: %d)...', size( features, 1 ) );
 
-		% sample features
+		% pre-computations
 	nsamples = size( features, 1 );
+
+	classinds = false( nclasses, nsamples ); % class indicators
+	for i = 1:nclasses
+		classinds(i, :) = labels == i;
+	end
+
+	trivial = 1; % trivial split impurity
+	for i = 1:nclasses
+		trivial = max( 0, trivial - (sum( classinds(i, :) ) / nsamples)^2 );
+	end
+	trivial = nsamples*trivial;
+
+		% prepare node
+	classoccs = sum( classinds, 2 ); % majority class label
+	imax = find( classoccs == max( classoccs ) );
+	if numel( imax ) > 1
+		imax = randsample( imax, 1 ); % choose randomly
+	end
+
+	node.label = imax;
+
+	if trivial == 0
+		logger.untab();
+		return;
+	end
+
+		% sample features for splitting
 	nfeatures = size( features, 2 );
 
 	fi = randi( nfeatures, 1, ceil( sqrt( nfeatures ) ) );
-
-		% find best splits
 	nfis = numel( fi );
 
+		% get best split for each feature
 	splits = NaN( nfis, 3 ); % pre-allocation (impurity, feature, value)
 
 	for i = 1:nfis
 
 			% prepare splitting
 		[fvals, order] = sort( features(:, fi(i)) ); % all possible splits
-		labelset = labels(order); % ordered set of labels
 
-		spliti = find( diff( labelset ) ~= 0 ) + 1; % splits w/ label change
+		labelset = labels(order); % check only splits w/ label change
+		spliti = find( diff( labelset ) ~= 0 ) + 1;
 		nsplits = numel( spliti );
 
-			% set split gini impurities
-		imps = NaN( 1, 1 + nsplits ); % pre-allocation
+		classoccs = cumsum( classinds(:, order), 2 ); % precompute class occupations
 
-		classinds = false( nclasses, nsamples ); % precompute class indications
-		for j = 1:nclasses
-			classinds(j, :) = labelset == j;
-		end
-		classinds = cumsum( classinds, 2 );
+			% get split impurities
+		impurities = NaN( nsplits + 1, 1 ); % pre-allocation
 
 		for j = 1:nsplits
 			nllabels = spliti(j) - 1; % number of child labels
@@ -65,66 +87,49 @@ function split( node, features, labels, nclasses )
 			li = 1;
 			ri = 1;
 			for k = 1:nclasses
-				li = li - (classinds(k, nllabels) / nllabels)^2;
-				ri = ri - ((classinds(k, end)-classinds(k, nllabels)) / nrlabels)^2;
+				li = max( 0, li - (classoccs(k, nllabels) / nllabels)^2 );
+				ri = max( 0, ri - ((classoccs(k, end)-classoccs(k, nllabels)) / nrlabels)^2 );
 			end
 
-			imps(j) = nllabels*li + nrlabels*ri;
+			impurities(j) = nllabels*li + nrlabels*ri;
 		end
 
-			% set none-split gini impurity
-		ni = 1;
-		for j = 1:nclasses
-			ni = ni - (classinds(j, end) / nsamples)^2;
+		impurities(end) = trivial; % append trivial split impurity
+
+			% record split w/ minimum impurity
+		imin = find( impurities == min( impurities ) );
+		if numel( imin ) > 1
+			imin = randsample( imin, 1 ); % choose randomly
 		end
 
-		imps(end) = nsamples*ni;
-
-			% store split w/ minimum impurity
-		impmin = min( imps );
-		impmini = find( imps == impmin );
-		if numel( impmini ) > 1
-			impmini = randsample( impmini, 1 ); % choose random minimum
-		end
-
-		if impmini > nsplits
-			splits(i, :) = [impmin, fi(i), Inf]; % full left node, empty right node
+		if imin > nsplits
+			splits(i, :) = [impurities(imin), fi(i), Inf]; % trivial split
 		else
-			splits(i, :) = [impmin, fi(i), fvals(spliti(impmini))];
+			splits(i, :) = [impurities(imin), fi(i), fvals(spliti(imin))];
 		end
 
 	end
 
-		% choose split w/ minimum impurity
-	splitimpmin = min( splits(:, 1) );
-	splitimpmini = find( splits(:, 1) == splitimpmin );
-	if numel( splitimpmini ) > 1
-		splitimpmini = randsample( splitimpmini, 1 ); % choose random minimum
+		% set split w/ minimum impurity
+	imin = find( splits(:, 1) == min( splits(:, 1) ) );
+	if numel( imin ) > 1
+		imin = randsample( imin, 1 ); % choose randomly
 	end
 
-	node.impurity = splits(splitimpmini, 1); % set split
-	node.feature = splits(splitimpmini, 2);
-	node.value = splits(splitimpmini, 3);
-
-	logger.log( 'impurity: %.3f', node.impurity );
+	node.feature = splits(imin, 2); % set node
+	node.value = splits(imin, 3);
 
 		% split node recursively
-	if node.impurity > 0
-
-			% left node
-		li = features(:, node.feature) < node.value;
-		if sum( li ) > 0
-			node.left = brf.hNode();
-			brf.split( node.left, features(li, :), labels(li), nclasses );
-		end
-		
-			% right node
-		ri = ~li;
-		if sum( ri ) > 0
-			node.right = brf.hNode();
-			brf.split( node.right, features(ri, :), labels(ri), nclasses );
-		end
-
+	li = features(:, node.feature) < node.value; % proceed left child node
+	if sum( li ) > 0
+		node.left = brf.hNode();
+		brf.split( node.left, features(li, :), labels(li), nclasses );
+	end
+	
+	ri = ~li; % proceed right child node
+	if sum( ri ) > 0
+		node.right = brf.hNode();
+		brf.split( node.right, features(ri, :), labels(ri), nclasses );
 	end
 
 	logger.untab();

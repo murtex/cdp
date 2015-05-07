@@ -4,7 +4,7 @@ classdef hNode < matlab.mixin.Copyable
 		% properties
 	properties (Access = public)
 
-		impurity = NaN; % gini impurity index (scalar numeric)
+		label = NaN; % majority class label (scalar numeric)
 
 		feature = NaN; % split feature (scalar numeric)
 		value = NaN; % split value (scalar numeric)

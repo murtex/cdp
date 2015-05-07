@@ -43,7 +43,7 @@ for id = ids
 end
 
 	% train classifier
-rng(1);
+rng(2);
 cdf.train( runs, cfg, false );
 
 	% clean-up
