@@ -108,7 +108,7 @@ function split( node, features, labels, nclasses )
 
 	logger.log( 'impurity: %.3f', node.impurity );
 
-		% split node and continue recursively
+		% split node recursively
 	if node.impurity > 0
 
 			% left node
