@@ -19,7 +19,7 @@ end
 cfg = cdf.hConfig(); % use defaults
 
 	% read subjects
-ids = [16, 17];
+ids = [16];
 
 runs = cdf.hRun.empty(); % pre-allocation
 

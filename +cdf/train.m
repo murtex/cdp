@@ -146,11 +146,16 @@ function train( runs, cfg, labeled )
 		logger.progress( i, nruns );
 	end
 
+	subs = reshape( subs, nclasses*nruns*nmaxsubs, sublen ); % plain list of features and labels
+	sublabels = repmat( 1:nclasses, 1, nruns*nmaxsubs );
+
+	logger.log( 'subsequences: %d', size( subs, 1 ) );
+
 	logger.untab();
 
-		% TODO
-	size( subs )
-	numel( subs(:, :, 1) )
+		% train random forest
+	rsi = randi( size( subs, 1 ), 10, 1 );
+	brf.train( subs(rsi, :), sublabels(rsi), nclasses, 1 );
 
 	logger.untab();
 end
