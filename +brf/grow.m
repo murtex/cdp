@@ -40,33 +40,48 @@ function grow( node, features, labels, nclasses )
 		% find best splits
 	nfis = numel( fi );
 
-	splits = NaN( 0, 3 ); % pre-allocation (impurity, feature, value )
+	splits = NaN( nfis, 3 ); % pre-allocation (impurity, feature, value )
 
 	logger.progress( 'find best splits...' );
 	for i = 1:nfis
 
-			% get split impurities
+			% prepare splitting
 		[fvals, order] = sort( features(:, fi(i)) ); % all possible splits
-		labelset = labels(order);
+		labelset = labels(order); % ordered set of labels
 
-		labelchange = diff( labelset ); % reduce to splits w/ label change
-		labelspliti = find( labelchange ~= 0 ) + 1;
+		spliti = find( diff( labelset ) ~= 0 ) + 1; % reduce to splits w/ label change
+		nsplits = numel( spliti );
 
-		nsplits = numel( labelspliti ); % pre-allocation
-		imps = NaN( 1, 1 + nsplits );
+		classinds = false( nclasses, nsamples ); % precompute class indicators
+		for j = 1:nclasses
+			classinds(j, :) = labelset == j;
+		end
+		classsums = cumsum( classinds, 2 ); % indicator sums
+
+			% set split impurities (gini)
+		imps = NaN( 1, 1 + nsplits ); % pre-allocation
 
 		for j = 1:nsplits
+			nllabels = spliti(j) - 1;
+			nrlabels = nsamples - nllabels;
 
-				% split set of labels
-			llabelset = labelset(1:labelspliti(j)-1);
-			rlabelset = labelset(labelspliti(j):end);
+			li = 1;
+			ri = 1;
+			for k = 1:nclasses
+				li = li - (classsums(k, nllabels) / nllabels)^2;
+				ri = ri - ((classsums(k, end)-classsums(k, nllabels)) / nrlabels)^2;
+			end
 
-				% compute impurity
-			imps(j) = numel( llabelset ) * brf.gini( llabelset, nclasses ) + ...
-				numel( rlabelset ) * brf.gini( rlabelset, nclasses );
-
+			imps(j) = nllabels*li + nrlabels*ri;
 		end
-		imps(end) = nsamples*brf.gini( labelset, nclasses );
+
+			% set none-split impurity (gini)
+		ni = 1;
+		for j = 1:nclasses
+			ni = ni - (classsums(j, end) / nsamples)^2;
+		end
+
+		imps(end) = nsamples*ni;
 
 			% store split w/ minimum impurity
 		impmin = min( imps );
@@ -76,9 +91,9 @@ function grow( node, features, labels, nclasses )
 		end
 
 		if impmini > nsplits
-			splits(end+1, :) = [impmin, fi(i), Inf]; % full left node, empty right node
+			splits(i, :) = [impmin, fi(i), Inf]; % full left node, empty right node
 		else
-			splits(end+1, :) = [impmin, fi(i), fvals(labelspliti(impmini))];
+			splits(i, :) = [impmin, fi(i), fvals(spliti(impmini))];
 		end
 
 		logger.progress( i, nfis );
@@ -91,20 +106,18 @@ function grow( node, features, labels, nclasses )
 		splitimpmini = randsample( splitimpmini, 1 ); % choose random minimum
 	end
 
-	splitimp = splits(splitimpmini, 1); % set split
-	splitfi = splits(splitimpmini, 2);
-	splitfval = splits(splitimpmini, 3);
+	node.impurity = splits(splitimpmini, 1); % set split
+	node.feature = splits(splitimpmini, 2);
+	node.value = splits(splitimpmini, 3);
 
-	logger.log( 'feature: %d (value: %f)', splitfi, splitfval );
-	logger.log( 'impurity: %f', splitimp );
+	logger.log( 'impurity: %f', node.impurity );
+	logger.log( 'feature: %d (value: %f)', node.feature, node.value );
 
 		% split node and continue recursively
-	node.impurity = splitimp;
-
 	if node.impurity > 0
 
 			% left node
-		li = features(:, splitfi) < splitfval;
+		li = features(:, node.feature) < node.value;
 		if sum( li ) > 0
 			node.left = brf.hNode();
 			brf.grow( node.left, features(li, :), labels(li), nclasses );

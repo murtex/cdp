@@ -19,7 +19,7 @@ end
 cfg = cdf.hConfig(); % use defaults
 
 	% read subjects
-ids = [16];
+ids = [16, 17];
 
 runs = cdf.hRun.empty(); % pre-allocation
 
@@ -43,6 +43,7 @@ for id = ids
 end
 
 	% train classifier
+rng(1);
 cdf.train( runs, cfg, false );
 
 	% clean-up
