@@ -1,7 +1,7 @@
-function grow( node, features, labels, nclasses )
-% grow tree
+function split( node, features, labels, nclasses )
+% split tree node recursively
 %
-% GROW( node, features, labels, nclasses )
+% SPLIT( node, features, labels, nclasses )
 %
 % INPUT
 % node : tree node (scalar object)
@@ -27,7 +27,7 @@ function grow( node, features, labels, nclasses )
 	end
 
 	logger = xis.hLogger.instance();
-	logger.tab( 'grow tree...' );
+	logger.tab( 'split node (samples: %d)...', size( features, 1 ) );
 
 		% sample features
 	nsamples = size( features, 1 );
@@ -35,50 +35,47 @@ function grow( node, features, labels, nclasses )
 
 	fi = randi( nfeatures, 1, ceil( sqrt( nfeatures ) ) );
 
-	logger.log( 'samples: %d', nsamples );
-
 		% find best splits
 	nfis = numel( fi );
 
-	splits = NaN( nfis, 3 ); % pre-allocation (impurity, feature, value )
+	splits = NaN( nfis, 3 ); % pre-allocation (impurity, feature, value)
 
-	logger.progress( 'find best splits...' );
 	for i = 1:nfis
 
 			% prepare splitting
 		[fvals, order] = sort( features(:, fi(i)) ); % all possible splits
 		labelset = labels(order); % ordered set of labels
 
-		spliti = find( diff( labelset ) ~= 0 ) + 1; % reduce to splits w/ label change
+		spliti = find( diff( labelset ) ~= 0 ) + 1; % splits w/ label change
 		nsplits = numel( spliti );
 
-		classinds = false( nclasses, nsamples ); % precompute class indicators
+			% set split gini impurities
+		imps = NaN( 1, 1 + nsplits ); % pre-allocation
+
+		classinds = false( nclasses, nsamples ); % precompute class indications
 		for j = 1:nclasses
 			classinds(j, :) = labelset == j;
 		end
-		classsums = cumsum( classinds, 2 ); % indicator sums
-
-			% set split impurities (gini)
-		imps = NaN( 1, 1 + nsplits ); % pre-allocation
+		classinds = cumsum( classinds, 2 );
 
 		for j = 1:nsplits
-			nllabels = spliti(j) - 1;
+			nllabels = spliti(j) - 1; % number of child labels
 			nrlabels = nsamples - nllabels;
 
 			li = 1;
 			ri = 1;
 			for k = 1:nclasses
-				li = li - (classsums(k, nllabels) / nllabels)^2;
-				ri = ri - ((classsums(k, end)-classsums(k, nllabels)) / nrlabels)^2;
+				li = li - (classinds(k, nllabels) / nllabels)^2;
+				ri = ri - ((classinds(k, end)-classinds(k, nllabels)) / nrlabels)^2;
 			end
 
 			imps(j) = nllabels*li + nrlabels*ri;
 		end
 
-			% set none-split impurity (gini)
+			% set none-split gini impurity
 		ni = 1;
 		for j = 1:nclasses
-			ni = ni - (classsums(j, end) / nsamples)^2;
+			ni = ni - (classinds(j, end) / nsamples)^2;
 		end
 
 		imps(end) = nsamples*ni;
@@ -96,7 +93,6 @@ function grow( node, features, labels, nclasses )
 			splits(i, :) = [impmin, fi(i), fvals(spliti(impmini))];
 		end
 
-		logger.progress( i, nfis );
 	end
 
 		% choose split w/ minimum impurity
@@ -110,8 +106,7 @@ function grow( node, features, labels, nclasses )
 	node.feature = splits(splitimpmini, 2);
 	node.value = splits(splitimpmini, 3);
 
-	logger.log( 'impurity: %f', node.impurity );
-	logger.log( 'feature: %d (value: %f)', node.feature, node.value );
+	logger.log( 'impurity: %.3f', node.impurity );
 
 		% split node and continue recursively
 	if node.impurity > 0
@@ -120,14 +115,14 @@ function grow( node, features, labels, nclasses )
 		li = features(:, node.feature) < node.value;
 		if sum( li ) > 0
 			node.left = brf.hNode();
-			brf.grow( node.left, features(li, :), labels(li), nclasses );
+			brf.split( node.left, features(li, :), labels(li), nclasses );
 		end
 		
 			% right node
 		ri = ~li;
 		if sum( ri ) > 0
 			node.right = brf.hNode();
-			brf.grow( node.right, features(ri, :), labels(ri), nclasses );
+			brf.split( node.right, features(ri, :), labels(ri), nclasses );
 		end
 
 	end

@@ -2,7 +2,7 @@ classdef (Sealed = true) hLogger < handle
 % hierarchic logging (singleton)
 
 		% properties
-	properties (GetAccess = public, SetAccess = private)
+	properties (Access = public)
 
 		hierarchy = 0; % hierarchy (scalar numeric)
 		hierarchymax = 10;

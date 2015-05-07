@@ -45,7 +45,7 @@ function train( features, labels, nclasses, ntrees )
 			% grow tree from root node
 		root = brf.hNode();
 
-		brf.grow( root, features(bi, :), labels(bi), nclasses );
+		brf.split( root, features(bi, :), labels(bi), nclasses );
 
 	end
 
