@@ -28,18 +28,19 @@ function [labels, errs] = classify( roots, features )
 	nroots = numel( roots );
 
 	labels = NaN( nroots, nsamples ); % pre-allocation
-	errs = NaN( 1, nsamples );
 
 	logger.progress();
 	for i = 1:nsamples
+		sfeatures = features(i, :);
 
 			% proceed root nodes
 		for j = 1:nroots
 
 				% proceed tree down to leaf
 			node = roots(j);
+			
 			while ~isempty( node.left ) || ~isempty( node.right )
-				if features(i, node.feature) < node.value
+				if sfeatures(node.feature) < node.value
 					node = node.left;
 				else
 					node = node.right;
@@ -54,16 +55,9 @@ function [labels, errs] = classify( roots, features )
 		logger.progress( i, nsamples );
 	end
 
-		% reduce to majoraty votes (w/ mismatch error)
-	for i = 1:nsamples
-
-			% TODO
-
-	end
-
-		% DEBUG
-	labels
-	errs
+		% reduce to majority votes w/ misclassification error
+	[labels, errs] = mode( labels, 1 );
+	errs = 1 - errs/nroots;
 
 	logger.untab();
 end

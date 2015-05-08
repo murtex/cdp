@@ -97,6 +97,10 @@ function features( run, cfg, labeled, landmarks, outdir )
 		respfeat = sta.unframe( respfeat, frame ); % smoothing
 		respfeat = zscore( respfeat, 1, 1 ); % standardization
 
+		if any( isnan( respfeat(:) ) ) || any( isinf( respfeat(:) ) )
+			warning( 'NaN/Inf features' );
+		end
+
 			% get subsequence features
 		subfeat = brf.subseq( respfeat, dsp.msec2smp( cfg.feat_intlen, run.audiorate ), cfg.feat_intcount );
 

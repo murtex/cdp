@@ -1,12 +1,15 @@
-function train( runs, cfg, labeled )
+function forest = train( runs, cfg, labeled )
 % train label classifier
 %
-% TRAIN( runs, cfg )
+% forest = TRAIN( runs, cfg, labeled )
 %
 % INPUT
 % runs : runs (row object)
 % cfg : configuration (scalar object)
 % labeled : use labeled response features (scalar logical)
+%
+% OUTPUT
+% forest : tree root nodes (row object)
 
 		% safeguard
 	if nargin < 1 || ~isrow( runs ) || ~isa( runs(1), 'cdf.hRun' )
@@ -24,7 +27,7 @@ function train( runs, cfg, labeled )
 	logger = xis.hLogger.instance();
 	logger.tab( 'train classifier...' );
 
-		% get classes
+		% get label classes
 	nruns = numel( runs );
 
 	classes = {}; % pre-allocation
@@ -153,11 +156,8 @@ function train( runs, cfg, labeled )
 
 	logger.untab();
 
-		% train random forest
-	rsi = randi( size( subs, 1 ), 10, 1 );
-	brf.train( subs(rsi, :), sublabels(rsi), nclasses, cfg.train_trees );
-
-	%brf.train( subs, sublabels, nclasses, 1 );
+		% grow subsequence forest
+	forest = brf.train( subs, sublabels, nclasses, cfg.train_trees, false );
 
 	logger.untab();
 end

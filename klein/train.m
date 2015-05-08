@@ -18,10 +18,10 @@ end
 	% configure framework
 cfg = cdf.hConfig(); % use defaults
 
-	% read subjects
+	% read training data
 ids = [16, 17];
 
-runs = cdf.hRun.empty(); % pre-allocation
+runs(1, numel( ids )) = cdf.hRun(); % pre-allocation
 
 logger.progress( 'read cdfs ''%s''...', indir );
 ic = 0;
@@ -36,18 +36,23 @@ for id = ids
 	end
 
 	load( infile, 'run' );
-	runs(end+1) = run;
+	runs(ic+1) = run;
 
 	ic = ic + 1;
 	logger.progress( ic, numel( ids ) );
 end
 
-	% train classifier
-rng(2);
-cdf.train( runs, cfg, false );
+	% train data and write classifier
+rng(2); % DEBUG
+forest = cdf.train( runs, cfg, false );
+
+outfile = fullfile( outdir, 'forest.mat' );
+logger.log( 'write classifier ''%s''...', outfile );
+save( outfile, 'forest' );
 
 	% clean-up
 delete( runs );
+delete( forest );
 
 	% exit
 logger.log( 'done.' ); % stop logging

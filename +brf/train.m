@@ -1,13 +1,17 @@
-function train( features, labels, nclasses, ntrees )
+function forest = train( features, labels, nclasses, ntrees, logoob )
 % grow forest
 %
-% TRAIN( features, labels )
+% forest = TRAIN( features, labels, nclasses, ntrees, logoob )
 %
 % INPUT
 % features : feature matrix (matrix numeric)
 % labels : sample labels (row numeric)
 % nclasses : number of classes (scalar numeric)
 % ntrees : number of trees (scalar numeric)
+% logoob : oob-error logging flag (scalar logical)
+%
+% OUTPUT
+% forest : tree root nodes (row object)
 
 		% safeguard
 	if nargin < 1 || ~ismatrix( features ) || ~isnumeric( features )
@@ -26,6 +30,10 @@ function train( features, labels, nclasses, ntrees )
 		error( 'invalid argument: ntrees' );
 	end
 
+	if nargin < 5 || ~isscalar( logoob ) || ~islogical( logoob )
+		error( 'invalid argument: logoob' );
+	end
+
 	logger = xis.hLogger.instance();
 	logger.tab( 'grow forest...' );
 
@@ -37,7 +45,7 @@ function train( features, labels, nclasses, ntrees )
 	logger.log( 'features: %d', nfeatures );
 	logger.log( 'samples: %d', nsamples );
 
-	roots(1, ntrees) = brf.hNode();
+	forest(1, ntrees) = brf.hNode(); % pre-allocation
 
 	for i = 1:ntrees
 		logger.tab( 'grow tree %d/%d...', i, ntrees );
@@ -50,20 +58,18 @@ function train( features, labels, nclasses, ntrees )
 		hiermax = logger.hierarchymax;
 		logger.hierarchymax = logger.hierarchy + 1; % limit logging depth
 
-		roots(i) = brf.hNode(); % grow tree
-		brf.split( roots(i), features(bagi, :), labels(bagi), nclasses );
+		forest(i) = brf.hNode(); % grow tree
+		brf.split( forest(i), features(bagi, :), labels(bagi), nclasses );
 
 		logger.hierarchymax = hiermax; % restore logging depth
 
-			% test tree and present forest
-		[treelabels, treeerrs] = brf.classify( roots(i), features(oobi, :) ); % tree error
-		labels(oobi) % DEBUG
+			% logging oob-error
+		if logoob
+			[ooblabels, ~] = brf.classify( forest(i), features(oobi, :) );
+			ooberr = sum( ooblabels ~= labels(oobi) ) / numel( oobi );
 
-		[forestlabels, foresterrs] = brf.classify( roots(1:i), features(oobi, :) ); % forest error
-		labels(oobi) % DEBUG
-
-		logger.log( 'tree error: %.6f', NaN );
-		logger.log( 'forest error: %.6f', NaN );
+			logger.log( 'oob-error: %.6f', ooberr );
+		end
 
 		logger.untab();
 	end

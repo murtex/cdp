@@ -36,7 +36,10 @@ function subser = subseq( featser, intlen, intcount )
 	end
 
 		% proceed subsequences
-	subser = NaN( subs, 2 + n*(2 + 3*intcount) ); % pre-allocation
+	nlocfeats = 2; % number of location features
+	nintfeats = 3; % number of interval features
+
+	subser = NaN( subs, nlocfeats + n*(2 + nintfeats*intcount) ); % pre-allocation
 
 	for i = 1:subs
 
@@ -57,7 +60,7 @@ function subser = subseq( featser, intlen, intcount )
 			% proceed prime features
 		for j = 1:n
 			seqser = featser(t1:t2, j);
-			ji = 2 + (j-1)*(2 + 3*intcount);
+			ji = 2 + (j-1)*(2 + nintfeats*intcount);
 
 				% set sequence features
 			subser(i, ji+1) = mean( seqser, 1 );
@@ -66,7 +69,7 @@ function subser = subseq( featser, intlen, intcount )
 				% proceed intervals
 			for k = 1:intcount
 				intser = featser(intstarts(k):intstops(k), j);
-				ki = ji + 2 + (k-1)*3;
+				ki = ji + 2 + (k-1)*nintfeats;
 
 					% set interval features
 				subser(i, ki+1) = mean( intser, 1 );
