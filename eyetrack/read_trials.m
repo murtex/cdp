@@ -22,11 +22,11 @@ function read_trials( run, logfile )
 		% read logfile content
 	f = fopen( logfile );
 	fdata = textscan( f, ...
-		'%n %n %s %s %s %s %n %n %n %n %s %s %s %n %*[^\n]', ... % 14 fields (some data have more)
+		'%n %n %n %s %s %s %s %n %n %n %s %s %n %n %n %n %s %*[^\n]', ... % 17 fields
 		'Delimiter', ',' ); % comma separated
 	fclose( f );
 
-	if size( fdata, 1 ) ~= 1 || size( fdata, 2 ) ~= 14 % single block, 14 fields
+	if size( fdata, 1 ) ~= 1 || size( fdata, 2 ) ~= 17 % single block, 17 fields
 		logger.untab();
 		error( 'invalid argument: logfile' );
 	end
@@ -35,8 +35,6 @@ function read_trials( run, logfile )
 	logger.log( 'trials: %d', n );
 
 		% content parsing
-	blocksize = max( fdata{8} );
-
 	function cl = cuelabel( symbol, hashlabel )
 		switch symbol
 			case '##'
@@ -51,25 +49,14 @@ function read_trials( run, logfile )
 		end
 	end
 
-	function dl = distlabel( label, vot )
-		switch vot
+	function dl = distlabel( label )
+		switch label
 			case 'n'
 				dl = 'none';
 			case 't'
 				dl = 'tone';
 			otherwise
 				dl = label;
-		end
-	end
-
-	function dv = distvot( vot )
-		switch vot
-			case 'n'
-				dv = NaN;
-			case 't'
-				dv = NaN;
-			otherwise
-				dv = str2double( vot );
 		end
 	end
 
@@ -81,23 +68,22 @@ function read_trials( run, logfile )
 	for i = 1:n
 		trial = run.trials(i);
 
-		trial.id = blocksize*(fdata{7}(i)-1) + fdata{8}(i);
+		trial.id = fdata{8}(i);
 
 			% labels
-		trial.cuelabel = cuelabel( fdata{11}{i}, fdata{6}{i} );
-		trial.distlabel = distlabel( fdata{12}{i}, fdata{13}{i} );
+		trial.cuelabel = cuelabel( fdata{11}{i}, fdata{7}{i} );
+		trial.distlabel = distlabel( fdata{12}{i} );
 
 			% cue/distractor
-		trial.cue = 1 + dsp.sec2smp( max( fdata{9}(i), fdata{10}(i) ), run.audiorate ); % (for some data order has switched)
-		trial.soa = dsp.sec2smp( fdata{14}(i), run.audiorate );
+		trial.cue = 1 + dsp.sec2smp( fdata{10}(i), run.audiorate );
+		trial.soa = dsp.sec2smp( fdata{13}(i), run.audiorate );
 
 		trial.distbo = 1 + trial.cue + trial.soa;
-		trial.distvo = 1 + trial.distbo + dsp.msec2smp( distvot( fdata{13}{i} ), run.audiorate );
 
 		% range, TODO: use next first cue as range end?
 		trial.range(1) = trial.cue;
 		if i < n
-			nextcue = 1 + dsp.sec2smp( max( fdata{9}(i+1), fdata{10}(i+1) ), run.audiorate ); % (for some data order has switched)
+			nextcue = 1 + dsp.sec2smp( fdata{10}(i+1), run.audiorate );
 			trial.range(2) = nextcue - 1; % TODO: trial overlap?
 		else
 			trial.range(2) = run.audiolen; % last trial ends with audio data, TODO: possibly gets invalidated by syncing
