@@ -22,7 +22,7 @@ function [actser, lothresh, hithresh] = activity( ser, clser )
 	end
 
 		% set adaptive thresholds
-	sermin = min( ser ); % thresholds
+	sermin = min( ser );
 	sermax = max( ser );
 	lothresh = sermin * (1+2*log10( sermax/sermin )); % based on noisy data
 	hithresh = lothresh + 0.25*(mean( clser(clser >= lothresh) )-lothresh); % based on clean data

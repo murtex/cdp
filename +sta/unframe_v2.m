@@ -1,4 +1,4 @@
-function ser = unframe( ser, frame )
+function ser = unframe_v2( ser, frame )
 % short-time un-framing
 %
 % ser = UNFRAME( ser, frame )

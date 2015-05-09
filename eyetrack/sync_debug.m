@@ -23,7 +23,7 @@ for i = 1:2
 	cfg = cdf.hConfig(); % use defaults
 
 		% proceed subjects
-	ids = 10;
+	ids = 16;
 
 	for id = ids
 		logger.tab( 'subject: %d', id );
@@ -47,8 +47,9 @@ for i = 1:2
 		end
 		mkdir( subjectdir );
 
-		rs = cat( 1, run.trials.range ); % choose 10 valid trials
-		trials = run.trials(~isnan( rs(:, 1) ));
+		trials = [run.trials]; % choose 10 valid trials
+		lens = diff( cat( 1, trials.range ), 1, 2 );
+		trials = run.trials(~isnan( lens ));
 		trials = randsample( trials, min( numel( trials ), 10 ) );
 
 		n = numel( trials ); % plot

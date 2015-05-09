@@ -44,8 +44,8 @@ for id = ids
 	mkdir( subjectdir );
 
 	trials = [run.trials.detected]; % choose 10 valid trials
-	rs = cat( 1, trials.range );
-	trials = run.trials(~isnan( rs(:, 1) ));
+	lens = diff( cat( 1, trials.range ), 1, 2 );
+	trials = run.trials(~isnan( lens ));
 	trials = randsample( trials, min( numel( trials ), 10 ) );
 
 	n = numel( trials ); % plot

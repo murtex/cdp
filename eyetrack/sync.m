@@ -8,7 +8,7 @@ addpath( '../' ); % set path to cue-distractor package
 logger = xis.hLogger.instance( '../data/eyetrack/sync.log' ); % start logging
 
 	% proceed experiments
-for i = 2:-1:1
+for i = 1:2
 	logger.tab( 'experiment: %d', i );
 
 		% prepare directories

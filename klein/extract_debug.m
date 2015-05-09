@@ -5,12 +5,12 @@ clear( 'all' );
 
 addpath( '../' ); % set path to cue-distractor package
 
-logger = xis.hLogger.instance( 'extract_debug.log' ); % start logging
+logger = xis.hLogger.instance( '../data/klein/extract_debug.log' ); % start logging
 
 	% prepare directories
-indir = 'cdf/extract/';
+indir = '../data/klein/cdf/extract/';
 
-plotdir = 'plot/extract_debug/';
+plotdir = '../data/klein/plot/extract_debug/';
 if exist( plotdir, 'dir' ) ~= 7
 	mkdir( plotdir );
 end
@@ -19,7 +19,7 @@ end
 cfg = cdf.hConfig(); % use defaults
 
 	% proceed subjects
-ids = [27, 32]
+ids = 1:47;
 
 for id = ids
 	logger.tab( 'subject: %d', id );
@@ -43,9 +43,10 @@ for id = ids
 	end
 	mkdir( subjectdir );
 
-	rs = cat( 1, run.trials.range ); % choose 10 valid trials
-	trials = run.trials(~isnan( rs(:, 1) ));
-	trials = randsample( trials, min( numel( trials ), 20 ) );
+	trials = [run.trials.detected]; % choose 10 valid trials
+	lens = diff( cat( 1, trials.range ), 1, 2 );
+	trials = run.trials(~isnan( lens ));
+	trials = randsample( trials, min( numel( trials ), 10 ) );
 
 	n = numel( trials ); % plot
 	for i = 1:n
