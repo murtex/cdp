@@ -1,7 +1,7 @@
 Cue-distractor package
 ======================
 
-- this package is split into parts: applications, framework, and others
+- the package is divided into parts: applications, framework, and others
 - applications are a good starting point for seeing how to make use of the framework
 
 Applications
