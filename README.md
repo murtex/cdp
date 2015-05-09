@@ -11,5 +11,6 @@ Modules/Namespaces
 - `sta`: short-time analysis
 - `xis`: convenience functionality
 - `klein`: reference application
+- `eyetrack` : eye-tracking experiment application
 - `dists`: distractor modification
 
