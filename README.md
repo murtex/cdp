@@ -7,9 +7,9 @@ Cue-distractor package
 Applications
 ------------
 
-- applications are collections of scripts which have to be executed in order
+- applications are collections of scripts which generally have to be executed in order
 - to get any script ran, you have to add *this* directory to your MATLAB search path
-- [`klein`](https://github.com/murtex/cdp/tree/master/klein) is *the* reference application, means it is a complete showcase of framwork functionality
+- [`klein`](https://github.com/murtex/cdp/tree/master/klein) is *the* reference application, means it is a complete showcase of framework functionality
 - [`eyetrack`](https://github.com/murtex/cdp/tree/master/eyetrack) handles same type of data, but without any labeling/annotations
 - [`dists`](https://github.com/murtex/cdp/tree/master/dists) contains minor scripts of how to modify distractors
 
