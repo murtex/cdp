@@ -25,6 +25,6 @@ Framework
 Other
 -----
 
-- [`doc`](https://github.com/murtex/cdp/tree/master/doc) contains the sources of the (too rarely updated) documentation of this package (PDF: here)
+- [`doc`](https://github.com/murtex/cdp/tree/master/doc) contains the sources of the (too rarely updated) documentation of this package (PDF: [here](https://github.com/murtex/cdp/raw/master/doc/cdp.pdf))
 - [`data`](TODO) TODO: provide some basic data, plots? at least classifiers?!
 
