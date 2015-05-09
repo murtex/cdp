@@ -32,26 +32,22 @@ function offs = sync( run, cfg, sync_resp )
 	logger.tab( 'sync timing...' );
 
 		% detect sync start (first tone-distractor)
-	vcsize = dsp.msec2smp( cfg.sync_mrklen, run.audiorate ); % vicinity size
+	mu = mean( run.audiodata(:, 2), 1 ); % noise estimate
+	sigma = std( run.audiodata(:, 2), 1, 1 );
 
-	mu = mean( run.audiodata(:, 2) ); % noise estimate
-	sigma = std( run.audiodata(:, 2 ) );
+	vcsize = dsp.msec2smp( cfg.sync_mrklen, run.audiorate ); % vicinity size
+	vcthresh = cfg.sync_thresh * vcsize * sigma;
 
 	start = 0; % pre-allocation
 
 	for i = 1:run.audiolen
-
-			% mean mahalanobis distance of vicinity
 		vc = i : min( run.audiolen, i+vcsize );
-		md = abs( run.audiodata(vc, 2) - mu ) / sigma;
-		mmd = sum( md ) / vcsize;
 
-			% exceeding threshold
-		if mmd >= cfg.sync_thresh
+		mmd = sum( abs( run.audiodata(vc, 2) - mu ) ); % mean mahalanobis dist
+		if mmd >= vcthresh
 			start = i-1;
 			break;
 		end
-
 	end
 
 	logger.log( 'start: %.1fms', dsp.smp2msec( start, run.audiorate ) );
@@ -62,41 +58,48 @@ function offs = sync( run, cfg, sync_resp )
 	n = numel( run.trials );
 
 	offs = zeros( 1, n ); % pre-allocation
+	hits = false( 1, n );
 
+	logger.progress();
 	for i = 1:n
 
 			% prepare search range
 		sr = run.trials(i).cue + start;
 		if i > 1
-			sr = sr + offs(i-1);
+			sr = sr + offs(i-1); % use last offset as an estimate
+			offs(i) = offs(i-1);
 		end
 		sr = sr + (range(1):range(2));
 
 		sr(sr < 1) = []; % do not exceed audio data
 		sr(sr > run.audiolen) = [];
 
-			% detect marker in range
-		m = numel( sr );
-
-		mu = mean( run.audiodata(sr, 2) ); % noise estimate
-		sigma = std( run.audiodata(sr, 2 ) );
-
-		for j = sr(1):sr(end)
-
-				% mean mahalanobis distance of vicinity
-			vc = j : min( sr(end), j+vcsize );
-			md = abs( run.audiodata(vc, 2) - mu ) / sigma;
-			mmd = sum( md ) / vcsize;
-
-				% exceeding threshold
-			if mmd >= cfg.sync_thresh
-				offs(i) = j - (start + run.trials(i).cue);
-				break;
-			end
-
+		if isempty( sr )
+			logger.progress( i, n );
+			continue;
 		end
 
+			% detect marker in range
+		mu = mean( run.audiodata(sr, 2), 1 ); % noise estimate
+		sigma = std( run.audiodata(sr, 2), 1, 1 );
+
+		vcthresh = cfg.sync_thresh * vcsize * sigma;
+
+		for j = sr(1):sr(end)
+			vc = j : min( sr(end), j+vcsize );
+
+			mmd = sum( abs( run.audiodata(vc, 2) - mu ) ); % mean mahalanobis dist
+			if mmd >= vcthresh
+				offs(i) = j - (start + run.trials(i).cue);
+				hits(i) = true;
+				break;
+			end
+		end
+
+		logger.progress( i, n );
 	end
+
+	offs(~hits) = NaN; % invalidate missed syncs
 
 		% sync trials
 	for i = 1:n

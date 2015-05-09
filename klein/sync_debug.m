@@ -5,12 +5,12 @@ clear( 'all' );
 
 addpath( '../' ); % set path to cue-distractor package
 
-logger = xis.hLogger.instance( 'sync_debug.log' ); % start logging
+logger = xis.hLogger.instance( '../data/klein/sync_debug.log' ); % start logging
 
 	% prepare directories
-indir = 'cdf/sync/';
+indir = '../data/klein/cdf/sync/';
 
-plotdir = 'plot/sync_debug/';
+plotdir = '../data/klein/plot/sync_debug/';
 if exist( plotdir, 'dir' ) ~= 7
 	mkdir( plotdir );
 end
