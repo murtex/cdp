@@ -12,7 +12,7 @@ indir1 = '../data/klein/cdf/features/';
 indir2 = '../data/klein/cdf/train/';
 
 	% read classification data
-ids = 15;
+ids = 16;
 
 runs(1, numel( ids )) = cdf.hRun(); % pre-allocation
 
