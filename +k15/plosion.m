@@ -43,7 +43,7 @@ function p = plosion( ser, delta, width )
 
 			% plosion index
 		if imax > delta+1
-			p(imax) = hemax/mean( he(li:ri) );
+			p(imax) = hemax/mean( he(li:ri), 1 );
 		end
 
 	end

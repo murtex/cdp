@@ -92,7 +92,11 @@ function timing( run, detected, labeled, plotfile )
 	end
 
 		% plot voice-onset time
-	subplot( 3, 2, 1 );
+	if ~isempty( labeled )
+		subplot( 3, 2, 1 );
+	else
+		subplot( 3, 1, 1 );
+	end
 	title( sprintf( 'trials: %d -- timing', size( detected, 1 ) ) );
 	xlabel( 'voice-onset time (detected) in milliseconds' );
 	ylabel( 'rate' );
@@ -110,7 +114,11 @@ function timing( run, detected, labeled, plotfile )
 	end
 
 		% plot vowel length
-	subplot( 3, 2, 3 );
+	if ~isempty( labeled )
+		subplot( 3, 2, 3 );
+	else
+		subplot( 3, 1, 2 );
+	end
 	xlabel( 'vowel length (detected) in milliseconds' );
 	ylabel( 'rate' );
 	xlim( dsp.smp2msec( xlvow, run.audiorate ) );
@@ -127,7 +135,11 @@ function timing( run, detected, labeled, plotfile )
 	end
 
 		% plot syllable length
-	subplot( 3, 2, 5 );
+	if ~isempty( labeled )
+		subplot( 3, 2, 5 );
+	else
+		subplot( 3, 1, 3 );
+	end
 	xlabel( 'syllable length (detected) in milliseconds' );
 	ylabel( 'rate' );
 	%xlim( dsp.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
