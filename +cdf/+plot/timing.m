@@ -142,7 +142,6 @@ function timing( run, detected, labeled, plotfile )
 	end
 	xlabel( 'syllable length (detected) in milliseconds' );
 	ylabel( 'rate' );
-	%xlim( dsp.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
 	xlim( dsp.smp2msec( xlsyl, run.audiorate ) );
 	bar( dsp.smp2msec( detsylpos, run.audiorate ), detsylns / ndetsyls, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
