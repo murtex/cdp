@@ -19,7 +19,7 @@ end
 cfg = cdf.hConfig(); % use defaults
 
 	% read training data
-ids = [15, 17];
+ids = [16, 17];
 
 runs(1, numel( ids )) = cdf.hRun(); % pre-allocation
 
@@ -44,10 +44,14 @@ end
 
 	% train data and write classifier
 rng(2); % DEBUG
-forest = cdf.train( runs, cfg, false );
+[classes, forest] = cdf.train( runs, cfg, false );
+
+outfile = fullfile( outdir, 'classes.mat' );
+logger.log( 'write classes ''%s''...', outfile );
+save( outfile, 'classes' );
 
 outfile = fullfile( outdir, 'forest.mat' );
-logger.log( 'write classifier ''%s''...', outfile );
+logger.log( 'write forest ''%s''...', outfile );
 save( outfile, 'forest' );
 
 	% clean-up

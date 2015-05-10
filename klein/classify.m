@@ -12,7 +12,7 @@ indir1 = '../data/klein/cdf/features/';
 indir2 = '../data/klein/cdf/train/';
 
 	% read classification data
-ids = 16;
+ids = [16, 17];
 
 runs(1, numel( ids )) = cdf.hRun(); % pre-allocation
 
@@ -36,11 +36,15 @@ for id = ids
 end
 
 	% read classifier and classify data
+infile = fullfile( indir2, 'classes.mat' );
+logger.log( 'read classes ''%s''...', infile );
+load( infile, 'classes' );
+
 infile = fullfile( indir2, 'forest.mat' );
-logger.log( 'read classifier ''%s''...', infile );
+logger.log( 'read forest ''%s''...', infile );
 load( infile, 'forest' );
 
-cdf.classify( runs, forest, false );
+cdf.classify( runs, classes, forest, false );
 
 	% clean-up
 delete( runs );

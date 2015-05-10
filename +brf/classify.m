@@ -20,8 +20,8 @@ function [labels, errs] = classify( roots, features )
 		error( 'invalid argument: features' );
 	end
 
-	logger = xis.hLogger.instance();
-	logger.tab( 'classify (samples: %d, trees: %d)...', size( features, 1 ), numel( roots ) );
+	%logger = xis.hLogger.instance();
+	%logger.tab( 'classify (samples: %d, trees: %d)...', size( features, 1 ), numel( roots ) );
 
 		% get class votes from all trees
 	nsamples = size( features, 1 );
@@ -29,7 +29,7 @@ function [labels, errs] = classify( roots, features )
 
 	labels = NaN( nroots, nsamples ); % pre-allocation
 
-	logger.progress();
+	%logger.progress();
 	for i = 1:nsamples
 		sfeatures = features(i, :);
 
@@ -52,13 +52,13 @@ function [labels, errs] = classify( roots, features )
 
 		end
 
-		logger.progress( i, nsamples );
+		%logger.progress( i, nsamples );
 	end
 
 		% reduce to majority votes w/ misclassification error
-	[labels, errs] = mode( labels, 1 );
+	[labels, errs] = mode( labels, 1 ); % TODO: equal frequencies?!
 	errs = 1 - errs/nroots;
 
-	logger.untab();
+	%logger.untab();
 end
 

@@ -1,4 +1,4 @@
-function forest = train( runs, cfg, labeled )
+function [classes, forest] = train( runs, cfg, labeled )
 % train label classifier
 %
 % forest = TRAIN( runs, cfg, labeled )
@@ -9,6 +9,7 @@ function forest = train( runs, cfg, labeled )
 % labeled : use labeled response features (scalar logical)
 %
 % OUTPUT
+% classes : class labels (cell row char)
 % forest : tree root nodes (row object)
 
 		% safeguard
@@ -27,7 +28,7 @@ function forest = train( runs, cfg, labeled )
 	logger = xis.hLogger.instance();
 	logger.tab( 'train classifier...' );
 
-		% get label classes
+		% get class labels
 	nruns = numel( runs );
 
 	classes = {}; % pre-allocation
