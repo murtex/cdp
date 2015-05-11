@@ -4,6 +4,8 @@ Upcoming cue-distractor experiment
 `interim` script
 ----------------
 
-- TODO: tell Eugen to use comment character `#` befor header line
-- TODO: remove fixed soa (`read_trials.m`, line 55)
-
+- @Eugen
+	- please prefix the logfile header line with a comment character `#`
+	- when you have included output of SOA in your scripts, please remove line 55 in script `read_trials.m`
+- @Stephen
+	- TODO
