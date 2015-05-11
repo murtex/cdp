@@ -101,6 +101,8 @@ function offs = sync( run, cfg, sync_resp )
 
 	offs(~hits) = NaN; % invalidate missed syncs
 
+	logger.log( 'syncs: %d/%d', sum( ~isnan( offs ) ), n );
+
 		% sync trials
 	for i = 1:n
 
@@ -136,8 +138,8 @@ function offs = sync( run, cfg, sync_resp )
 
 	end
 
-	rs = cat( 1, run.trials.range );
-	logger.log( 'syncs: %d/%d', sum( ~isnan( rs(:, 1) ) ), n );
+	lens = diff( cat( 1, run.trials.range ), 1, 2 );
+	logger.log( 'trials: %d/%d', sum( ~isnan( lens ) ), n );
 
 	logger.untab();
 end
