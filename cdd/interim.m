@@ -12,6 +12,7 @@ cfg = cdf.hConfig(); % use defaults
 
     % read (raw) data
 indir = '../data/cdd/interim/';
+plotdir = indir;
 
 logfile = fullfile( indir, 'participant_production.txt' );
 audiofile = fullfile( indir, 'participant_production.wav' );
@@ -24,9 +25,6 @@ run = cdf.hRun();
 
 read_audio( run, audiofile, false );
 read_trials( run, logfile );
-
-	% prepare directories
-plotdir = indir;
 
 	% sync timings and plot verification
 offs = cdf.sync( run, cfg, false );
