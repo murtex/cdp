@@ -52,6 +52,13 @@ function offs = sync( run, cfg, sync_resp )
 
 	logger.log( 'start: %.1fms', dsp.smp2msec( start, run.audiorate ) );
 
+		% DEBUG
+	start
+
+	k15.scs05( run.audiodata(:, 2), vcsize, cfg.sync_thresh )
+
+	error( 'DEBUG' );
+
 		% detect sync marker offsets
 	range = dsp.msec2smp( cfg.sync_range, run.audiorate );
 
