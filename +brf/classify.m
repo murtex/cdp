@@ -20,7 +20,7 @@ function [labels, errs] = classify( roots, features )
 		error( 'invalid argument: features' );
 	end
 
-	%logger = xis.hLogger.instance();
+	logger = xis.hLogger.instance( 'bla' );
 	%logger.tab( 'classify (samples: %d, trees: %d)...', size( features, 1 ), numel( roots ) );
 
 		% get class votes from all trees
@@ -41,14 +41,24 @@ function [labels, errs] = classify( roots, features )
 			
 			while ~isempty( node.left ) || ~isempty( node.right )
 				if sfeatures(node.feature) < node.value
-					node = node.left;
+					if isempty( node.left )
+						break;
+					else
+						node = node.left;
+					end
 				else
-					node = node.right;
+					if isempty( node.right )
+						break;
+					else
+						node = node.right;
+					end
 				end
 			end
 
 				% vote for leaf label
 			labels(j, i) = node.label;
+
+			logger.log( 'label: %d', node.label );
 
 		end
 
