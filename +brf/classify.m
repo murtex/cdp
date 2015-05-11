@@ -1,18 +1,17 @@
-function [labels, errs] = classify( roots, features )
+function labels = classify( roots, features )
 % classify features
 %
-% [labels, errs] = CLASSIFY( roots, features )
+% labels = CLASSIFY( roots, features )
 %
 % INPUT
-% roots : tree root nodes (row object)
+% roots : mex tree root nodes (row struct)
 % features : feature matrix (matrix numeric)
 %
 % OUTPUT
-% labels : prediction labels (row numeric)
-% errs : prediction errors (row numeric)
+% labels : prediction labels (matrix numeric)
 
 		% safeguard
-	if nargin < 1 || ~isrow( roots ) || ~isa( roots(1), 'brf.hNode' )
+	if nargin < 1 || ~isrow( roots ) % no type check!
 		error( 'ivalid argument: roots' );
 	end
 
@@ -20,8 +19,24 @@ function [labels, errs] = classify( roots, features )
 		error( 'invalid argument: features' );
 	end
 
-	logger = xis.hLogger.instance( 'bla' );
-	%logger.tab( 'classify (samples: %d, trees: %d)...', size( features, 1 ), numel( roots ) );
+		% compile mex-file (once)
+	persistent compile;
+
+	if isempty( compile )
+		[st, i] = dbstack( '-completenames' ); % get current module path
+		[path, ~, ~] = fileparts( st(i).file );
+		src = fullfile( path, 'classify_mex.c' ); % compile mex-file
+		mex( src, '-outdir', path );
+		compile = false; % never check again
+	end
+
+		% call and return with mex-file
+	labels = brf.classify_mex( roots, features );
+
+	return;
+
+		% MATLAB MEX-FILE TEMPLATE
+		% DO NOT CALL ANYTHING THAT FOLLOWS!
 
 		% get class votes from all trees
 	nsamples = size( features, 1 );
@@ -29,7 +44,6 @@ function [labels, errs] = classify( roots, features )
 
 	labels = NaN( nroots, nsamples ); % pre-allocation
 
-	%logger.progress();
 	for i = 1:nsamples
 		sfeatures = features(i, :);
 
@@ -58,17 +72,9 @@ function [labels, errs] = classify( roots, features )
 				% vote for leaf label
 			labels(j, i) = node.label;
 
-			logger.log( 'label: %d', node.label );
-
 		end
 
-		%logger.progress( i, nsamples );
 	end
 
-		% reduce to majority votes w/ misclassification error
-	[labels, errs] = mode( labels, 1 ); % TODO: equal frequencies?!
-	errs = 1 - errs/nroots;
-
-	%logger.untab();
 end
 

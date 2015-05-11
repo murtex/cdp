@@ -17,31 +17,35 @@ classdef hNode < matlab.mixin.Copyable
 		% methods
 	methods (Access = public)
 
-		function s = rstruct( this )
-		% convert to struture
+		function s = mexify( this )
+		% convert class to struture (for mex-file usage)
 		%
-		% s = RSTRUCT( this )
+		% s = MEXIFY( this )
 		%
 		% INPUT
-		% this : tree node (scalar object)
+		% this : tree node (object)
 		%
 		% OUTPUT
-		% s : tree node structure (scalar struct)
-		
-				% safeguard
-			if ~isscalar( this )
-				error( 'invalid argument: this' );
+		% s : tree node structure (struct)
+
+				% proceed array elements
+			n = numel( this );
+
+			for i = n:-1:1
+
+					% convert recursively
+				s(i) = struct( this(i) );
+
+				if ~isempty( this(i).left )
+					s(i).left = this(i).left.mexify();
+				end
+				if ~isempty( this(i).right )
+					s(i).right = this(i).right.mexify();
+				end
+
 			end
 
-				% convert recursively
-			s = struct( this );
-
-			if ~isempty( this.left )
-				s.left = this.left.rstruct();
-			end
-			if ~isempty( this.right )
-				s.right = this.right.rstruct();
-			end
+			s = reshape( s, size( this ) );
 
 		end
 

@@ -29,6 +29,16 @@ function classify( runs, classes, forest, labeled )
 	logger = xis.hLogger.instance();
 	logger.tab( 'classify data...' );
 
+		% convert forest for mex-file usage
+	logger.tab( 'convert forest...' );
+
+	wstate = warning( 'query', 'all' );
+	warning( 'off', 'all' );
+	mexforest = forest.mexify(); % conversion
+	warning( wstate );
+
+	logger.untab();
+
 		% proceed runs
 	nruns = numel( runs );
 
@@ -58,9 +68,11 @@ function classify( runs, classes, forest, labeled )
 				% read and classify subsequences
 			load( featfile, 'subfeat' );
 
-			[labels, errs] = brf.classify( forest, subfeat );
+			labels = brf.classify( mexforest, subfeat );
 
-				% set majority vote label
+			labels = mode( labels, 1 ); % majority vote
+
+				% set detected label
 			runs(i).trials(j).detected.label = classes{mode( labels )}; % TODO: equal frequencies?!
 
 			if ~isempty( runs(i).trials(j).labeled.label )
@@ -74,13 +86,11 @@ function classify( runs, classes, forest, labeled )
 			logger.progress( j, m );
 		end
 
-		%logger.log( 'accuracy: %.6f', hits(i) / (hits(i)+misses(i)) );
 		logger.log( 'error: %.2f%%', 100 * misses(i) / (hits(i)+misses(i)) );
 
 		logger.untab();
 	end
 
-	%logger.log( 'accuracy: %.6f', sum( hits ) / (sum( hits )+sum( misses )) );
 	logger.log( 'error: %.2f%%', 100 * sum( misses ) / (sum( hits )+sum( misses )) );
 
 	logger.untab();
