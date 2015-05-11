@@ -5,7 +5,7 @@ Upcoming cue-distractor experiment
 ----------------
 
 - @Eugen
-	- please prefix the logfile header line with a comment character `#`
+	- we can keep the logfile header line, but please prefix it with a comment character `#`
 	- when you have included output of SOA in your scripts, please remove line 55 in script `read_trials.m`
 - @Stephen
 	- just download the zip file and extract to your desktop (or wherever you want)
