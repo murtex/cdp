@@ -9,7 +9,7 @@ Upcoming cue-distractor experiment
 	- when you have included output of SOA in your scripts, please remove line 55 in script `read_trials.m`
 - @Stephen
 	- just download the zip file and extract it to your desktop (or wherever you want)
-	- change to that directory in MATLAB and start the single script `interim`
+	- change to directory `cdd/` in MATLAB and start the single script `interim`
 	- raw recordings (for any individual subject) you can store wherever you want them to be
 	- files of the *current* subject needs to be called `participant_production.txt` and `participant_production.wav` and put into subdirectory `data/cdd/interim/` (if it does not exist please create)
 	- after script execution you will find two plots there: `sync.png` and `timing.png`
