@@ -39,8 +39,6 @@ function read_audio( run, audiofile, info_only )
 		run.audiolen = size( run.audiodata, 1 );
 	end
 
-	run.audiodata = single( run.audiodata ); % single precision
-
 	logger.log( 'rate: %dHz', run.audiorate );
 	logger.log( 'length: %.1fs', dsp.smp2sec( run.audiolen, run.audiorate ) );
 

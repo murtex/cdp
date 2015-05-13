@@ -25,7 +25,7 @@ function labels = classify( roots, features )
 	if isempty( compile )
 		[st, i] = dbstack( '-completenames' ); % get current module path
 		[path, ~, ~] = fileparts( st(i).file );
-		src = fullfile( path, 'classify_mex.c' ); % compile mex-file
+		src = fullfile( path, 'classify_mex.cpp' ); % compile mex-file
 		mex( src, '-outdir', path );
 		compile = false; % never check again
 	end

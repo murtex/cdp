@@ -31,33 +31,15 @@ function offs = sync( run, cfg, sync_resp )
 	logger = xis.hLogger.instance();
 	logger.tab( 'sync timing...' );
 
-		% detect sync start (first tone-distractor)
-	mu = mean( run.audiodata(:, 2), 1 ); % noise estimate
-	sigma = std( run.audiodata(:, 2), 1, 1 );
+		% detect sync zero-point (first 'tone' distractor)
+	vic = dsp.msec2smp( cfg.sync_mrklen, run.audiorate );
 
-	vcsize = dsp.msec2smp( cfg.sync_mrklen, run.audiorate ); % vicinity size
-	vcthresh = cfg.sync_thresh * vcsize * sigma;
-
-	start = 0; % pre-allocation
-
-	for i = 1:run.audiolen
-		vc = i : min( run.audiolen, i+vcsize );
-
-		mmd = sum( abs( run.audiodata(vc, 2) - mu ) ); % mean mahalanobis dist
-		if mmd >= vcthresh
-			start = i-1;
-			break;
-		end
+	zoffs = k15.scs05( run.audiodata(:, 2), vic, cfg.sync_thresh ) - 1;
+	if isnan( zoffs )
+		error( 'invalid argument: run' );
 	end
 
-	logger.log( 'start: %.1fms', dsp.smp2msec( start, run.audiorate ) );
-
-		% DEBUG
-	start
-
-	k15.scs05( run.audiodata(:, 2), vcsize, cfg.sync_thresh )
-
-	error( 'DEBUG' );
+	logger.log( 'zero-point: %.1fms', dsp.smp2msec( zoffs, run.audiorate ) );
 
 		% detect sync marker offsets
 	range = dsp.msec2smp( cfg.sync_range, run.audiorate );
@@ -71,7 +53,7 @@ function offs = sync( run, cfg, sync_resp )
 	for i = 1:n
 
 			% prepare search range
-		sr = run.trials(i).cue + start;
+		sr = run.trials(i).cue + zoffs;
 		if i > 1
 			sr = sr + offs(i-1); % use last offset as an estimate
 			offs(i) = offs(i-1);
@@ -81,26 +63,18 @@ function offs = sync( run, cfg, sync_resp )
 		sr(sr < 1) = []; % do not exceed audio data
 		sr(sr > run.audiolen) = [];
 
-		if isempty( sr )
+		if isempty( sr ) % skip empty search range
 			logger.progress( i, n );
 			continue;
 		end
 
-			% detect marker in range
-		mu = mean( run.audiodata(sr, 2), 1 ); % noise estimate
-		sigma = std( run.audiodata(sr, 2), 1, 1 );
+			% detect marker start and set offset
+		moffs = k15.scs05( run.audiodata(sr, 2), vic, cfg.sync_thresh );
+		moffs = sr(1)+moffs-1 - zoffs - run.trials(i).cue;
 
-		vcthresh = cfg.sync_thresh * vcsize * sigma;
-
-		for j = sr(1):sr(end)
-			vc = j : min( sr(end), j+vcsize );
-
-			mmd = sum( abs( run.audiodata(vc, 2) - mu ) ); % mean mahalanobis dist
-			if mmd >= vcthresh
-				offs(i) = j - (start + run.trials(i).cue);
-				hits(i) = true;
-				break;
-			end
+		if ~isnan( moffs )
+			offs(i) = moffs;
+			hits(i) = true;
 		end
 
 		logger.progress( i, n );
@@ -114,23 +88,23 @@ function offs = sync( run, cfg, sync_resp )
 	for i = 1:n
 
 			% adjust timing
-		run.trials(i).range = run.trials(i).range + start + offs(i);
+		run.trials(i).range = run.trials(i).range + zoffs + offs(i);
 
-		run.trials(i).cue = run.trials(i).cue + start + offs(i);
+		run.trials(i).cue = run.trials(i).cue + zoffs + offs(i);
 
-		run.trials(i).distbo = run.trials(i).distbo + start + offs(i);
-		run.trials(i).distvo = run.trials(i).distvo + start + offs(i);
+		run.trials(i).distbo = run.trials(i).distbo + zoffs + offs(i);
+		run.trials(i).distvo = run.trials(i).distvo + zoffs + offs(i);
 
 		if sync_resp % optionally for responses
-			run.trials(i).detected.range = run.trials(i).detected.range + start + offs(i);
-			run.trials(i).detected.bo = run.trials(i).detected.bo + start + offs(i);
-			run.trials(i).detected.vo = run.trials(i).detected.vo + start + offs(i);
-			run.trials(i).detected.vr = run.trials(i).detected.vr + start + offs(i);
+			run.trials(i).detected.range = run.trials(i).detected.range + zoffs + offs(i);
+			run.trials(i).detected.bo = run.trials(i).detected.bo + zoffs + offs(i);
+			run.trials(i).detected.vo = run.trials(i).detected.vo + zoffs + offs(i);
+			run.trials(i).detected.vr = run.trials(i).detected.vr + zoffs + offs(i);
 
-			run.trials(i).labeled.range = run.trials(i).labeled.range + start + offs(i);
-			run.trials(i).labeled.bo = run.trials(i).labeled.bo + start + offs(i);
-			run.trials(i).labeled.vo = run.trials(i).labeled.vo + start + offs(i);
-			run.trials(i).labeled.vr = run.trials(i).labeled.vr + start + offs(i);
+			run.trials(i).labeled.range = run.trials(i).labeled.range + zoffs + offs(i);
+			run.trials(i).labeled.bo = run.trials(i).labeled.bo + zoffs + offs(i);
+			run.trials(i).labeled.vo = run.trials(i).labeled.vo + zoffs + offs(i);
+			run.trials(i).labeled.vr = run.trials(i).labeled.vr + zoffs + offs(i);
 		end
 
 			% validate timing

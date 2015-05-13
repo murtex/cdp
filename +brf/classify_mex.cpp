@@ -1,10 +1,10 @@
 /**
- * classfiy_mex.c
+ * classfiy_mex.cpp
  * 20150510
  *
  * classify features
  *
- * COMPILE: mex 'classify_mex.c'
+ * COMPILE: mex 'classify_mex.cpp'
  *
  * INPUT
  * roots : tree root nodes (row object)
@@ -15,6 +15,8 @@
  */
 
 	/* includes */
+#include <cmath>
+
 #include "mex.h"
 
 	/* input extraction */
@@ -24,7 +26,7 @@ get_val( mxArray const * matrix, int index, int field )
 	double const * label = mxGetPr( mxGetFieldByNumber( matrix, index, field ) );
 
 	if ( label == NULL )
-		return 0;
+		return NAN;
 
 	return label[0];
 }
@@ -40,28 +42,19 @@ get_node( mxArray const * matrix, int index, int field )
 	return node;
 }
 
-	/* gateway */
+	/* matlab gateway */
 void
 mexFunction( int nlhs, mxArray ** lhs, int nrhs, mxArray const ** rhs )
 {
 
-		/* safeguard */
-	if ( nrhs < 1 || 
-			mxGetNumberOfDimensions( rhs[0] ) != 2 || mxGetM( rhs[0] ) != 1 )
-		mexErrMsgTxt( "invalid argument: roots" );
-
-	if ( nrhs < 2 || 
-			mxGetNumberOfDimensions( rhs[1] ) != 2 )
-		mexErrMsgTxt( "invalid argument: features" );
-
 		/* extract inputs */
 	int const nroots = mxGetN( rhs[0] );
 
-	int field_label = mxGetFieldNumber( rhs[0], "label" );
-	int field_feature = mxGetFieldNumber( rhs[0], "feature" );
-	int field_value = mxGetFieldNumber( rhs[0], "value" );
-	int field_left = mxGetFieldNumber( rhs[0], "left" );
-	int field_right = mxGetFieldNumber( rhs[0], "right" );
+	int const field_label = mxGetFieldNumber( rhs[0], "label" );
+	int const field_feature = mxGetFieldNumber( rhs[0], "feature" );
+	int const field_value = mxGetFieldNumber( rhs[0], "value" );
+	int const field_left = mxGetFieldNumber( rhs[0], "left" );
+	int const field_right = mxGetFieldNumber( rhs[0], "right" );
 
 	int const nsamples = mxGetM( rhs[1] );
 	int const nfeatures = mxGetN( rhs[1] );
@@ -79,12 +72,10 @@ mexFunction( int nlhs, mxArray ** lhs, int nrhs, mxArray const ** rhs )
 	mxArray const * left;
 	mxArray const * right;
 
-	int i;
-	for ( i = 0; i < nsamples; ++i ) {
+	for ( int i = 0; i < nsamples; ++i ) {
 
 			/* proceed roots */
-		int j;
-		for ( j = 0; j < nroots; ++j ) {
+		for ( int j = 0; j < nroots; ++j ) {
 
 				/* proceed tree down to leaf */
 			node = rhs[0];
