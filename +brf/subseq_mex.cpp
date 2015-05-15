@@ -116,7 +116,7 @@ mexFunction( int nlhs, mxArray ** lhs, int nrhs, mxArray const ** rhs )
 
 				double sxy = 0;
 				for ( int l = substart + k*rndintlen; l < substart + (k+1)*rndintlen; ++l )
-					sxy += vand[l - substart - k*rndintlen] * featser[j*featserlen + l];
+					sxy += vand[l - substart - k*rndintlen] * (featser[j*featserlen + l] - mean);
 				double const slope = sxy/sx;
 
 				int const koffs = joffs + NSUBFEATS + k*NINTFEATS;
