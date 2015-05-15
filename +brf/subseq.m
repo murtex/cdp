@@ -1,5 +1,5 @@
 function subser = subseq( featser, intlen, intcount )
-% generate subsequences and features
+% generate subsequences of features
 %
 % subser = SUBSEQ( featser, intlen, intcount )
 %
@@ -24,13 +24,36 @@ function subser = subseq( featser, intlen, intcount )
 		error( 'invalid argument: intcount' );
 	end
 
-		% set number of subsequences
-	m = size( featser, 1 ); % time series length
-	n = size( featser, 2 ); % number of prime features
+		% try to call mex-version (once)
+	persistent mexified;
 
-	r = floor( m / intlen );
-	subs = r - intcount;
-	if subs < 1
+	if isempty( mexified )
+
+			% get current module path
+		[st, i] = dbstack( '-completenames' );
+		[path, ~, ~] = fileparts( st(i).file );
+
+			% compile mex-source
+		src = fullfile( path, 'subseq_mex.cpp' );
+		ret = mex( src, '-silent', '-outdir', path );
+
+		mexified = ~ret;
+	end
+
+	if mexified
+		subser = brf.subseq_mex( featser, intlen, intcount ); % call mex-version
+		return;
+	end
+
+		% MATLAB FALLBACK IMPLEMENTATION
+
+		% set number of subsequences
+	featserlen = size( featser, 1 ); % time series length
+	featserwidth = size( featser, 2 ); % number of prime features
+
+	r = floor( featserlen / intlen );
+	subserlen = r - intcount;
+	if subserlen < 1
 		subser = []; % no subdivision possible
 		return;
 	end
@@ -39,13 +62,13 @@ function subser = subseq( featser, intlen, intcount )
 	nlocfeats = 2; % number of location features
 	nintfeats = 3; % number of interval features
 
-	subser = NaN( subs, nlocfeats + n*(2 + nintfeats*intcount) ); % pre-allocation
+	subser = NaN( subserlen, nlocfeats + featserwidth*(2 + nintfeats*intcount) ); % pre-allocation
 
-	for i = 1:subs
+	for i = 1:subserlen
 
-			% choose random endpoints (restricted by interval length)
-		rndintlen = randi( [intlen, floor( m / intcount )], 1, 1 );
-		t1 = randi( m - intcount*rndintlen + 1, 1, 1 );
+			% choose random endpoints (restricted by interval length and count)
+		rndintlen = randi( [intlen, floor( featserlen / intcount )], 1, 1 );
+		t1 = randi( featserlen - intcount*rndintlen + 1, 1, 1 );
 		t2 = t1 + intcount*rndintlen - 1;
 
 		intstarts = t1:rndintlen:t2; % interval indices
@@ -54,11 +77,11 @@ function subser = subseq( featser, intlen, intcount )
 		vand = [ones( rndintlen, 1 ), (1:rndintlen)']; % regression matrix
 
 			% set location features
-		subser(i, 1) = (t1-1)/(m-1);
-		subser(i, 2) = (t2-1)/(m-1);
+		subser(i, 1) = (t1-1)/(featserlen-1);
+		subser(i, 2) = (t2-1)/(featserlen-1);
 
 			% proceed prime features
-		for j = 1:n
+		for j = 1:featserwidth
 			seqser = featser(t1:t2, j);
 			ji = 2 + (j-1)*(2 + nintfeats*intcount);
 
