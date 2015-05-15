@@ -1,17 +1,17 @@
 /**
- * unframe_mex.cpp
+ * expand_mex.cpp
  * 20150513
  *
- * short-time un-framing
+ * expand and center frames
  * 
- * COMPILE: mex 'unfame_mex.cpp'
+ * COMPILE: mex 'expand_mex.cpp'
  *
  * INPUT
  * ser : time series (numeric)
  * frame : frame length and stride (pair numeric)
  *
  * OUTPUT
- * ser : unframed time series (numeric)
+ * ser : expanded time series (numeric)
  */
 
 	/* includes */
@@ -33,7 +33,7 @@ mexFunction( int nlhs, mxArray ** lhs, int nrhs, mxArray const ** rhs )
 	double const * ser = mxGetPr( rhs[0] );
 
 	double const * frame = mxGetPr( rhs[1] );
-	int overlap = (int) (frame[0]-frame[1]);
+	int const overlap = (int) (frame[0]-frame[1]);
 
 		/* prepare outputs */
 	int const seroutlen = serlen * (int) frame[1] + overlap;
@@ -43,20 +43,23 @@ mexFunction( int nlhs, mxArray ** lhs, int nrhs, mxArray const ** rhs )
 
 		/* expand frames */
 	for ( int i = 0; i < sernum; ++i ) {
-		int offs = i/serlen * overlap;
-		int nums = (i % serlen == serlen-1) ? (frame[0]) : (frame[1]);
+		int const offs = i/serlen * overlap;
+		int const nums = (i % serlen == serlen-1) ? (frame[0]) : (frame[1]);
+
 		std::fill_n( serout + i * (int) frame[1] + offs, nums, ser[i] );
 	}
 
 		/* center frames */
-    int const l2 = (int) floor( frame[0]/2 );
+    int const f2 = (int) floor( frame[0]/2 );
+	int const len = serlen * (int) frame[1] * sizeof( double );
 
-	mexPrintf( "%d\n", l2 );
+	for ( int i = 0; i < serwidth; ++i ) {
+		int const from = i*seroutlen;
+		int const to = from + f2;
 
-	for ( int i = serwidth-1; i >= 0; --i ) {
-		int offs = i*seroutlen;
-		//memmove( serout + offs+l2, serout + offs, serlen * (int) frame[1] * sizeof( double ) );
-    }
+		memmove( serout + to, serout + from, len );
+		std::fill_n( serout + from + 1, f2 - 1, *(serout + from) );
+	}
 
 }
 

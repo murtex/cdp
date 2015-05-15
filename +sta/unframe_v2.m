@@ -15,17 +15,42 @@ function ser = unframe_v2( ser, frame )
 		error( 'invalid argument: ser' );
 	end
 
-		% expand frames
-	ser = kron( ser, ones( frame(2), 1 ) );
-	ser(end+1:end+frame(1)-frame(2), :) = repmat( ser(end, :), frame(1)-frame(2), 1 );
+		% try to call mex-version (once)
+	persistent mexified;
 
-		% center frames
-	l2 = floor( frame(1)/2 );
-	ser = cat( 1, repmat( ser(1, :), l2, 1 ), ser );
-	ser(end-l2+1:end, :) = [];
+	if isempty( mexified )
+
+			% get current module path
+		[st, i] = dbstack( '-completenames' );
+		[path, ~, ~] = fileparts( st(i).file );
+
+			% compile mex-source
+		src = fullfile( path, 'expand_mex.cpp' );
+		ret = mex( src, '-silent', '-outdir', path );
+
+		mexified = ~ret;
+	end
+
+	if mexified
+		ser = sta.expand_mex( ser, frame ); % call mex-version
+
+	else
+
+			% MATLAB FALLBACK IMPLEMENTATION
+
+			% expand frames
+		ser = kron( ser, ones( frame(2), 1 ) );
+		ser(end+1:end+frame(1)-frame(2), :) = repmat( ser(end, :), frame(1)-frame(2), 1 );
+
+			% center frames
+		f2 = floor( frame(1)/2 );
+		ser = cat( 1, repmat( ser(1, :), f2, 1 ), ser );
+		ser(end-f2+1:end, :) = [];
+
+	end
 
 		% smoothing
-	kernel = fspecial( 'average', [2*(frame(1)-frame(2)), 1] );
+	kernel = fspecial( 'average', [2*(frame(1)-frame(2)) + 1, 1] );
 	ser = filter2( kernel, ser );
 
 end

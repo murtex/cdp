@@ -21,6 +21,29 @@ function [actser, lothresh, hithresh] = activity( ser, clser )
 		error( 'invalid argument: clser' );
 	end
 
+		% try to call mex-version (once)
+	persistent mexified;
+
+	if isempty( mexified )
+
+			% get current module path
+		[st, i] = dbstack( '-completenames' );
+		[path, ~, ~] = fileparts( st(i).file );
+
+			% compile mex-source
+		src = fullfile( path, 'activity_mex.cpp' );
+		ret = mex( src, '-silent', '-outdir', path );
+
+		mexified = ~ret;
+	end
+
+	if mexified
+		[actser, lothresh, hithresh] = k15.activity_mex( ser, clser ); % call mex-version
+		return;
+	end
+
+		% MATLAB FALLBACK IMPLEMENTATION
+
 		% set adaptive thresholds
 	sermin = min( ser );
 	sermax = max( ser );
@@ -39,13 +62,13 @@ function [actser, lothresh, hithresh] = activity( ser, clser )
 		switch state
 
 			case 1 % no activity
-				if clser(i) >= lothresh
+				if clser(i) >= lothresh % start potential activity
 					state = 2;
 					statelen = 0;
 				end
 
 			case 2 % potential activity
-				if clser(i) >= hithresh % assured past activity
+				if clser(i) >= hithresh % assured past/current activity
 					actser(i-statelen:i) = true;
 					state = 3;
 					statelen = 0;
