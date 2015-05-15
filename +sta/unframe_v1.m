@@ -1,7 +1,7 @@
-function ser = unframe( ser, frame )
+function ser = unframe_v1( ser, frame )
 % short-time un-framing
 %
-% ser = UNFRAME( ser, frame )
+% ser = UNFRAME_V1( ser, frame )
 %
 % INPUT
 % ser : time series (numeric)
@@ -9,15 +9,6 @@ function ser = unframe( ser, frame )
 %
 % OUTPUT
 % ser : unframed time series (numeric)
-
-		% safeguard
-	if nargin < 1 || ~isnumeric( ser )
-		error( 'invalid argument: ser' );
-	end
-
-	if nargin < 2 || ~isnumeric( frame ) || numel( frame ) ~= 2
-		error( 'invalid argument: frame' );
-	end
 
 		% expand and overlap frames
 	s = size( ser );

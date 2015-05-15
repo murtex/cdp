@@ -24,30 +24,37 @@ function asi = scs05( ser, vic, sigma )
 		error( 'invalid argument: sigma' );
 	end
 
-		% compile mex-file (once)
-	persistent compile;
+		% try to call mex-version (once)
+	persistent mexified;
 
-	if isempty( compile )
-		[st, i] = dbstack( '-completenames' ); % get current module path
+	if isempty( mexified )
+
+			% get current module path
+		[st, i] = dbstack( '-completenames' );
 		[path, ~, ~] = fileparts( st(i).file );
-		src = fullfile( path, 'scs05_mex.cpp' ); % compile mex-file
-		mex( src, '-outdir', path );
-		compile = false; % never check again
+
+			% compile mex-source
+		src = fullfile( path, 'scs05_mex.cpp' );
+		ret = mex( src, '-silent', '-outdir', path );
+
+		mexified = ~ret;
 	end
 
-	asi = k15.scs05_mex( ser, vic, sigma );
+	if mexified
+		asi = k15.scs05_mex( ser, vic, sigma ); % call mex-version
+		return;
+	end
 
-	return;
-
-		% DO NOT CALL ANY CODE BELOW!
-		% MATLAB TEMPLATE FOR MEX-FILE
+		% MATLAB FALLBACK IMPLEMENTATION
 
 	asi = NaN; % pre-allocation
 
-	sermu = mean( ser ); % use series itself as noise estimation
+		% use series itself as noise estimation
+	sermu = mean( ser );
 	sersigma = std( ser, 1 );
 
-	n = numel( ser ); % proceed series values
+		% proceed series values
+	n = numel( ser );
 	for i = 1:n
 
 			% get mean mahalanobis distance of forward vicinity

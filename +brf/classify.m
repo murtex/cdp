@@ -19,24 +19,28 @@ function labels = classify( roots, features )
 		error( 'invalid argument: features' );
 	end
 
-		% compile mex-file (once)
-	persistent compile;
+		% try to call mex-version (once)
+	persistent mexified;
 
-	if isempty( compile )
-		[st, i] = dbstack( '-completenames' ); % get current module path
+	if isempty( mexified )
+
+			% get current module path
+		[st, i] = dbstack( '-completenames' );
 		[path, ~, ~] = fileparts( st(i).file );
-		src = fullfile( path, 'classify_mex.cpp' ); % compile mex-file
-		mex( src, '-outdir', path );
-		compile = false; % never check again
+
+			% compile mex-source
+		src = fullfile( path, 'classify_mex.cpp' );
+		ret = mex( src, '-silent', '-outdir', path );
+
+		mexified = ~ret;
 	end
 
-		% call and return with mex-file
-	labels = brf.classify_mex( roots, features );
+	if mexified
+		labels = brf.classify_mex( roots, features ); % call mex-version
+		return;
+	end
 
-	return;
-
-		% MATLAB MEX-FILE TEMPLATE
-		% DO NOT CALL ANYTHING THAT FOLLOWS!
+		% MATLAB FALLBACK IMPLEMENTATION
 
 		% get class votes from all trees
 	nsamples = size( features, 1 );
