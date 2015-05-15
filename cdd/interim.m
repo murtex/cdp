@@ -51,6 +51,14 @@ cdf.plot.timing( run, detected, [], fullfile( plotdir, 'timing' ) );
 	%end
 %end
 
+	% log vot mean and standard deviation
+trials = [run.trials.detected];
+vots = dsp.smp2msec( [trials.vo]-[trials.bo], run.audiorate );
+vots(isnan( vots )) = [];
+
+logger.log( 'vot mean: %.1fms', mean( vots ) );
+logger.log( 'vot std: %.1fms', std( vots, 1 ) );
+
 	% put your own additional code here
 ...
 
