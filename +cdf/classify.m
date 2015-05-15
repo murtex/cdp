@@ -1,13 +1,12 @@
-function classify( runs, classes, forest, labeled )
+function classify( runs, classes, forest );
 % classify labels
 %
-% CLASSIFY( runs, classes, forest, labeled )
+% CLASSIFY( runs, classes, forest )
 %
 % INPUT
 % runs : runs (row object)
 % classes : class labels (cell row char)
 % forest : tree root nodes (row object)
-% labeled : use labeled response features (scalar logical)
 
 		% safeguard
 	if nargin < 1 || ~isrow( runs ) || ~isa( runs(1), 'cdf.hRun' )
@@ -20,10 +19,6 @@ function classify( runs, classes, forest, labeled )
 
 	if nargin < 3 || ~isrow( forest) || ~isa( forest(1), 'brf.hNode' )
 		error( 'invalid argument: forest' );
-	end
-
-	if nargin < 4 || ~isscalar( labeled ) || ~islogical( labeled )
-		error( 'invalid argument: labeled' );
 	end
 
 	logger = xis.hLogger.instance();
@@ -55,12 +50,7 @@ function classify( runs, classes, forest, labeled )
 		for j = 1:m
 
 				% skip unfeatured data
-			if labeled
-				featfile = runs(i).trials(j).labeled.featfile;
-			else
-				featfile = runs(i).trials(j).detected.featfile;
-			end
-
+			featfile = runs(i).trials(j).detected.featfile;
 			if isempty( featfile )
 				continue;
 			end

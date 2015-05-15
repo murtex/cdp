@@ -1,12 +1,11 @@
-function features( run, cfg, labeled, landmarks, outdir )
+function features( run, cfg, landmarks, outdir )
 % extract features
 %
-% FEATURES( run, cfg, labeled, landmarks, outdir )
+% FEATURES( run, cfg, landmarks, outdir )
 %
 % INPUT
 % run : run (scalar object)
 % cfg : configuration (scalar object)
-% labeled : use labeled responses (scalar logical)
 % landmarks : use landmarks (scalar logical)
 % outdir : output directory (row char)
 
@@ -19,15 +18,11 @@ function features( run, cfg, labeled, landmarks, outdir )
 		error( 'invalid argument: cfg' );
 	end
 
-	if nargin < 3 || ~isscalar( labeled ) || ~islogical( labeled )
-		error( 'invalid argument: labeled' );
-	end
-
-	if nargin < 4 || ~isscalar( landmarks ) || ~islogical( landmarks )
+	if nargin < 3 || ~isscalar( landmarks ) || ~islogical( landmarks )
 		error( 'invalid argument: landmarks' );
 	end
 
-	if nargin < 5 || ~isrow( outdir ) || ~ischar( outdir )
+	if nargin < 4 || ~isrow( outdir ) || ~ischar( outdir )
 		error( 'invalid argument: outdir' );
 	end
 
@@ -46,15 +41,13 @@ function features( run, cfg, labeled, landmarks, outdir )
 			% reset features
 		trial = run.trials(i);
 
-		if labeled % set response
-			trial.labeled.featfile = '';
-			resp = trial.labeled;
-		else
-			trial.detected.featfile = '';
-			resp = trial.detected;
-		end
+		trial.detected.featfile = '';
+		trial.labeled.featfile = '';
 
-		if landmarks % set response range
+			% set response range
+		resp = trial.detected;
+
+		if landmarks
 			resprange = [resp.bo, resp.vr];
 		else
 			resprange = resp.range;
@@ -113,15 +106,9 @@ function features( run, cfg, labeled, landmarks, outdir )
 		subs = subs + size( subfeat, 1 );
 
 			% set and write feature file
-		outfile = fullfile( outdir, sprintf( '%d.mat', trial.id ) );
+		trial.detected.featfile = fullfile( outdir, sprintf( '%d.mat', trial.id ) );
 
-		if labeled
-			trial.labeled.featfile = outfile;
-		else
-			trial.detected.featfile = outfile;
-		end
-
-		save( outfile, 'subfeat', '-v7.3' ); % hdf5-format
+		save( trial.detected.featfile, 'subfeat', '-v7.3' ); % hdf5-format
 
 		logger.progress( i, n );
 	end

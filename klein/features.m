@@ -19,7 +19,7 @@ end
 cfg = cdf.hConfig(); % use defaults
 
 	% proceed subjects
-ids = 15;
+ids = 1:47;
 
 for id = ids
 	logger.tab( 'subject: %d', id );
@@ -42,7 +42,7 @@ for id = ids
 		rmdir( subjectdir, 's' );
 	end
 	mkdir( subjectdir );
-	cdf.features( run, cfg, false, true, subjectdir );
+	cdf.features( run, cfg, true, subjectdir );
 
 		% write data
 	run.audiodata = []; % do not write audio data

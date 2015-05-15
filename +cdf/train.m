@@ -1,12 +1,11 @@
-function [classes, forest] = train( runs, cfg, labeled )
+function [classes, forest] = train( runs, cfg )
 % train label classifier
 %
-% forest = TRAIN( runs, cfg, labeled )
+% forest = TRAIN( runs, cfg )
 %
 % INPUT
 % runs : runs (row object)
 % cfg : configuration (scalar object)
-% labeled : use labeled response features (scalar logical)
 %
 % OUTPUT
 % classes : class labels (cell row char)
@@ -19,10 +18,6 @@ function [classes, forest] = train( runs, cfg, labeled )
 
 	if nargin < 2 || ~isscalar( cfg ) || ~isa( cfg, 'cdf.hConfig' )
 		error( 'invalid arguments: cfg' );
-	end
-
-	if nargin < 3 || ~isscalar( labeled ) || ~islogical( labeled )
-		error( 'invalid argument: labeled' );
 	end
 
 	logger = xis.hLogger.instance();
@@ -68,11 +63,7 @@ function [classes, forest] = train( runs, cfg, labeled )
 		for j = 1:m
 
 				% skip unfeatured or unlabeled data
-			if labeled
-				featfile = runs(i).trials(j).labeled.featfile;
-			else
-				featfile = runs(i).trials(j).detected.featfile;
-			end
+			featfile = runs(i).trials(j).detected.featfile;
 
 			cid = classid( runs(i).trials(j).labeled.label );
 
@@ -121,11 +112,7 @@ function [classes, forest] = train( runs, cfg, labeled )
 			for k = 1:m
 
 					% skip unfeatured or unlabeled data
-				if labeled
-					featfile = runs(i).trials(k).labeled.featfile;
-				else
-					featfile = runs(i).trials(k).detected.featfile;
-				end
+				featfile = runs(i).trials(k).detected.featfile;
 
 				cid = classid( runs(i).trials(k).labeled.label );
 

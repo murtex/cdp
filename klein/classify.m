@@ -12,7 +12,7 @@ indir1 = '../data/klein/cdf/features/';
 indir2 = '../data/klein/cdf/train/';
 
 	% read classification data
-ids = [16, 17];
+ids = 7;
 
 runs(1, numel( ids )) = cdf.hRun(); % pre-allocation
 
@@ -44,7 +44,7 @@ infile = fullfile( indir2, 'forest.mat' );
 logger.log( 'read forest ''%s''...', infile );
 load( infile, 'forest' );
 
-cdf.classify( runs, classes, forest, false );
+cdf.classify( runs, classes, forest );
 
 	% clean-up
 delete( runs );
