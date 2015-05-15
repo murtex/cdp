@@ -102,9 +102,7 @@ function features( run, cfg, labeled, landmarks, outdir )
 		end
 
 			% get subsequence features
-		%rng(1); % DEBUG
 		subfeat = brf.subseq( respfeat, dsp.msec2smp( cfg.feat_intlen, run.audiorate ), cfg.feat_intcount );
-		%error( 'DEBUG' );
 
 		if isempty( subfeat )
 			logger.progress( i, n );
