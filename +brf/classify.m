@@ -30,7 +30,7 @@ function labels = classify( roots, features )
 
 			% compile mex-source
 		src = fullfile( path, 'classify_mex.cpp' );
-		ret = mex( src, '-silent', '-outdir', path );
+		ret = mex( src, '-outdir', path );
 
 		mexified = ~ret;
 	end

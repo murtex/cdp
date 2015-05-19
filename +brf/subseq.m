@@ -35,7 +35,7 @@ function subser = subseq( featser, intlen, intcount )
 
 			% compile mex-source
 		src = fullfile( path, 'subseq_mex.cpp' );
-		ret = mex( src, '-silent', '-outdir', path );
+		ret = mex( src, '-outdir', path );
 
 		mexified = ~ret;
 	end

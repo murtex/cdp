@@ -1,15 +1,15 @@
-function classify( runs, classes, forest );
+function classify( run, classes, forest );
 % classify labels
 %
-% CLASSIFY( runs, classes, forest )
+% CLASSIFY( run, classes, forest )
 %
 % INPUT
-% runs : runs (row object)
+% run : run (scalar object)
 % classes : class labels (cell row char)
-% forest : tree root nodes (row object)
+% forest : mex tree root nodes (row struct)
 
 		% safeguard
-	if nargin < 1 || ~isrow( runs ) || ~isa( runs(1), 'cdf.hRun' )
+	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
 		error( 'invalid arguments: run' );
 	end
 
@@ -17,71 +17,70 @@ function classify( runs, classes, forest );
 		error( 'invalida argument: classes' );
 	end
 
-	if nargin < 3 || ~isrow( forest) || ~isa( forest(1), 'brf.hNode' )
+	if nargin < 3 || ~isrow( forest) % no type check!
 		error( 'invalid argument: forest' );
 	end
 
 	logger = xis.hLogger.instance();
 	logger.tab( 'classify data...' );
 
-		% convert forest for mex-file usage
-	logger.tab( 'convert forest...' );
+		% proceed trials
+	n = numel( run.trials );
 
-	wstate = warning( 'query', 'all' );
-	warning( 'off', 'all' );
-	mexforest = forest.mexify(); % conversion
-	warning( wstate );
+	ntrees = numel( forest );
+	nclasses = numel( classes );
 
-	logger.untab();
+	tlabels = NaN( ntrees, 1 ); % pre-allocation
+	classoccs = zeros( nclasses, 1 );
 
-		% proceed runs
-	nruns = numel( runs );
+	logger.progress();
+	for i = 1:n
 
-	hits = zeros( 1, nruns ); % pre-allocation
-	misses = zeros( 1, nruns );
+			% reset label
+		trial = run.trials(i);
 
-	for i = 1:nruns
-		logger.tab( 'subject: %d', runs(i).id );
+		trial.detected.label = '';
 
-			% proceed trials
-		m = numel( runs(i).trials );
-
-		logger.progress();
-		for j = 1:m
-
-				% skip unfeatured data
-			featfile = runs(i).trials(j).detected.featfile;
-			if isempty( featfile )
-				continue;
-			end
-
-				% read and classify subsequences
-			load( featfile, 'subfeat' );
-
-			labels = brf.classify( mexforest, subfeat );
-
-			labels = mode( labels, 1 ); % majority vote
-
-				% set detected label
-			runs(i).trials(j).detected.label = classes{mode( labels )}; % TODO: equal frequencies?!
-
-			if ~isempty( runs(i).trials(j).labeled.label )
-				if strcmp( runs(i).trials(j).detected.label, runs(i).trials(j).labeled.label )
-					hits(i) = hits(i) + 1;
-				else
-					misses(i) = misses(i) + 1;
-				end
-			end
-
-			logger.progress( j, m );
+		if isempty( trial.detected.featfile )
+			logger.progress( i, n );
+			continue;
 		end
 
-		logger.log( 'error: %.2f%%', 100 * misses(i) / (hits(i)+misses(i)) );
+			% read and classify subsequences
+		load( trial.detected.featfile, 'subfeat' );
 
-		logger.untab();
+		labels = brf.classify( forest, subfeat );
+
+			% set majority vote
+		for j = 1:ntrees
+
+			for k = 1:nclasses
+				classoccs(k) = sum( labels(j, :) == k );
+			end
+
+			label = find( classoccs == max( classoccs ) );
+			if numel( label ) > 1
+				label = randsample( label, 1 ); % random majority
+			end
+
+			tlabels(j) = label; % subsequence majority
+
+		end
+
+		for j = 1:nclasses
+			classoccs(j) = sum( tlabels == j );
+		end
+
+		label = find( classoccs == max( classoccs ) );
+		if numel( label ) > 1
+			label = randsample( label, 1 ); % random majority
+		end
+
+			% set detected label
+		trial.detected.label = classes{label}; % forest majority
+
+		logger.progress( i, n );
 	end
-
-	logger.log( 'error: %.2f%%', 100 * sum( misses ) / (sum( hits )+sum( misses )) );
 
 	logger.untab();
 end

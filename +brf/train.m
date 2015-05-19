@@ -56,14 +56,20 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 
 			% grow tree from root node
 		hiermax = logger.hierarchymax;
-		logger.hierarchymax = logger.hierarchy + 1; % limit logging depth
+		logger.hierarchymax = logger.hierarchy + 2; % limit logging depth
 
 		forest(i) = brf.hNode(); % grow tree
 		brf.split( forest(i), features(bagi, :), labels(bagi), nclasses );
 
 		logger.hierarchymax = hiermax; % restore logging depth
 
-			% logging oob-error
+			% log statistics
+		[nodes, depth] = forest(i).stats();
+
+		logger.log( 'nodes: %d', nodes );
+		logger.log( 'depth: %d', depth );
+
+			% log oob-error
 		if logoob
 			[ooblabels, ~] = brf.classify( forest(i), features(oobi, :) );
 			ooberr = sum( ooblabels ~= labels(oobi) ) / numel( oobi );

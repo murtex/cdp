@@ -4,7 +4,8 @@ classdef hNode < matlab.mixin.Copyable
 		% properties
 	properties (Access = public)
 
-		label = NaN; % majority class label (scalar numeric)
+		label = NaN; % node label (scalar numeric)
+		impurity = NaN; % node impurity (scalar numeric)
 
 		feature = NaN; % split feature (scalar numeric)
 		value = NaN; % split value (scalar numeric)
@@ -17,6 +18,7 @@ classdef hNode < matlab.mixin.Copyable
 		% methods
 	methods (Access = public)
 
+			% conversion
 		function s = mexify( this )
 		% convert class to struture (for mex-file usage)
 		%
@@ -46,6 +48,52 @@ classdef hNode < matlab.mixin.Copyable
 			end
 
 			s = reshape( s, size( this ) );
+
+		end
+
+			% statistics
+		function [nodes, depth] = stats( this, nodes, depth )
+		% tree statistics
+		%
+		% [nodes, depth] = STATS( this, nodes=0, depth=0 )
+		%
+		% INPUT
+		% this : tree node (scalar object)
+		% nodes : number of nodes (scalar numeric)
+		% depth : maximum tree depth (scalar numeric)
+		%
+		% OUTPUT
+		% nodes : number of nodes (scalar numeric)
+		% depth : maximum tree depth (scalar numeric)
+
+				% safeguard
+			if ~isscalar( this )
+				error( 'invalid argument: this' );
+			end
+
+			if nargin < 2
+				nodes = 0;
+			end
+			if ~isscalar( nodes ) || ~isnumeric( nodes )
+				error( 'invalid argument: nodes' );
+			end
+
+			if nargin < 3
+				depth = 0;
+			end
+			if ~isscalar( depth ) || ~isnumeric( depth )
+				error( 'invalid argument: depth' );
+			end
+
+				% gather statistics recursively
+			if ~isempty( this.left )
+				[nodes, depth] = this.left.stats( nodes, depth );
+			end
+			if ~isempty( this.right )
+				[nodes, depth] = this.right.stats( nodes, depth );
+			end
+
+			nodes = nodes + 1;
 
 		end
 

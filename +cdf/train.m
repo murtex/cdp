@@ -145,6 +145,10 @@ function [classes, forest] = train( runs, cfg )
 	logger.untab();
 
 		% grow subsequence forest
+	%dbgi = randsample( size( subs, 1 ), 20 );
+	%forest = brf.train( subs(dbgi, :), sublabels(dbgi), nclasses, cfg.train_trees, false );
+	%error( 'DEBUG' );
+
 	forest = brf.train( subs, sublabels, nclasses, cfg.train_trees, false );
 
 	logger.untab();
