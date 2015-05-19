@@ -35,7 +35,7 @@ function asi = scs05( ser, vic, sigma )
 
 			% compile mex-source
 		src = fullfile( path, 'scs05_mex.cpp' );
-		ret = mex( src, '-silent', '-outdir', path );
+		ret = mex( src, '-outdir', path );
 
 		mexified = ~ret;
 	end

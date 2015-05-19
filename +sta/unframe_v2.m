@@ -26,7 +26,7 @@ function ser = unframe_v2( ser, frame )
 
 			% compile mex-source
 		src = fullfile( path, 'expand_mex.cpp' );
-		ret = mex( src, '-silent', '-outdir', path );
+		ret = mex( src, '-outdir', path );
 
 		mexified = ~ret;
 	end

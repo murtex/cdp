@@ -32,7 +32,7 @@ function [actser, lothresh, hithresh] = activity( ser, clser )
 
 			% compile mex-source
 		src = fullfile( path, 'activity_mex.cpp' );
-		ret = mex( src, '-silent', '-outdir', path );
+		ret = mex( src, '-outdir', path );
 
 		mexified = ~ret;
 	end
