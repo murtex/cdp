@@ -54,7 +54,7 @@ mexFunction( int nlhs, mxArray ** lhs, int nrhs, mxArray const ** rhs )
 
 	for ( int i = 0; i < serlen; ++i ) {
 
-			/* get mean mahalanobis distance of forward vicinit */
+			/* get mean mahalanobis distance of forward vicinity */
 		double mmd = 0;
 
 		int vicstop = i + vic;
