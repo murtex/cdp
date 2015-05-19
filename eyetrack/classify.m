@@ -18,6 +18,16 @@ infile = fullfile( indir, 'forest.mat' );
 logger.log( 'read forest ''%s''...', infile );
 load( infile, 'forest' );
 
+	% convert forest for mex-file usage
+logger.tab( 'convert forest...' );
+
+wstate = warning( 'query', 'all' );
+warning( 'off', 'all' );
+mexforest = forest.mexify(); % conversion
+warning( wstate );
+
+logger.untab();
+
 	% proceed experiments
 for i = 1:2
 	logger.tab( 'experiment: %d', i );
@@ -42,7 +52,7 @@ for i = 1:2
 		load( infile, 'run' );
 
 			% classify labels
-		cdf.classify( run, classes, forest, false );
+		cdf.classify( run, classes, mexforest );
 
 			% clean-up
 		delete( run );

@@ -42,7 +42,7 @@ for id = ids
 		rmdir( subjectdir, 's' );
 	end
 	mkdir( subjectdir );
-	cdf.features( run, cfg, true, subjectdir );
+	cdf.features( run, cfg, false, subjectdir );
 
 		% write data
 	run.audiodata = []; % do not write audio data
