@@ -84,8 +84,11 @@ function features( run, cfg, landmarks, outdir )
 			% set prime features
 		respfeat = NaN( size( respft, 1 ), 0 ); % pre-allocation
 
-		respfeat(:, end+1) = sum( respft, 2 ); % total power 
 		respfeat(:, end+1) = sum( repmat( respfreqs, size( respft, 1 ), 1 ) .* respft, 2 ) ./ sum( respft, 2 ); % spectral centroid
+		[lorespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band1 ); % lower power
+		respfeat(:, end+1) = sum( lorespft, 2 );
+		[hirespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band2 ); % upper power
+		respfeat(:, end+1) = sum( hirespft, 2 );
 
 		respfeat = sta.unframe( respfeat, frame ); % smoothing
 		respfeat = zscore( respfeat, 1, 1 ); % standardization
