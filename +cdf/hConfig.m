@@ -30,6 +30,9 @@ classdef hConfig < matlab.mixin.Copyable
 		feat_intcount = 10; % number of intervals (scalar numeric)
 		feat_intlen = 5; % minimum interval length (scalar numeric)
 
+		feat_band1 = [150, 4000]; % lower frequency band (pair numeric)
+		feat_band2 = [4000, 8000]; % upper frequency band (pair numeric)
+
 		train_trees = 10; % number of trees (scalar numeric)
 
 	end
