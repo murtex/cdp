@@ -18,7 +18,7 @@ Framework
 
 - as already said: *this* directory needs to be on your MATLAB search path
 - the framework functionality is split into several namespaces (indicated by a plus sign)
-- [`+cdf`](https://github.com/murtex/cdp/tree/master/%2Bcdf) contains *everything* you need to get your data being processed
+- [`+cdf`](https://github.com/murtex/cdp/tree/master/%2Bcdf) contains everything you need to get your data being processed
 - [`+cdf/+plot`](https://github.com/murtex/cdp/tree/master/%2Bcdf/%2Bplot) comes up with functionality for testing and debugging
 - remaining namespaces like [`+k15`](https://github.com/murtex/cdp/tree/master/%2Bk15), [`+brf`](https://github.com/murtex/cdp/tree/master/%2Bbrf), etc. contain low-level functions and algorithms
 
