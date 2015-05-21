@@ -31,7 +31,7 @@ global_freqs = [];
 cfg = cdf.hConfig(); % use defaults
 
 	% proceed subjects
-ids = 6:47; % some syncs are malicious
+ids = 37; % some syncs are malicious
 
 for id = ids
 	logger.tab( 'subject: %d', id );

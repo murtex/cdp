@@ -19,7 +19,7 @@ end
 cfg = cdf.hConfig(); % use defaults
 
 	% proceed subjects
-ids = 17;
+ids = 37;
 
 for id = ids
 	logger.tab( 'subject: %d', id );

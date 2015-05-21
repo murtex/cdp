@@ -41,7 +41,7 @@ global_hits = 0;
 global_misses = 0;
 
 	% proceed subjects
-ids = [15, 16, 17];
+ids = [22, 37];
 
 for id = ids
 	logger.tab( 'subject: %d', id );

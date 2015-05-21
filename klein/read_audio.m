@@ -24,7 +24,7 @@ function read_audio( run, audiofile, info_only )
 	logger = xis.hLogger.instance();
 	logger.tab( 'read audio ''%s''...', audiofile );
 
-		% read audio data/info
+		% read audio data/info, TODO: wavread is deprecated for >= R2012b
 	run.audiofile = audiofile;
 
 	if info_only

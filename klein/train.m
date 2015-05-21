@@ -19,7 +19,7 @@ end
 cfg = cdf.hConfig(); % use defaults
 
 	% read training data
-ids = [15, 16, 17];
+ids = [22, 37];
 
 runs = cdf.hRun.empty(); % pre-allocation
 

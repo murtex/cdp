@@ -59,7 +59,7 @@ classdef (Sealed = true) hStyle < handle
 				error( 'invalid argument: plotfile' );
 			end
 
-				% print figure
+				% print figure, TODO: hardcopy is deprectated (at least for >= R2014b)
 			%print( plotfile, '-dpng', '-r120' );
 
 			imwrite( hardcopy( gcf(), '-dzbuffer', '-r120' ), sprintf( '%s.png', plotfile ), 'png' );

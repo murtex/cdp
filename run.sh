@@ -16,5 +16,6 @@ DIR=`dirname "$1"`
 FILE=`basename "$1"`
 
 cd "$DIR"
-matlab -nosplash -nodesktop -r "try, run ./$FILE; end, exit();"
+#matlab -nosplash -nodesktop -r "try, run ./$FILE; end, exit();"
+matlab -nosplash -nodesktop -r "run ./$FILE; exit();"
 
