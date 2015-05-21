@@ -15,6 +15,8 @@ function ser = unframe_v2( ser, frame )
 		error( 'invalid argument: ser' );
 	end
 
+	overlap = frame(1)-frame(2);
+
 		% try to call mex-version (once)
 	persistent mexified;
 
@@ -40,7 +42,7 @@ function ser = unframe_v2( ser, frame )
 
 			% expand frames
 		ser = kron( ser, ones( frame(2), 1 ) );
-		ser(end+1:end+frame(1)-frame(2), :) = repmat( ser(end, :), frame(1)-frame(2), 1 );
+		ser(end+1:end+overlap, :) = repmat( ser(end, :), overlap, 1 );
 
 			% center frames
 		f2 = floor( frame(1)/2 );
@@ -50,12 +52,17 @@ function ser = unframe_v2( ser, frame )
 	end
 
 		% smoothing
-	kernel = fspecial( 'average', [2*(frame(1)-frame(2)) + 1, 1] );
+	kernel = fspecial( 'average', [2*overlap + 1, 1] );
 
 	n = size( ser, 2 );
-	parfor i = 1:n
-		ser(:, i) = filter2( kernel, ser(:, i) );
+	if n >= 8 % parallelize if worthy
+		parfor (i = 1:n, 4)
+			ser(:, i) = filter2( kernel, ser(:, i) );
+		end
+	else
+		ser = filter2( kernel, ser );
 	end
+
 
 end
 
