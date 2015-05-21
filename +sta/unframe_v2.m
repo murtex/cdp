@@ -51,7 +51,11 @@ function ser = unframe_v2( ser, frame )
 
 		% smoothing
 	kernel = fspecial( 'average', [2*(frame(1)-frame(2)) + 1, 1] );
-	ser = filter2( kernel, ser );
+
+	n = size( ser, 2 );
+	parfor i = 1:n
+		ser(:, i) = filter2( kernel, ser(:, i) );
+	end
 
 end
 
