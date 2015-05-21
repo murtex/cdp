@@ -259,14 +259,14 @@ classdef (Sealed = true) hLogger < handle
 		% OUTPUT
 		% that : logger (scalar object)
 
-				% ensure singleton validity
+				% ensure singleton existence
 			persistent this;
 
 			if isempty( this ) || ~isvalid( this )
 				this = xis.hLogger();
 			end
 
-				% (re-)start file logging
+				% reset logger
 			if nargin > 0
 
 					% safeguard
@@ -274,11 +274,13 @@ classdef (Sealed = true) hLogger < handle
 					error( 'invalid argument: logfile' );
 				end
 
-					% (re-)start timing and diary
-				diary( 'off' );
-				diary( logfile );
+					% reset
+				delete( this ); % stop logging
+
+				this = xis.hLogger.instance(); % (re-)start logging
 
 				this.tics = tic();
+				diary( logfile );
 
 			end
 
