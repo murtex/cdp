@@ -7,7 +7,7 @@ classdef hConfig < matlab.mixin.Copyable
 			% sync
 		sync_mrklen = 1; % sync marker length (scalar numeric)
 		sync_thresh = 3; % sync detection threshold (scalar numeric)
-		sync_range = [-75, 25]; % sync detection range (row numeric)
+		sync_range = [-125, 25]; % sync detection range (row numeric)
 
 			% extraction
 		sta_frame = [15, 5]; % short-time frame length and stride (row numeric)

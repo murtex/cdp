@@ -49,7 +49,6 @@ function offs = sync( run, cfg, sync_resp )
 	offs = zeros( 1, n ); % pre-allocation
 	hits = false( 1, n );
 
-	logger.progress();
 	for i = 1:n
 
 			% prepare search range
@@ -77,7 +76,6 @@ function offs = sync( run, cfg, sync_resp )
 			hits(i) = true;
 		end
 
-		logger.progress( i, n );
 	end
 
 	offs(~hits) = NaN; % invalidate missed syncs
@@ -118,9 +116,6 @@ function offs = sync( run, cfg, sync_resp )
 		end
 
 	end
-
-	lens = diff( cat( 1, run.trials.range ), 1, 2 );
-	logger.log( 'trials: %d/%d', sum( ~isnan( lens ) ), n );
 
 	logger.untab();
 end
