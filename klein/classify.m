@@ -14,19 +14,9 @@ infile = fullfile( indir, 'classes.mat' );
 logger.log( 'read classes ''%s''...', infile );
 load( infile, 'classes' );
 
-infile = fullfile( indir, 'forest.mat' );
+infile = fullfile( indir, 'mexforest.mat' );
 logger.log( 'read forest ''%s''...', infile );
-load( infile, 'forest' );
-
-	% convert forest for mex-file usage
-logger.tab( 'convert forest...' );
-
-wstate = warning( 'query', 'all' );
-warning( 'off', 'all' );
-mexforest = forest.mexify(); % conversion
-warning( wstate );
-
-logger.untab();
+load( infile, 'mexforest' );
 
 	% prepare directories
 indir = '../data/klein/cdf/features/';
@@ -92,9 +82,6 @@ for id = ids
 end
 
 logger.log( 'accuracy: %.2f%%', global_hits / (global_hits + global_misses) * 100 );
-
-	% clean-up
-delete( forest );
 
 	% exit
 logger.log( 'done.' ); % stop logging

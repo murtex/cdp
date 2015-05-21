@@ -53,6 +53,20 @@ outfile = fullfile( outdir, 'forest.mat' );
 logger.log( 'write forest ''%s''...', outfile );
 save( outfile, 'forest' );
 
+	% convert forest for mex-file usage
+logger.tab( 'convert forest...' );
+
+wstate = warning( 'query', 'all' );
+warning( 'off', 'all' );
+mexforest = forest.mexify(); % conversion
+warning( wstate );
+
+outfile = fullfile( outdir, 'mexforest.mat' );
+logger.log( 'write forest ''%s''...', outfile );
+save( outfile, 'mexforest' );
+
+logger.untab();
+
 	% clean-up
 delete( runs );
 delete( forest );

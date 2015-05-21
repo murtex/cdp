@@ -14,19 +14,9 @@ infile = fullfile( indir, 'classes.mat' );
 logger.log( 'read classes ''%s''...', infile );
 load( infile, 'classes' );
 
-infile = fullfile( indir, 'forest.mat' );
+infile = fullfile( indir, 'mexforest.mat' );
 logger.log( 'read forest ''%s''...', infile );
-load( infile, 'forest' );
-
-	% convert forest for mex-file usage
-logger.tab( 'convert forest...' );
-
-wstate = warning( 'query', 'all' );
-warning( 'off', 'all' );
-mexforest = forest.mexify(); % conversion
-warning( wstate );
-
-logger.untab();
+load( infile, 'mexforest' );
 
 	% proceed experiments
 for i = 1:2
@@ -62,9 +52,6 @@ for i = 1:2
 
 	logger.untab();
 end
-
-	% clean-up
-delete( forest );
 
 	% exit
 logger.log( 'done.' ); % stop logging
