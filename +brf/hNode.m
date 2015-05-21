@@ -52,15 +52,16 @@ classdef hNode < matlab.mixin.Copyable
 		end
 
 			% statistics
-		function [nodes, depth] = stats( this, nodes, depth )
+		function [nodes, depth] = stats( this, nodes, depth, level )
 		% tree statistics
 		%
-		% [nodes, depth] = STATS( this, nodes=0, depth=0 )
+		% [nodes, depth] = STATS( this, nodes=0, depth=0, level=0 )
 		%
 		% INPUT
 		% this : tree node (scalar object)
 		% nodes : number of nodes (scalar numeric)
 		% depth : maximum tree depth (scalar numeric)
+		% level : current recursion level (scalar numeric)
 		%
 		% OUTPUT
 		% nodes : number of nodes (scalar numeric)
@@ -85,15 +86,25 @@ classdef hNode < matlab.mixin.Copyable
 				error( 'invalid argument: depth' );
 			end
 
+			if nargin < 4
+				level = 0;
+			end
+			if ~isscalar( level ) || ~isnumeric( level )
+				error( 'invalid argument: level' );
+			end
+
 				% gather statistics recursively
 			if ~isempty( this.left )
-				[nodes, depth] = this.left.stats( nodes, depth );
+				[nodes, depth] = this.left.stats( nodes, depth, level + 1 );
 			end
 			if ~isempty( this.right )
-				[nodes, depth] = this.right.stats( nodes, depth );
+				[nodes, depth] = this.right.stats( nodes, depth, level + 1 );
 			end
 
 			nodes = nodes + 1;
+			if level > depth
+				depth = level;
+			end
 
 		end
 
