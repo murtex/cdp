@@ -10,59 +10,33 @@ function ser = unframe_v2( ser, frame )
 % OUTPUT
 % ser : unframed time series (numeric)
 
-		% TODO: support multi-dimensional arrays!
-	if ~ismatrix( ser )
-		error( 'invalid argument: ser' );
+		% expand and overlap frames
+	s = size( ser );
+	n = s(1); % number of frames
+
+	starts = frame(2) * (0:n-1) + 1; % frame ranges
+	stops = starts + frame(1) - 1;
+
+	expand = zeros( cat( 2, max( stops ), s(2:end) ) ); % pre-allocation
+	overlap = zeros( max( stops ), 1 );
+
+	for i = 1:n
+		expand(starts(i):stops(i), :) = expand(starts(i):stops(i), :) + repmat( ser(i, :), frame(1), 1 );
+		overlap(starts(i):stops(i)) = overlap(starts(i):stops(i)) + ones( frame(1), 1 );
 	end
 
-	overlap = frame(1)-frame(2);
-
-		% try to call mex-version (once)
-	persistent mexified;
-
-	if isempty( mexified )
-
-			% get current module path
-		[st, i] = dbstack( '-completenames' );
-		[path, ~, ~] = fileparts( st(i).file );
-
-			% compile mex-source
-		src = fullfile( path, 'expand_mex.cpp' );
-		ret = mex( src, '-outdir', path );
-
-		mexified = ~ret;
+	m = numel( overlap ); % averaging overlaps
+	for i = 1:m
+		expand(i, :) = expand(i, :) ./ overlap(i);
 	end
 
-	if mexified
-		ser = sta.expand_mex( ser, frame ); % call mex-version
+	ser = expand;
 
-	else
+		% center frames
+	l2 = floor( frame(1)/2 ); % half frame length
 
-			% MATLAB FALLBACK IMPLEMENTATION
-
-			% expand frames
-		ser = kron( ser, ones( frame(2), 1 ) );
-		ser(end+1:end+overlap, :) = repmat( ser(end, :), overlap, 1 );
-
-			% center frames
-		f2 = floor( frame(1)/2 );
-		ser = cat( 1, repmat( ser(1, :), f2, 1 ), ser );
-		ser(end-f2+1:end, :) = [];
-
-	end
-
-		% smoothing
-	kernel = fspecial( 'average', [2*overlap + 1, 1] );
-
-	n = size( ser, 2 );
-	if n >= 8 % parallelize if worthy
-		parfor (i = 1:n, 4)
-			ser(:, i) = filter2( kernel, ser(:, i) );
-		end
-	else
-		ser = filter2( kernel, ser );
-	end
-
+	ser = cat( 1, repmat( ser(1, :), l2, 1 ), ser );
+	ser(end-l2+1:end, :) = [];
 
 end
 
