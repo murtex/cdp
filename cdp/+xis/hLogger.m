@@ -7,7 +7,7 @@ classdef (Sealed = true) hLogger < handle
 		hierarchy = 0; % hierarchy (scalar numeric)
 		hierarchymax = 11;
 
-		tics = tic(); % timing (row numeric)
+		tics = tic(); % timing (internal)
 
 	end
 
@@ -262,31 +262,23 @@ classdef (Sealed = true) hLogger < handle
 				% ensure singleton validity
 			persistent this;
 
-			if isempty( this )
+			if isempty( this ) || ~isvalid( this )
+				this = xis.hLogger();
+			end
+
+				% (re-)start file logging
+			if nargin > 0
 
 					% safeguard
-				if nargin < 1 || ~isrow( logfile ) || ~ischar( logfile )
+				if ~isrow( logfile ) || ~ischar( logfile )
 					error( 'invalid argument: logfile' );
 				end
 
-					% (re-)start command window logging
+					% (re-)start timing and diary
 				diary( 'off' );
-
-				if exist( logfile, 'file' ) == 2
-					delete( logfile )
-				end
-
 				diary( logfile );
 
-					% create instance
-				this = xis.hLogger();
-
-			else
-
-					% safeguard
-				if nargin > 0
-					warning( 'odd argument: logfile' );
-				end
+				this.tics = tic();
 
 			end
 
