@@ -279,8 +279,8 @@ classdef (Sealed = true) hLogger < handle
 
 				this = xis.hLogger.instance(); % (re-)start logging
 
-				this.tics = tic();
 				diary( logfile );
+				this.tics = tic();
 
 			end
 
