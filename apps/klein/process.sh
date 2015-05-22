@@ -1,11 +1,14 @@
 #!/bin/sh
 
 	# landmark detection
-./convert.sh
-./sync.sh
-./extract.sh
-./landmark.sh
-./debug.sh
+#./convert.sh
+#./sync.sh
+#./extract.sh
+#./landmark.sh
+#./debug.sh
 
 	# label classification
+#./features.sh
+./train.sh
+./classify.sh
 

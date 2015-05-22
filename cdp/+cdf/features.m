@@ -1,5 +1,5 @@
 function features( run, cfg, landmarks, outdir )
-% extract features
+% compute features
 %
 % FEATURES( run, cfg, landmarks, outdir )
 %
@@ -27,7 +27,7 @@ function features( run, cfg, landmarks, outdir )
 	end
 
 	logger = xis.hLogger.instance();
-	logger.tab( 'extract features ''%s''...', outdir );
+	logger.tab( 'compute features ''%s''...', outdir );
 
 		% proceed trials
 	n = numel( run.trials );
@@ -111,7 +111,7 @@ function features( run, cfg, landmarks, outdir )
 			% set and write feature file
 		trial.detected.featfile = fullfile( outdir, sprintf( '%d.mat', trial.id ) );
 
-		save( trial.detected.featfile, 'subfeat', '-v7.3' ); % hdf5-format
+		save( trial.detected.featfile, 'subfeat', '-v7.3' ); % require hdf5-format
 
 		logger.progress( i, n );
 	end

@@ -1,13 +1,14 @@
-function train( indir, outdir, ids, seed )
+function train( indir, outdir, ids, seed, ntrees )
 % train classifier
 %
-% TRAIN( indir, outdir, ids )
+% TRAIN( indir, outdir, ids, ntrees )
 %
 % INPUT
 % indir : input directory (row char)
 % outdir : output directory (row char)
 % ids : subject identifiers (row numeric)
 % seed : randomization seed (scalar numeric)
+% ntrees : number of trees (scalar numeric)
 
 		% safeguard
 	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
@@ -24,6 +25,10 @@ function train( indir, outdir, ids, seed )
 
 	if nargin < 4 || ~isscalar( seed ) || ~isnumeric( seed )
 		error( 'invalid argument: ids' );
+	end
+
+	if nargin < 5 || ~isscalar( ntrees ) || ~isnumeric( ntrees )
+		error( 'invaid argument: ntrees' );
 	end
 
 	addpath( '../../cdp/' ); % include cue-distractor package
@@ -64,7 +69,7 @@ function train( indir, outdir, ids, seed )
 		% train classifier
 	rng( seed );
 
-	[classes, forest] = cdf.train( runs, cfg );
+	[classes, forest] = cdf.train( runs, ntrees );
 
 		% mexify classifier
 	logger.log( 'mexify classifier...' );

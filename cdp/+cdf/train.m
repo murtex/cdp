@@ -1,11 +1,11 @@
-function [classes, forest] = train( runs, cfg )
+function [classes, forest] = train( runs, ntrees )
 % train label classifier
 %
-% forest = TRAIN( runs, cfg )
+% forest = TRAIN( runs, ntrees )
 %
 % INPUT
 % runs : runs (row object)
-% cfg : configuration (scalar object)
+% ntrees : number of trees (scalar object)
 %
 % OUTPUT
 % classes : class labels (cell row char)
@@ -16,8 +16,8 @@ function [classes, forest] = train( runs, cfg )
 		error( 'invalid arguments: runs' );
 	end
 
-	if nargin < 2 || ~isscalar( cfg ) || ~isa( cfg, 'cdf.hConfig' )
-		error( 'invalid arguments: cfg' );
+	if nargin < 2 || ~isscalar( ntrees ) || ~isnumeric( ntrees )
+		error( 'invalid argument: ntrees' );
 	end
 
 	logger = xis.hLogger.instance();
@@ -146,10 +146,10 @@ function [classes, forest] = train( runs, cfg )
 
 		% grow subsequence forest
 	%dbgi = randsample( size( subs, 1 ), 20 );
-	%forest = brf.train( subs(dbgi, :), sublabels(dbgi), nclasses, cfg.train_trees, false );
+	%forest = brf.train( subs(dbgi, :), sublabels(dbgi), nclasses, ntrees, false );
 	%error( 'DEBUG' );
 
-	forest = brf.train( subs, sublabels, nclasses, cfg.train_trees, false );
+	forest = brf.train( subs, sublabels, nclasses, ntrees, false );
 
 	logger.untab();
 end
