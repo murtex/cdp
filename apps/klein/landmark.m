@@ -1,80 +1,86 @@
+function landmark( indir, outdir, ids )
 % detect landmarks
+%
+% LANDMARK( indir, outdir, ids )
+%
+% INPUT
+% indir : input directory (row char)
+% outdir : output directory (row char)
+% ids : subject identifiers (row numeric)
 
-	% init
-clear( 'all' );
-
-addpath( '../' ); % set path to cue-distractor package
-
-logger = xis.hLogger.instance( '../data/klein/landmark-2.log' ); % start logging
-
-	% prepare directories
-indir = '../data/klein/cdf/extract/';
-
-outdir = '../data/klein/cdf/landmark-2/';
-if exist( outdir, 'dir' ) ~= 7
-	mkdir( outdir );
-end
-
-plotdir = '../data/klein/plot/landmark-2/';
-if exist( plotdir, 'dir' ) ~= 7
-	mkdir( plotdir );
-end
-
-	% prepare landmark statistics
-global_detected = [];
-global_labeled = [];
-
-	% configure framework
-cfg = cdf.hConfig(); % use defaults
-
-	% proceed subjects
-ids = 1:47;
-
-for id = ids
-	logger.tab( 'subject: %d', id );
-
-		% read data
-	infile = fullfile( indir, sprintf( '%d.mat', id ) );
-	if exist( infile, 'file' ) ~= 2 % skip non-existent data
-		logger.untab( 'skipping' );
-		continue;
+		% safeguard
+	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
+		error( 'invalid argument: indir' );
 	end
 
-	logger.log( 'read cdf ''%s''...', infile );
-	load( infile, 'run' );
+	if nargin < 2 || ~isrow( outdir ) || ~ischar( outdir )
+		error( 'invalid argument: outdir' );
+	end
 
-	read_audio( run, run.audiofile, false );
+	if nargin < 3 || ~isrow( ids ) || ~isnumeric( ids )
+		error( 'invalid argument: ids' );
+	end
 
-		% detect landmarks
-	cdf.landmark( run, cfg );
+	addpath( '../../cdp/' ); % include cue-distractor package
 
-		% plot landmark statistics
-	trials = [run.trials.detected];
-	detected = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
-	trials = [run.trials.labeled];
-	labeled = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
-	cdf.plot.landmark( run, detected, labeled, fullfile( plotdir, sprintf( '%d_landmark', run.id ) ) );
-	cdf.plot.timing( run, detected, labeled, fullfile( plotdir, sprintf( '%d_timing', run.id ) ) );
+		% prepare for output
+	if exist( outdir, 'dir' ) ~= 7
+		mkdir( outdir );
+	end
 
-	global_detected = cat( 1, global_detected, detected );
-	global_labeled = cat( 1, global_labeled, labeled );
-	cdf.plot.landmark( run, global_detected, global_labeled, fullfile( plotdir, 'global_landmark' ) );
-	cdf.plot.timing( run, global_detected, global_labeled, fullfile( plotdir, 'global_timing' ) );
+	plotdir = fullfile( outdir, 'plot' );
+	if exist( plotdir, 'dir' ) ~= 7
+		mkdir( plotdir );
+	end
 
-		% write data
-	run.audiodata = []; % do not write audio data
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'landmark_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
+	logger.tab( 'detect landmarks...' );
 
-	outfile = fullfile( outdir, sprintf( '%d.mat', run.id ) );
-	logger.log( 'write cdf ''%s''...', outfile );
-	save( outfile, 'run' );
+		% configure framework
+	cfg = cdf.hConfig(); % use defaults
 
-		% clean-up
-	delete( run );
+		% proceed subjects
+	for i = ids
+		logger.tab( 'subject: %d', i );
 
-	logger.untab();
+			% read cdf data
+		infile = fullfile( indir, sprintf( '%03d.cdf', i ) );
+
+		if exist( infile, 'file' ) ~= 2
+			logger.untab( 'skipping' ); % skip non-existing
+			continue;
+		end
+
+		logger.log( 'read cdf ''%s''...', infile );
+		load( infile, '-mat', 'run' );
+
+		read_audio( run, run.audiofile, false );
+
+			% detect landmarks and plot
+		cdf.landmark( run, cfg );
+
+		trials = [run.trials.detected];
+		detected = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
+		trials = [run.trials.labeled];
+		labeled = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
+		cdf.plot.landmark( run, detected, labeled, fullfile( plotdir, sprintf( '%d_landmarks.png', run.id ) ) );
+		cdf.plot.timing( run, detected, labeled, fullfile( plotdir, sprintf( '%d_timing.png', run.id ) ) );
+
+			% write cdf data
+		run.audiodata = []; % do not write audio data
+
+		outfile = fullfile( outdir, sprintf( '%03d.cdf', run.id ) );
+		logger.log( 'write cdf ''%s''...', outfile );
+		save( outfile, 'run', '-v7.3' );
+
+			% cleanup
+		delete( run );
+
+		logger.untab();
+	end
+
+		% cleanup
+	logger.untab( 'done.' ); % stop logging
+
 end
-
-	% exit
-logger.log( 'done.' ); % stop logging
-delete( logger );
 

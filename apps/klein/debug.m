@@ -1,7 +1,7 @@
-function sync( indir, outdir, ids )
-% sync timings
+function debug( indir, outdir, ids )
+% debug data
 %
-% SYNC( indir, outdir, ids )
+% DEBUG( indir, outdir, ids )
 %
 % INPUT
 % indir : input directory (row char)
@@ -28,13 +28,8 @@ function sync( indir, outdir, ids )
 		mkdir( outdir );
 	end
 
-	plotdir = fullfile( outdir, 'plot' );
-	if exist( plotdir, 'dir' ) ~= 7
-		mkdir( plotdir );
-	end
-
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'sync_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
-	logger.tab( 'sync timings...' );
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'debug_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
+	logger.tab( 'debug data...' );
 
 		% configure framework
 	cfg = cdf.hConfig(); % use defaults
@@ -56,17 +51,27 @@ function sync( indir, outdir, ids )
 
 		read_audio( run, run.audiofile, false );
 
-			% sync timings and plot
-		offs = cdf.sync( run, cfg, false );
+			% prepare for output
+		plotdir = fullfile( outdir, sprintf( '%d', run.id ) );
+		if exist( plotdir, 'dir' ) == 7
+			rmdir( plotdir, s );
+		end
+		mkdir( plotdir );
 
-		cdf.plot.sync( run, offs, fullfile( plotdir, sprintf( '%d.png', run.id ) ) );
+			% plot random trials
+		trials = [run.trials.detected];
+		lens = diff( cat( 1, trials.range ), 1, 2 );
+		trials = run.trials(~isnan( lens ));
+		trials = randsample( trials, min( numel( trials ), 10 ) ); % 10 trials
 
-			% write cdf data
-		run.audiodata = []; % do not write audio data
-
-		outfile = fullfile( outdir, sprintf( '%03d.cdf', run.id ) );
-		logger.log( 'write cdf ''%s''...', outfile );
-		save( outfile, 'run', '-v7.3' );
+		n = numel( trials );
+		for j = 1:n
+			cdf.plot.trial_range( run, cfg, trials(j), [...
+				min( trials(j).detected.range(1), trials(j).labeled.range(1) ), ...
+				max( trials(j).detected.range(2), trials(j).labeled.range(2) )], ...
+				trials(j).detected.range(1), ...
+				fullfile( plotdir, sprintf( '%d.png', trials(j).id ) ) );
+		end
 
 			% cleanup
 		delete( run );

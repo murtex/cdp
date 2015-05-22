@@ -24,7 +24,10 @@ function read_audio( run, audiofile, info_only )
 	logger = xis.hLogger.instance();
 	logger.tab( 'read audio ''%s''...', audiofile );
 
-		% read audio data/info, TODO: wavread is deprecated for >= R2012b
+		% read audio data/info
+	ws = warning( 'query' ); % TODO: wavread is deprecated for >= R2012b
+	warning( 'off' );
+
 	run.audiofile = audiofile;
 
 	if info_only
@@ -38,6 +41,8 @@ function read_audio( run, audiofile, info_only )
 		[run.audiodata, run.audiorate] = wavread( audiofile, 'double' );
 		run.audiolen = size( run.audiodata, 1 );
 	end
+
+	warning( ws );
 
 	logger.log( 'rate: %dHz', run.audiorate );
 	logger.log( 'length: %.1fs', dsp.smp2sec( run.audiolen, run.audiorate ) );
