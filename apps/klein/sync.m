@@ -66,7 +66,7 @@ function sync( indir, outdir, ids )
 
 		outfile = fullfile( outdir, sprintf( '%03d.cdf', run.id ) );
 		logger.log( 'write cdf ''%s''...', outfile );
-		save( outfile, 'run', '-v7.3' );
+		save( outfile, 'run', '-v7' );
 
 			% cleanup
 		delete( run );
