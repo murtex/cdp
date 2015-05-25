@@ -1,8 +1,8 @@
 #!/bin/sh
 
 	# data directories
-INDIR='../../data/klein/landmark/'
-OUTDIR='../../data/klein/debug/'
+INDIR='../../data/klein/classify/'
+OUTDIR='../../data/klein/debug-classify/'
 
 	# spread workload
 matlab -nosplash -nodesktop -r "debug( '$INDIR', '$OUTDIR', 1:10 ); exit();" &
