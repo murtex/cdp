@@ -45,7 +45,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 	logger.tab( 'read classifiers...' );
 
 	global_classes = {}; % pre-allocation
-	global_mexforest = [];
+	global_forest = [];
 
 	for i = seeds
 
@@ -54,18 +54,18 @@ function classify( indir, outdir, ids, traindir, seeds )
 		logger.log( 'read classes ''%s''...', infile );
 		load( infile, '-mat', 'classes' );
 
-		infile = fullfile( traindir, sprintf( 'mexforest_%d.cdf', i ) );
-		logger.log( 'read mexforest ''%s''...', infile );
-		load( infile, '-mat', 'mexforest' );
+		infile = fullfile( traindir, sprintf( 'forest_%d.cdf', i ) );
+		logger.log( 'read forest ''%s''...', infile );
+		load( infile, '-mat', 'forest' );
 
 			% accumulate
 		global_classes = unique( cat( 2, global_classes, classes ), 'stable' );
-		global_mexforest = cat( 2, global_mexforest, mexforest );
+		global_forest = cat( 2, global_forest, forest );
 
 	end
 
 	logger.log( 'classes: %d', numel( global_classes ) );
-	logger.log( 'trees: %d', numel( global_mexforest ) );
+	logger.log( 'trees: %d', numel( global_forest ) );
 
 	logger.untab();
 
@@ -88,7 +88,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 		load( infile, '-mat', 'run' );
 
 			% classify labels
-		cdf.classify( run, global_classes, global_mexforest );
+		cdf.classify( run, global_classes, global_forest );
 
 			% log classification accuracy
 		n = numel( run.trials );

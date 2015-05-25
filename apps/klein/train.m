@@ -71,16 +71,6 @@ function train( indir, outdir, ids, seed, ntrees )
 
 	[classes, forest] = cdf.train( runs, ntrees );
 
-		% mexify classifier
-	logger.log( 'mexify classifier...' );
-
-	ws = warning( 'query' ); % suppress conversion warning
-	warning( 'off' );
-
-	mexforest = forest.mexify();
-
-	warning( ws );
-
 		% write classifier
 	logger.tab( 'write cdf...' );
 
@@ -92,14 +82,9 @@ function train( indir, outdir, ids, seed, ntrees )
 	logger.log( 'write forest ''%s''...', outfile );
 	save( outfile, 'forest', '-v7' );
 
-	outfile = fullfile( outdir, sprintf( 'mexforest_%d.cdf', seed ) );
-	logger.log( 'write mexified forest ''%s''...', outfile );
-	save( outfile, 'mexforest', '-v7' );
-
 	logger.untab();
 
 		% cleanup
-	delete( forest );
 	delete( runs );
 
 	logger.untab( 'done.' ); % stop logging

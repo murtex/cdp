@@ -9,7 +9,7 @@ function [classes, forest] = train( runs, ntrees )
 %
 % OUTPUT
 % classes : class labels (cell row char)
-% forest : tree root nodes (row object)
+% forest : trees (row struct)
 
 		% safeguard
 	if nargin < 1 || ~isrow( runs ) || ~isa( runs(1), 'cdf.hRun' )
@@ -146,10 +146,12 @@ function [classes, forest] = train( runs, ntrees )
 
 		% grow subsequence forest
 	%dbgi = randsample( size( subs, 1 ), 20 );
-	%forest = brf.train( subs(dbgi, :), sublabels(dbgi), nclasses, ntrees, false );
+	%%forest = brf.train( subs(dbgi, :), sublabels(dbgi), nclasses, ntrees, false );
+	%forest = brf.train_v2( subs(dbgi, :), sublabels(dbgi), nclasses, ntrees, false );
 	%error( 'DEBUG' );
 
-	forest = brf.train( subs, sublabels, nclasses, ntrees, false );
+	%forest = brf.train( subs, sublabels, nclasses, ntrees, false );
+	forest = brf.train_v2( subs, sublabels, nclasses, ntrees, false );
 
 	logger.untab();
 end

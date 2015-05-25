@@ -6,7 +6,7 @@ function classify( run, classes, forest );
 % INPUT
 % run : run (scalar object)
 % classes : class labels (cell row char)
-% forest : mex tree root nodes (row struct)
+% forest : trees (row struct)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
@@ -49,7 +49,7 @@ function classify( run, classes, forest );
 			% read and classify subsequences
 		load( trial.detected.featfile, 'subfeat' );
 
-		labels = brf.classify( forest, subfeat );
+		labels = brf.classify_v2( forest, subfeat );
 
 			% set majority vote
 		for j = 1:ntrees
