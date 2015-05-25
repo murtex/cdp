@@ -11,7 +11,7 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 % logoob : oob-error logging flag (scalar logical)
 %
 % OUTPUT
-% forest : tree root nodes (row object)
+% forest : tree root nodes (row struct)
 
 		% safeguard
 	if nargin < 1 || ~ismatrix( features ) || ~isnumeric( features )
@@ -45,37 +45,32 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 	logger.log( 'features: %d', nfeatures );
 	logger.log( 'samples: %d', nsamples );
 
-	forest(1, ntrees) = brf.hNode(); % pre-allocation
+	forest = struct( ... % pre-allocation
+		'labels', NaN, ...
+		'impurities', NaN, ...
+		'features', NaN, ...
+		'values', NaN, ...
+		'lefts', NaN, ...
+		'rights', NaN );
+	forest = repmat( forest, 1, ntrees );
 
 	for i = 1:ntrees
 		logger.tab( 'grow tree %d/%d...', i, ntrees );
 
-			% bootstrap aggregation
+			% bootstrap samples
 		bagi = randsample( nsamples, nsamples, true );
 		oobi = setdiff( 1:nsamples, bagi );
 
-			% grow tree from root node
+			% grow tree from root
 		hiermax = logger.hierarchymax;
 		logger.hierarchymax = logger.hierarchy + 2; % limit logging depth
 
-		forest(i) = brf.hNode(); % grow tree
-		brf.split( forest(i), features(bagi, :), labels(bagi), nclasses );
+		forest(i) = brf.split( forest(i), features(bagi, :), labels(bagi), nclasses, 1 );
 
 		logger.hierarchymax = hiermax; % restore logging depth
 
 			% log statistics
-		[nodes, depth] = forest(i).stats();
-
-		logger.log( 'nodes: %d', nodes );
-		logger.log( 'depth: %d', depth );
-
-			% log oob-error
-		if logoob
-			[ooblabels, ~] = brf.classify( forest(i), features(oobi, :) );
-			ooberr = sum( ooblabels ~= labels(oobi) ) / numel( oobi );
-
-			logger.log( 'oob-error: %.6f', ooberr );
-		end
+		logger.log( 'nodes: %d', numel( forest(i).labels ) );
 
 		logger.untab();
 	end

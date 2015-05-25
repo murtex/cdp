@@ -1,17 +1,21 @@
-function split( node, features, labels, nclasses )
-% split tree node recursively
+function tree = split( tree, features, labels, nclasses, curnode )
+% grow tree recursively
 %
-% SPLIT( node, features, labels, nclasses )
+% SPLIT( tree, features, labels, nclasses, curnode )
 %
 % INPUT
-% node : tree node (scalar object)
+% tree : tree (scalar struct)
 % features : feature matrix (matrix numeric)
 % labels : sample labels (row numeric)
 % nclasses : number of classes (scalar numeric)
+% curnode : current node index (scalar numeric)
+%
+% OUTPUT
+% tree : tree (scalar struct)
 
 		% safeguard
-	%if nargin < 1 || ~isscalar( node ) || ~isa( node, 'brf.hNode' )
-		%error( 'invalid argument: node' );
+	%if nargin < 1 || ~isscalar( tree ) || ~isstruct( tree )
+		%error( 'invalid argument: tree' );
 	%end
 
 	%if nargin < 2 || ~ismatrix( features ) || ~isnumeric( features )
@@ -26,8 +30,12 @@ function split( node, features, labels, nclasses )
 		%error( 'invalid argument: nclasses' );
 	%end
 
+	%if nargin < 5 || ~isscalar( curnode ) || ~isnumeric( curnode )
+		%error( 'invalid argument: curnode' );
+	%end
+
 	%logger = xis.hLogger.instance();
-	%logger.tab( 'grow node (samples: %d)...', size( features, 1 ) );
+	%logger.tab( 'split node...' );
 
 		% mex preparation
 	persistent mexified;
@@ -45,12 +53,38 @@ function split( node, features, labels, nclasses )
 		mexified = ~ret;
 	end
 
-		% pre-computations
+		% prepare current node
 	nsamples = size( features, 1 );
 
 	classinds = false( nclasses, nsamples ); % class indicators
 	for i = 1:nclasses
 		classinds(i, :) = labels == i;
+	end
+
+	occs = sum( classinds, 2 ); % majority vote
+	label = find( occs == max( occs ) );
+	if numel( label ) > 1
+		label = randsample( label, 1 ); % random majority
+	end
+	tree.labels(curnode) = label;
+
+	impurity = 1; % gini impurity
+	for i = 1:nclasses
+		impurity = impurity - (occs(i) / nsamples)^2;
+	end
+	tree.impurities(curnode) = impurity;
+
+	tree.features(curnode) = NaN; % split properties
+	tree.values(curnode) = NaN;
+	tree.lefts(curnode) = NaN;
+	tree.rights(curnode) = NaN;
+
+	%logger.log( 'node label: %d', label );
+	%logger.log( 'node impurity: %f', impurity );
+	
+	if sum( occs ~= 0 ) == 1 % stop with pure node
+		%logger.untab();
+		return;
 	end
 
 		% sample split features
@@ -61,31 +95,52 @@ function split( node, features, labels, nclasses )
 
 		% set split properties
 	simps = NaN( nfis, 1 ); % pre-allocation
-	svals = zeros( nfis, 1 );
+	svals = NaN( nfis, 1 );
 
 	for i = 1:nfis
 
-			% prepare split values to check
-		[fvals, order] = sort( features(:, fis(i)) ); % all possible split values
-
-		vis = find( diff( labels(order) ) ~= 0 ) + 1; % value indices with label change
+			% set split values to check
+		[fvals, order] = sort( features(:, fis(i)) ); % all possible values
+		
+		vis = find( diff( labels(order) ) ~= 0 ) + 1; % values with label change
 		nvis = numel( vis );
+
+			% set split impurities
+		%occs = cumsum( classinds(:, order), 2 );
+
+		%fimps = NaN( nvis, 1 ); % pre-allocation
+
+		%for j = 1:nvis
+
+			%nlsamples = vis(j) - 1;
+			%nrsamples = nsamples - nlsamples;
+
+			%limp = 1; % child gini impurities
+			%rimp = 1;
+			%for k = 1:nclasses
+				%limp = limp - (occs(k, nlsamples) / nlsamples)^2;
+				%rimp = rimp - ((occs(k, end)-occs(k, nlsamples)) / nrsamples)^2;
+			%end
+
+			%fimps(j) = (limp*nlsamples + rimp*nrsamples) / nsamples; % overall impurity
+
+		%end
 
 			% get split impurities
 		if mexified
-			fsimps = brf.split_imp_mex( cumsum( classinds(:, order), 2 ), vis );
+			fimps = brf.split_imp_mex( cumsum( classinds(:, order), 2 ), vis );
 		else
-			fsimps = brf.split_imp( cumsum( classinds(:, order), 2 ), vis );
+			fimps = brf.split_imp( cumsum( classinds(:, order), 2 ), vis );
 		end
 
 			% choose split with lowest impurity
-		si = find( fsimps == min( fsimps ) );
+		si = find( fimps == min( fimps ) );
 		if numel( si ) > 1
-			si = randsample( si, 1 ); % choose random minimum
+			si = randsample( si, 1 ); % random minimum
 		end
 
 		if ~isempty( si )
-			simps(i) = fsimps(si);
+			simps(i) = fimps(si);
 			svals(i) = fvals(vis(si));
 		end
 
@@ -94,74 +149,52 @@ function split( node, features, labels, nclasses )
 		% choose split with lowest impurity
 	si = find( simps == min( simps ) );
 	if numel( si ) > 1
-		si = randsample( si, 1 ); % choose random minimum
+		si = randsample( si, 1 ); % random minimum
 	end
 
-		% split node recursively
+		% finish current node (split recursively)
 	if ~isempty( si )
 
-			% update current node
-		node.feature = fis(si);
-		node.value = svals(si);
+		tree.features(curnode) = fis(si); % split properties
+		tree.values(curnode) = svals(si);
 
 			% proceed left child
-		lsamples = features(:, node.feature) < node.value;
+		lsamples = features(:, tree.features(curnode)) < tree.values(curnode);
 		nlsamples = sum( lsamples );
 
 		if nlsamples > 0
 
-				% prepare child node
-			node.left = brf.hNode();
+			tree = expand( tree ); % add child node
+			tree.lefts(curnode) = numel( tree.labels );
 
-			occs = sum( classinds(:, lsamples), 2 );
-			label = find( occs == max( occs ) );
-			if numel( label ) > 1
-				label = randsample( label, 1 );
-			end
-			node.left.label = label;
-
-			node.left.impurity = 1;
-			for i = 1:nclasses
-				node.left.impurity = node.left.impurity - (occs(i) / nlsamples)^2;
-			end
-
-				% proceed non-uniform child node
-			if sum( occs ~= 0 ) > 1
-				brf.split( node.left, features(lsamples, :), labels(lsamples), nclasses );
-			end
+			tree = brf.split( tree, features(lsamples, :), labels(lsamples), nclasses, tree.lefts(curnode) ); % recursion
 
 		end
 
 			% proceed right child
 		rsamples = ~lsamples;
-		nrsamples = nsamples - nlsamples;
+		nrsamples = sum( rsamples );
 
 		if nrsamples > 0
 
-				% prepare child node
-			node.right = brf.hNode();
+			tree = expand( tree ); % add child node
+			tree.rights(curnode) = numel( tree.labels );
 
-			occs = sum( classinds(:, rsamples), 2 );
-			label = find( occs == max( occs ) );
-			if numel( label ) > 1
-				label = randsample( label, 1 );
-			end
-			node.right.label = label;
-
-			node.right.impurity = 1;
-			for i = 1:nclasses
-				node.right.impurity = node.right.impurity - (occs(i) / nrsamples)^2;
-			end
-
-				% proceed non-uniform child node
-			if sum( occs ~= 0 ) > 1
-				brf.split( node.right, features(rsamples, :), labels(rsamples), nclasses );
-			end
+			tree = brf.split( tree, features(rsamples, :), labels(rsamples), nclasses, tree.rights(curnode) ); % recursion
 
 		end
 
 	end
 
 	%logger.untab();
+end
+
+function tree = expand( tree )
+	tree.labels(end+1) = NaN;
+	tree.impurities(end+1) = NaN;
+	tree.features(end+1) = NaN;
+	tree.values(end+1) = NaN;
+	tree.lefts(end+1) = NaN;
+	tree.rights(end+1) = NaN;
 end
 
