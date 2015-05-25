@@ -71,6 +71,7 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 
 			% log statistics
 		logger.log( 'nodes: %d', numel( forest(i).labels ) );
+		logger.log( 'leaves: %d', sum( isnan( forest(i).lefts ) & isnan( forest(i).rights ) ) );
 
 		logger.untab();
 	end
