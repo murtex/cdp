@@ -1,18 +1,18 @@
-function labels = classify( roots, features )
+function labels = classify( forest, features )
 % classify features
 %
-% labels = CLASSIFY( roots, features )
+% labels = CLASSIFY( forest, features )
 %
 % INPUT
-% roots : mex tree root nodes (row struct)
+% forest : trees (row struct)
 % features : feature matrix (matrix numeric)
 %
 % OUTPUT
 % labels : prediction labels (matrix numeric)
 
 		% safeguard
-	if nargin < 1 || ~isrow( roots ) % no type check!
-		error( 'ivalid argument: roots' );
+	if nargin < 1 || ~isrow( forest ) % no type check!
+		error( 'ivalid argument: forest' );
 	end
 
 	if nargin < 2 || ~ismatrix( features ) || ~isnumeric( features )
@@ -36,7 +36,7 @@ function labels = classify( roots, features )
 	end
 
 	if mexified
-		labels = brf.classify_mex( roots, features ); % call mex-version
+		labels = brf.classify_mex( forest, features ); % call mex-version
 		return;
 	end
 
@@ -44,37 +44,37 @@ function labels = classify( roots, features )
 
 		% get class votes from all trees
 	nsamples = size( features, 1 );
-	nroots = numel( roots );
+	ntrees = numel( forest );
 
-	labels = NaN( nroots, nsamples ); % pre-allocation
+	labels = NaN( ntrees, nsamples ); % pre-allocation
 
 	for i = 1:nsamples
 		sfeatures = features(i, :);
 
-			% proceed root nodes
-		for j = 1:nroots
+			% proceed trees
+		for j = 1:ntrees
 
-				% proceed tree down to leaf
-			node = roots(j);
-			
-			while ~isempty( node.left ) || ~isempty( node.right )
-				if sfeatures(node.feature) < node.value
-					if isempty( node.left )
-						break;
+				% proceed down to leaf
+			node = 1;
+
+			while ~isnan( forest(j).lefts(node) ) || ~isnan( forest(j).rights(node) )
+				if sfeatures(forest(j).features(node)) < forest(j).values(node)
+					if isnan( forest(j).lefts(node) )
+						break; % found leaf
 					else
-						node = node.left;
+						node = forest(j).lefts(node); % proceed
 					end
 				else
-					if isempty( node.right )
-						break;
+					if isnan( forest(j).rights(node) )
+						break; % found leaf
 					else
-						node = node.right;
+						node = forest(j).rights(node); % proceed
 					end
 				end
 			end
 
 				% vote for leaf label
-			labels(j, i) = node.label;
+			labels(j, i) = forest(j).labels(node);
 
 		end
 

@@ -49,7 +49,7 @@ function classify( run, classes, forest );
 			% read and classify subsequences
 		load( trial.detected.featfile, 'subfeat' );
 
-		labels = brf.classify_v2( forest, subfeat );
+		labels = brf.classify( forest, subfeat );
 
 			% set majority vote
 		for j = 1:ntrees
