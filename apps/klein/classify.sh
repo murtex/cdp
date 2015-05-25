@@ -8,7 +8,7 @@ TRAINDIR='../../data/klein/train/'
 	# spread workload
 IDS='[16, 17]'
 IDS='11:20'
-SEEDS='1:8'
+SEEDS='1:10'
 
 matlab -nosplash -nodesktop -r "classify( '$INDIR', '$OUTDIR', $IDS, '$TRAINDIR', $SEEDS); exit();" &
 
