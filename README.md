@@ -1,7 +1,7 @@
 Cue-distractor package
 ======================
 
-- this package is divided into parts: applications ([`apps`](#apps)), framework ([`cdp`](#cdp)) and documentation ([`doc`](https://github.com/murtex/cdp/tree/maria/doc))
+- this package is divided into parts: [applications](#apps), [framework](#cdp) and documentation ([`doc`](https://github.com/murtex/cdp/tree/maria/doc))
 - applications are a good starting point to see how to make use of the framework
 - the full (but sadly not too very often updated) documentation of this package can be found [here](https://github.com/murtex/cdp/blob/maria/doc/cdp.pdf) (use the 'Raw' button there to download the PDF)
 
