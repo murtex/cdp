@@ -41,9 +41,11 @@ Parallelization
 ---------------
 
 - all of the above mentioned Matlab scripts come up with (UNIX-style, sorry for Windows users) shell scripts of same name (file extension: `.sh`)
-- they might give a hint of how to parallelize data processing (processed-based)
-- the framework itself will take the advantage of a multi-core system only if you have installed 'Parallel Computing Toolbox'
+- they might give a hint of how to parallelize data processing (process-based)
+- the framework itself will take the advantage of a multi-core system only if you have installed 'Parallel Computing Toolbox' (thread-based)
 
 Extras
 ------
+
+- TODO: speech-weighted spectrum!
 
