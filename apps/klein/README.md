@@ -13,7 +13,7 @@ Klein's thesis-data application
 Import data
 -----------
 
-- this application assumes that raw data are stored in the paradigm of [Psychtoolbox](http://psychtoolbox.org/) with well-featured WAV-recordings and dedicated CSV-logfiles
+- this application specifically assumes that raw data are stored in the paradigm of [Psychtoolbox](http://psychtoolbox.org/) with well-featured WAV-recordings and dedicated CSV-logfiles
 - additionally it depends on hand-labeled annotations in XLSX-format
 - [`convert.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/convert.m) reads these raw triads and transforms them into framework's format
 - [`sync.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/sync.m) corrects any temporal misalignment between logfiles and recordings
@@ -21,14 +21,28 @@ Import data
 Landmark detection
 ------------------
 
+- [`extract.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/extract.m) finds parts of speech in audio recording (this stage may take some time)
+- [`landmark.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/landmark.m) detects landmarks (Burst+, Glottis+/-) in these selected parts
+
 Label classification
 --------------------
 
-Debugging
+- [`features.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/features.m) computes classification features by fixed heuristics (this may take some time too)
+- [`train.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/train.m) trains a random forest classifier based upon classification features (this may take a lot of time, and you should run it only if you know what you are doing; in most cases you can skip this stage)
+- [`classify.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/classify.m) classifies labels based upon a previously trained classifier
+
+Debugging (TODO: not yet)
 ---------
+
+- for verification of any mentioned stages you might run [`debug.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/debug.m) directly afterwards
+- it will generate additional debugging plots ready for visual assessment
 
 Parallelization
 ---------------
+
+- all of the above mentioned Matlab scripts come up with (UNIX-style, sorry for Windows users) shell scripts of same name (file extension: `.sh`)
+- they might give a hint of how to parallelize data processing (processed-based)
+- the framework itself will take the advantage of a multi-core system only if you have installed 'Parallel Computing Toolbox'
 
 Extras
 ------
