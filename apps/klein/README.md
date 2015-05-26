@@ -7,9 +7,16 @@ Klein's thesis-data application
   1. import data
   2. detect landmarks
   3. classify labels
+- each of these stages may contain several scripts which also have to be ran in order
+- every script below follows the same concept: read input data -- process these data -- write output data; so data are sequentially passed from stage to stage
 
 Import data
 -----------
+
+- this application assumes that raw data are stored in the paradigm of [Psychtoolbox](http://psychtoolbox.org/) with well-featured WAV-recordings and dedicated CSV-logfiles
+- additionally it depends on hand-labeled annotations in XLSX-format
+- [`convert.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/convert.m) reads these raw triads and transforms them into framework's format
+- [`sync.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/sync.m) corrects any temporal misalignment between logfiles and recordings
 
 Landmark detection
 ------------------
