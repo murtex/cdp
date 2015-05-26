@@ -41,15 +41,15 @@ function classify( indir, outdir, ids, traindir, seeds )
 	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'classify_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
 	logger.tab( 'classify labels...' );
 
-		% read classifiers
-	logger.tab( 'read classifiers...' );
+		% read forests
+	logger.tab( 'read forests...' );
 
 	global_classes = {}; % pre-allocation
 	global_forest = [];
 
 	for i = seeds
 
-			% read classifier
+			% read forest
 		infile = fullfile( traindir, sprintf( 'classes_%d.cdf', i ) );
 		logger.log( 'read classes ''%s''...', infile );
 		load( infile, '-mat', 'classes' );
@@ -58,7 +58,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 		logger.log( 'read forest ''%s''...', infile );
 		load( infile, '-mat', 'forest' );
 
-			% accumulate
+			% accumulate forests
 		global_classes = unique( cat( 2, global_classes, classes ), 'stable' );
 		global_forest = cat( 2, global_forest, forest );
 
@@ -69,7 +69,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 
 	logger.untab();
 
-		% proceed subject
+		% proceed subjects
 	global_hits = 0;
 	global_misses = 0;
 
@@ -109,7 +109,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 		global_hits = global_hits + hits;
 		global_misses = global_misses + misses;
 
-		logger.log( 'accuracy: %.2f%%', hits / (hits + misses) * 100 );
+		logger.log( 'accuracy: %.1f%%', hits / (hits + misses) * 100 );
 
 			% write cdf data
 		run.audiodata = []; % do not write audio data
@@ -124,7 +124,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 		logger.untab();
 	end
 
-	logger.log( 'accuracy: %.2f%%', global_hits / (global_hits + global_misses) * 100 );
+	logger.log( 'accuracy: %.1f%%', global_hits / (global_hits + global_misses) * 100 );
 
 
 		% cleanup
