@@ -31,9 +31,10 @@ Label classification
 - [`train.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/train.m) trains a random forest classifier based upon classification features (this may take a lot of time, and you should run it only if you know what you are doing; in most cases you can skip this stage)
 - [`classify.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/classify.m) classifies labels based upon a previously trained classifier
 
-Debugging (TODO: not yet)
+Debugging
 ---------
 
+- TODO: not yet!
 - for verification of any mentioned stages you might run [`debug.m`](https://github.com/murtex/cdp/blob/maria/apps/klein/debug.m) directly afterwards
 - it will generate additional debugging plots ready for visual assessment
 
