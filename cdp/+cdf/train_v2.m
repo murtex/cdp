@@ -1,7 +1,7 @@
-function [classes, forest] = train( runs, ntrees, seed )
+function [classes, forest] = train_v2( runs, ntrees, seed )
 % train random forest
 %
-% [classes, forest] = TRAIN( runs, ntrees, seed )
+% [classes, forest] = TRAIN_V2( runs, ntrees, seed )
 %
 % INPUT
 % runs : runs (row object)
@@ -28,76 +28,72 @@ function [classes, forest] = train( runs, ntrees, seed )
 	logger = xis.hLogger.instance();
 	logger.tab( 'train random forest...' );
 
-		% get class labels
+		% gather training set statistics
+	logger.tab( 'gather statistics...' );
+
 	nruns = numel( runs );
 
+	ntrials = 0;
+	nlabeled = 0;
+	nfeatured = 0;
+
+	nclasses = 0;
+	nfeatures = 0;
+
 	classes = {}; % pre-allocation
+	nsubs = zeros( 0, nruns );
 
-	for i = 1:nruns
-		m = numel( runs(i).trials );
-		for j = 1:m
-			label = runs(i).trials(j).labeled.label;
-			if ~isempty( label ) && ~any( strcmp( label, classes ) )
-				classes{end+1} = label;
-			end
-		end
+	function cid = classid( label ) % label to class conversion
+		cid = find( strcmp( label, classes ) );
 	end
-
-	nclasses = numel( classes );
-	if nclasses < 2
-		error( 'invalid number of classes' );
-	end
-
-	function cid = classid( class ) % string to index conversion
-		cid = find( strcmp( class, classes ) );
-	end
-
-	logger.log( 'subjects: %d', nruns );
-	logger.log( 'classes: %d', nclasses );
-
-		% prepare subsequence dataset
-	logger.tab( 'prepare subsequence dataset...' );
-
-	nsubs = zeros( nclasses, nruns ); % pre-allocation
-	sublen = 0;
 
 	logger.progress();
 	for i = 1:nruns
-
-			% proceed trials
 		m = numel( runs(i).trials );
+		ntrials = ntrials + m;
+
 		for j = 1:m
+			label = runs(i).trials(j).labeled.label;
+			if ~isempty( label )
+				nlabeled = nlabeled + 1;
 
-				% skip unfeatured or unlabeled data
-			featfile = runs(i).trials(j).detected.featfile;
+					% add new class
+				if ~any( strcmp( label, classes ) )
+					nclasses = nclasses + 1;
+					classes{end+1} = label;
 
-			cid = classid( runs(i).trials(j).labeled.label );
+					nsubs(end+1, :) = zeros( 1, nruns );
+				end
 
-			if isempty( featfile ) || isempty( cid )
-				continue;
+					% count subsequences
+				featfile = runs(i).trials(j).detected.featfile;
+				if ~isempty( featfile )
+					nfeatured = nfeatured + 1;
+
+					mf = matfile( featfile );
+					cid = classid( label );
+					nsubs(cid, i) = nsubs(cid, i) + size( mf, 'subfeat', 1 );
+
+					nfeatures = size( mf, 'subfeat', 2 );
+				end
+
 			end
-
-				% inspect subsequences
-			mf = matfile( featfile, 'Writable', false );
-			sfs = size( mf, 'subfeat' );
-
-			if sublen == 0
-				sublen = sfs(2);
-			elseif sfs(2) ~= sublen
-				error( 'invalid subsequence' );
-			end
-			nsubs(cid, i) = nsubs(cid, i) + sfs(1);
-
 		end
 
 		logger.progress( i, nruns );
 	end
 
+	logger.log( 'subjects: %d', nruns );
+	logger.log( 'trials: %d/%d/%d', nfeatured, nlabeled, ntrials );
 	for i = 1:nclasses
-		logger.log( 'class #%d subsequences: %d (max: %d)', i, sum( nsubs(i, :) ), min( nsubs(i, :) ) );
+		logger.log( 'class #%d samples: %d', i, sum( nsubs(i, :) ) );
 	end
+	logger.log( 'features: %d', nfeatures );
 
 	logger.untab();
+
+		% prepare subsequence dataset
+	sublen = nfeatures;
 
 		% build subsequence dataset
 	logger.tab( 'build subsequence dataset...' );

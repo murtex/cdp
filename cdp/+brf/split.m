@@ -1,7 +1,7 @@
-function tree = split( tree, features, labels, nclasses, curnode )
+function tree = split( tree, features, labels, nclasses, curnode, curdepth )
 % grow tree recursively
 %
-% SPLIT( tree, features, labels, nclasses, curnode )
+% SPLIT( tree, features, labels, nclasses, curnode, curdepth )
 %
 % INPUT
 % tree : tree (scalar struct)
@@ -9,6 +9,7 @@ function tree = split( tree, features, labels, nclasses, curnode )
 % labels : sample labels (row numeric)
 % nclasses : number of classes (scalar numeric)
 % curnode : current node index (scalar numeric)
+% curdepth : current tree depth (scalar numeric)
 %
 % OUTPUT
 % tree : tree (scalar struct)
@@ -34,6 +35,10 @@ function tree = split( tree, features, labels, nclasses, curnode )
 		%error( 'invalid argument: curnode' );
 	%end
 
+	%if nargin < 6 || ~isscalar( curdepth ) || ~isnumeric( curdepth )
+		%error( 'invalid argument: curdepth' );
+	%end
+
 	%logger = xis.hLogger.instance();
 	%logger.tab( 'split node...' );
 
@@ -55,6 +60,8 @@ function tree = split( tree, features, labels, nclasses, curnode )
 
 		% prepare current node
 	nsamples = size( features, 1 );
+
+	tree.depths(curnode) = curdepth;
 
 	classinds = false( nclasses, nsamples ); % class indicators
 	for i = 1:nclasses
@@ -167,7 +174,9 @@ function tree = split( tree, features, labels, nclasses, curnode )
 			tree = expand( tree ); % add child node
 			tree.lefts(curnode) = numel( tree.labels );
 
-			tree = brf.split( tree, features(lsamples, :), labels(lsamples), nclasses, tree.lefts(curnode) ); % recursion
+			tree = brf.split( tree, ...
+				features(lsamples, :), labels(lsamples), nclasses, ...
+				tree.lefts(curnode), curdepth+1 ); % recursion
 
 		end
 
@@ -180,7 +189,9 @@ function tree = split( tree, features, labels, nclasses, curnode )
 			tree = expand( tree ); % add child node
 			tree.rights(curnode) = numel( tree.labels );
 
-			tree = brf.split( tree, features(rsamples, :), labels(rsamples), nclasses, tree.rights(curnode) ); % recursion
+			tree = brf.split( tree, ...
+				features(rsamples, :), labels(rsamples), nclasses, ...
+				tree.rights(curnode), curdepth+1 ); % recursion
 
 		end
 

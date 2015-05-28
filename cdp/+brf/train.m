@@ -41,11 +41,11 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 	nfeatures = size( features, 2 );
 	nsamples = size( features, 1 );
 
-	logger.log( 'classes: %d', nclasses );
-	logger.log( 'features: %d', nfeatures );
 	logger.log( 'samples: %d', nsamples );
+	logger.log( 'features: %d', nfeatures );
 
 	forest = struct( ... % pre-allocation
+		'depths', NaN, ...
 		'labels', NaN, ...
 		'impurities', NaN, ...
 		'features', NaN, ...
@@ -65,13 +65,14 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 		hiermax = logger.hierarchymax;
 		logger.hierarchymax = logger.hierarchy + 2; % limit logging depth
 
-		forest(i) = brf.split( forest(i), features(bagi, :), labels(bagi), nclasses, 1 );
+		forest(i) = brf.split( forest(i), features(bagi, :), labels(bagi), nclasses, 1, 0 );
 
 		logger.hierarchymax = hiermax; % restore logging depth
 
 			% log statistics
 		logger.log( 'nodes: %d', numel( forest(i).labels ) );
 		logger.log( 'leaves: %d', sum( isnan( forest(i).lefts ) & isnan( forest(i).rights ) ) );
+		logger.log( 'depth: %d', max( forest(i).depths ) );
 
 		logger.untab();
 	end
