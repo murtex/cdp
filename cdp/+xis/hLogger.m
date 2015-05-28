@@ -5,7 +5,7 @@ classdef (Sealed = true) hLogger < handle
 	properties (Access = public)
 
 		hierarchy = 0; % hierarchy (scalar numeric)
-		hierarchymax = 11;
+		hierarchymax = 11; % maximum hierarchy (scalar numeric)
 
 		tics = tic(); % timing (internal)
 
