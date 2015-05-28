@@ -137,7 +137,7 @@ function [classes, forest] = train( runs, ntrees, seed )
 			end
 
 				% sample subsequences from pool
-			si = randi( size( subpool, 1 ), nmaxsubs, 1 );
+			si = randsample( 1:size( subpool, 1 ), nmaxsubs );
 			subs(j, (i-1)*nmaxsubs+1:i*nmaxsubs, :) = subpool(si, :);
 
 		end

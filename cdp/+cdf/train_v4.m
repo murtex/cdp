@@ -1,7 +1,7 @@
-function [classes, forest] = train_v2( runs, ntrees, seed )
+function [classes, forest] = train_v3( runs, ntrees, seed )
 % train random forest
 %
-% [classes, forest] = TRAIN_V2( runs, ntrees, seed )
+% [classes, forest] = TRAIN_V3( runs, ntrees, seed )
 %
 % INPUT
 % runs : runs (row object)
@@ -97,54 +97,64 @@ function [classes, forest] = train_v2( runs, ntrees, seed )
 
 	rng( 1 ); % fixed randomness
 
-	nmaxsubs = min( nsubs(:) );
-
-	subs = zeros( nclasses, nruns*nmaxsubs, nfeatures ); % pre-allocation
+	subs = []; % pre-allocation
+	sublabels = [];
 
 	logger.progress();
 	for i = 1:nruns
-		for j = 1:nclasses
 
-				% prepare sample pool
-			pool = zeros( 0, nfeatures ); % pre-allocation
+			% read subsequences
+		rsubs = zeros( sum( nsubs(:, i) ), nfeatures ); % pre-allocation
+		rsublabels = zeros( 1, size( rsubs, 1 ) );
 
-			m = numel( runs(i).trials );
-			for k = 1:m
+		ci = 1;
 
-					% current class only
-				label = runs(i).trials(k).labeled.label;
-				featfile = runs(i).trials(k).detected.featfile;
+		m = numel( runs(i).trials );
+		for j = 1:m
+			label = runs(i).trials(j).labeled.label;
+			featfile = runs(i).trials(j).detected.featfile;
 
-				if ~isempty( label ) && classid( label ) == j && ~isempty( featfile )
+			if ~isempty( label ) && ~isempty( featfile )
+				load( featfile, 'subfeat' );
+				n = size( subfeat, 1 );
 
-						% read subsequences
-					load( featfile, 'subfeat' );
-					pool(end+1:end+size( subfeat, 1 ), :) = subfeat;
+				rsubs(ci:ci+n-1, :) = subfeat;
+				rsublabels(ci:ci+n-1) = classid( label );
 
-				end
+				ci = ci + n;
 			end
-
-				% sample from pool
-			si = randsample( 1:size( pool, 1 ), nmaxsubs );
-			subs(j, (i-1)*nmaxsubs+1:i*nmaxsubs, :) = pool(si, :);
-
 		end
+
+			% sample even labeled subsequences
+		nmax = min( nsubs(:, i) );
+
+		for j = 1:nclasses
+			ci = find( rsublabels == j );
+
+			n = numel( ci );
+			if n > nmax
+				si = randsample( ci, n-nmax );
+
+				rsubs(si, :) = [];
+				rsublabels(si) = [];
+			end
+		end
+
+		subs = cat( 1, subs, rsubs );
+		sublabels = cat( 2, sublabels, rsublabels );
 
 		logger.progress( i, nruns );
 	end
 
-	subs = reshape( subs, nclasses*nruns*nmaxsubs, nfeatures ); % plain feature matrix
-	sublabels = repmat( 1:nclasses, 1, nruns*nmaxsubs ); % labels
-
 	for i = 1:nclasses
-		logger.log( 'class #%d samples: %d (%.1f%%)', ...
-			i, nruns*nmaxsubs, 100 * nruns*nmaxsubs / sum( nsubs(i, :) ) );
+		n = sum( sublabels == i );
+		logger.log( 'class #%d samples: %d (%.1f%%)', i, n, 100 * n / sum( nsubs(i, :) ) );
 	end
 
 	logger.untab();
 
 		% train random forest
-	rng( seed ); % random seed
+	rng( seed ); % seed randomness
 
 	%dbgi = randsample( size( subs, 1 ), 20 );
 	%forest = brf.train( subs(dbgi, :), sublabels(dbgi), nclasses, ntrees, false );

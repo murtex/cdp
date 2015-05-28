@@ -1,7 +1,7 @@
-function [classes, forest] = train_v2( runs, ntrees, seed )
+function [classes, forest] = train_v3( runs, ntrees, seed )
 % train random forest
 %
-% [classes, forest] = TRAIN_V2( runs, ntrees, seed )
+% [classes, forest] = TRAIN_V3( runs, ntrees, seed )
 %
 % INPUT
 % runs : runs (row object)
@@ -92,54 +92,38 @@ function [classes, forest] = train_v2( runs, ntrees, seed )
 
 	logger.untab();
 
-		% sample training set
-	logger.tab( 'sample training set...' );
+		% read training set
+	logger.tab( 'read training set...' );
 
-	rng( 1 ); % fixed randomness
+	subs = zeros( sum( nsubs(:) ), nfeatures ); % pre-allocation
+	sublabels = zeros( 1, sum( nsubs(:) ) );
 
-	nmaxsubs = min( nsubs(:) );
-
-	subs = zeros( nclasses, nruns*nmaxsubs, nfeatures ); % pre-allocation
-
+	ci = 1;
 	logger.progress();
 	for i = 1:nruns
-		for j = 1:nclasses
+		m = numel( runs(i).trials );
+		for j = 1:m
 
-				% prepare sample pool
-			pool = zeros( 0, nfeatures ); % pre-allocation
+				% read subsequences
+			label = runs(i).trials(j).labeled.label;
+			featfile = runs(i).trials(j).detected.featfile;
 
-			m = numel( runs(i).trials );
-			for k = 1:m
+			if ~isempty( label ) && ~isempty( featfile )
+				load( featfile, 'subfeat' );
+				n = size( subfeat, 1 );
 
-					% current class only
-				label = runs(i).trials(k).labeled.label;
-				featfile = runs(i).trials(k).detected.featfile;
+				subs(ci:ci+n-1, :) = subfeat;
+				sublabels(ci:ci+n-1) = classid( label );
 
-				if ~isempty( label ) && classid( label ) == j && ~isempty( featfile )
-
-						% read subsequences
-					load( featfile, 'subfeat' );
-					pool(end+1:end+size( subfeat, 1 ), :) = subfeat;
-
-				end
+				ci = ci + n;
 			end
-
-				% sample from pool
-			si = randsample( 1:size( pool, 1 ), nmaxsubs );
-			subs(j, (i-1)*nmaxsubs+1:i*nmaxsubs, :) = pool(si, :);
 
 		end
 
 		logger.progress( i, nruns );
 	end
 
-	subs = reshape( subs, nclasses*nruns*nmaxsubs, nfeatures ); % plain feature matrix
-	sublabels = repmat( 1:nclasses, 1, nruns*nmaxsubs ); % labels
-
-	for i = 1:nclasses
-		logger.log( 'class #%d samples: %d (%.1f%%)', ...
-			i, nruns*nmaxsubs, 100 * nruns*nmaxsubs / sum( nsubs(i, :) ) );
-	end
+	logger.log( 'samples: %d', ci-1 );
 
 	logger.untab();
 

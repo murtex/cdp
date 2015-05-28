@@ -41,9 +41,6 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 	nfeatures = size( features, 2 );
 	nsamples = size( features, 1 );
 
-	logger.log( 'samples: %d', nsamples );
-	logger.log( 'features: %d', nfeatures );
-
 	forest = struct( ... % pre-allocation
 		'depths', NaN, ...
 		'labels', NaN, ...
@@ -71,7 +68,6 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 
 			% log statistics
 		logger.log( 'nodes: %d', numel( forest(i).labels ) );
-		logger.log( 'leaves: %d', sum( isnan( forest(i).lefts ) & isnan( forest(i).rights ) ) );
 		logger.log( 'depth: %d', max( forest(i).depths ) );
 
 		logger.untab();
