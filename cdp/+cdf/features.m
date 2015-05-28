@@ -85,10 +85,22 @@ function features( run, cfg, landmarks, outdir )
 		respfeat = NaN( size( respft, 1 ), 0 ); % pre-allocation
 
 		respfeat(:, end+1) = sum( repmat( respfreqs, size( respft, 1 ), 1 ) .* respft, 2 ) ./ sum( respft, 2 ); % spectral centroid
-		%[lorespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band1 ); % lower power
-		%respfeat(:, end+1) = sum( lorespft, 2 );
-		%[hirespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band2 ); % upper power
-		%respfeat(:, end+1) = sum( hirespft, 2 );
+		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band1 ); % band #1
+		respfeat(:, end+1) = sum( brespft, 2 );
+		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band2 ); % band #2
+		respfeat(:, end+1) = sum( brespft, 2 );
+		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band3 ); % band #3
+		respfeat(:, end+1) = sum( brespft, 2 );
+		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band4 ); % band #4
+		respfeat(:, end+1) = sum( brespft, 2 );
+		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band5 ); % band #5
+		respfeat(:, end+1) = sum( brespft, 2 );
+		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band6 ); % band #6
+		respfeat(:, end+1) = sum( brespft, 2 );
+		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band7 ); % band #7
+		respfeat(:, end+1) = sum( brespft, 2 );
+		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band8 ); % band #8
+		respfeat(:, end+1) = sum( brespft, 2 );
 
 		respfeat = sta.unframe( respfeat, frame ); % smoothing
 		respfeat = zscore( respfeat, 1, 1 ); % standardization

@@ -1,14 +1,12 @@
 #!/bin/sh
 
 	# data directories
-INDIR='../../data/klein/features/'
-OUTDIR='../../data/klein/train/'
+INDIR='../../data/klein/features-8/'
+OUTDIR='../../data/klein/train-8/'
 
 	# spread workload
-IDS='[3, 6, 8, 10]'
-IDS='[16, 17]'
 IDS='[1:3, 5:10]'
-NTREES=50 # 500 trees total
+NTREES=25 # 250 trees total
 
 matlab -nosplash -nodesktop -r "train( '$INDIR', '$OUTDIR', $IDS, 1, $NTREES ); exit();" &
 sleep 3

@@ -20,7 +20,7 @@
 #include "mex.h"
 
 	/* defines */
-#define NLOCFEATS 2
+#define NLOCFEATS 0
 #define NSUBFEATS 2
 #define NINTFEATS 3
 
@@ -70,8 +70,8 @@ mexFunction( int nlhs, mxArray ** lhs, int nrhs, mxArray const ** rhs )
 		int const substart = randmm( 0, featserlen - intcount*rndintlen );
 
 			/* set location features */
-		subser[0*subserlen + i] = (double) substart / (featserlen-1);
-		subser[1*subserlen + i] = (double) (substart+sublen-1) / (featserlen-1);
+		/*subser[0*subserlen + i] = (double) substart / (featserlen-1);
+		 *subser[1*subserlen + i] = (double) (substart+sublen-1) / (featserlen-1);*/
 
 			/* prepare vandermonde buffer for slope regression */
 		double * vand = (double *) mxMalloc( rndintlen * sizeof( double ) );

@@ -1,12 +1,11 @@
 #!/bin/sh
 
 	# data directories
-INDIR='../../data/klein/features/'
-OUTDIR='../../data/klein/classify/'
-TRAINDIR='../../data/klein/train/'
+INDIR='../../data/klein/features-8/'
+OUTDIR='../../data/klein/classify-8/'
+TRAINDIR='../../data/klein/train-8/'
 
 	# spread workload
-IDS='[16, 17]'
 IDS='11:20'
 SEEDS='1:10'
 

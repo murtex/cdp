@@ -1,11 +1,12 @@
-function [classes, forest] = train( runs, ntrees )
+function [classes, forest] = train( runs, ntrees, seed )
 % train label classifier
 %
-% forest = TRAIN( runs, ntrees )
+% forest = TRAIN( runs, ntrees, seed )
 %
 % INPUT
 % runs : runs (row object)
 % ntrees : number of trees (scalar object)
+% seed : randomization seed (scalar numeric)
 %
 % OUTPUT
 % classes : class labels (cell row char)
@@ -18,6 +19,10 @@ function [classes, forest] = train( runs, ntrees )
 
 	if nargin < 2 || ~isscalar( ntrees ) || ~isnumeric( ntrees )
 		error( 'invalid argument: ntrees' );
+	end
+
+	if nargin < 3 || ~isscalar( seed ) || ~isnumeric( seed )
+		error( 'invalid argument: seed' );
 	end
 
 	logger = xis.hLogger.instance();
@@ -96,6 +101,8 @@ function [classes, forest] = train( runs, ntrees )
 		% build subsequence dataset
 	logger.tab( 'build subsequence dataset...' );
 
+	rng( 1 ); % fixed random for subsequence sampling
+
 	nmaxsubs = min( nsubs(:) ); % pre-allocation
 	subs = NaN( nclasses, nruns*nmaxsubs, sublen );
 
@@ -137,14 +144,16 @@ function [classes, forest] = train( runs, ntrees )
 		logger.progress( i, nruns );
 	end
 
-	subs = reshape( subs, nclasses*nruns*nmaxsubs, sublen ); % plain list of features and labels
-	sublabels = repmat( 1:nclasses, 1, nruns*nmaxsubs );
+	subs = reshape( subs, nclasses*nruns*nmaxsubs, sublen ); % feature matrix
+	sublabels = repmat( 1:nclasses, 1, nruns*nmaxsubs ); % labels
 
 	logger.log( 'subsequences: %d', size( subs, 1 ) );
 
 	logger.untab();
 
 		% grow subsequence forest
+	rng( seed );
+
 	%dbgi = randsample( size( subs, 1 ), 20 );
 	%forest = brf.train( subs(dbgi, :), sublabels(dbgi), nclasses, ntrees, false );
 	%error( 'DEBUG' );
