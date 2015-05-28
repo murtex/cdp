@@ -31,8 +31,8 @@ function d = depth( tree, curnode )
 		end
 
 		rd = 0; % right depth
-		if ~isnan( tree.lefts(curnode) )
-			rd = brf.depth( tree, tree.lefts(curnode) );
+		if ~isnan( tree.rights(curnode) )
+			rd = brf.depth( tree, tree.rights(curnode) );
 		end
 
 		d = max( ld, rd ) + 1; % maximum
