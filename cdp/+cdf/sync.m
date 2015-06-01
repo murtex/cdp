@@ -32,17 +32,17 @@ function offs = sync( run, cfg, sync_resp )
 	logger.tab( 'sync timing...' );
 
 		% detect sync zero-point (first 'tone' distractor)
-	vic = dsp.msec2smp( cfg.sync_mrklen, run.audiorate );
+	vic = sta.msec2smp( cfg.sync_mrklen, run.audiorate );
 
 	zoffs = k15.scs05( run.audiodata(:, 2), vic, cfg.sync_thresh ) - 1;
 	if isnan( zoffs )
 		error( 'invalid argument: run' );
 	end
 
-	logger.log( 'zero-point: %.1fms', dsp.smp2msec( zoffs, run.audiorate ) );
+	logger.log( 'zero-point: %.1fms', sta.smp2msec( zoffs, run.audiorate ) );
 
 		% detect sync marker offsets
-	range = dsp.msec2smp( cfg.sync_range, run.audiorate );
+	range = sta.msec2smp( cfg.sync_range, run.audiorate );
 
 	n = numel( run.trials );
 

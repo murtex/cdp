@@ -69,7 +69,7 @@ function [pows, freqs] = babbling( run, cfg, labeled, landmarks )
 		respser = run.audiodata(range(1):range(2), 1);
 
 			% get full bandwidth fft
-		frame = dsp.msec2smp( cfg.sta_frame, run.audiorate );
+		frame = sta.msec2smp( cfg.sta_frame, run.audiorate );
 		
 		noift = sta.framing( noiser, frame, cfg.sta_wnd );
 		[noift, noifreqs] = sta.fft( noift, run.audiorate );

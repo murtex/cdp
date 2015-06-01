@@ -100,16 +100,16 @@ function timing( run, detected, labeled, plotfile )
 	title( sprintf( 'trials: %d -- timing', size( detected, 1 ) ) );
 	xlabel( 'voice-onset time (detected) in milliseconds' );
 	ylabel( 'rate' );
-	xlim( dsp.smp2msec( xlvot, run.audiorate ) );
-	bar( dsp.smp2msec( detvotpos, run.audiorate ), detvotns / ndetvots, ...
+	xlim( sta.smp2msec( xlvot, run.audiorate ) );
+	bar( sta.smp2msec( detvotpos, run.audiorate ), detvotns / ndetvots, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 	if ~isempty( labeled )
 		subplot( 3, 2, 2 );
 		xlabel( 'voice-onset time (labeled) in milliseconds' );
 		ylabel( 'rate' );
-		xlim( dsp.smp2msec( xlvot, run.audiorate ) );
-		bar( dsp.smp2msec( labvotpos, run.audiorate ), labvotns / nlabvots, ...
+		xlim( sta.smp2msec( xlvot, run.audiorate ) );
+		bar( sta.smp2msec( labvotpos, run.audiorate ), labvotns / nlabvots, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 	end
 
@@ -121,16 +121,16 @@ function timing( run, detected, labeled, plotfile )
 	end
 	xlabel( 'vowel length (detected) in milliseconds' );
 	ylabel( 'rate' );
-	xlim( dsp.smp2msec( xlvow, run.audiorate ) );
-	bar( dsp.smp2msec( detvowpos, run.audiorate ), detvowns / ndetvows, ...
+	xlim( sta.smp2msec( xlvow, run.audiorate ) );
+	bar( sta.smp2msec( detvowpos, run.audiorate ), detvowns / ndetvows, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 	if ~isempty( labeled )
 		subplot( 3, 2, 4 );
 		xlabel( 'vowel length (labeled) in milliseconds' );
 		ylabel( 'rate' );
-		xlim( dsp.smp2msec( xlvow, run.audiorate ) );
-		bar( dsp.smp2msec( labvowpos, run.audiorate ), labvowns / nlabvows, ...
+		xlim( sta.smp2msec( xlvow, run.audiorate ) );
+		bar( sta.smp2msec( labvowpos, run.audiorate ), labvowns / nlabvows, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 	end
 
@@ -142,16 +142,16 @@ function timing( run, detected, labeled, plotfile )
 	end
 	xlabel( 'syllable length (detected) in milliseconds' );
 	ylabel( 'rate' );
-	xlim( dsp.smp2msec( xlsyl, run.audiorate ) );
-	bar( dsp.smp2msec( detsylpos, run.audiorate ), detsylns / ndetsyls, ...
+	xlim( sta.smp2msec( xlsyl, run.audiorate ) );
+	bar( sta.smp2msec( detsylpos, run.audiorate ), detsylns / ndetsyls, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 	if ~isempty( labeled )
 		subplot( 3, 2, 6 );
 		xlabel( 'syllable length (labeled) in milliseconds' );
 		ylabel( 'rate' );
-		xlim( dsp.smp2msec( xlsyl, run.audiorate ) );
-		bar( dsp.smp2msec( labsylpos, run.audiorate ), labsylns / nlabsyls, ...
+		xlim( sta.smp2msec( xlsyl, run.audiorate ) );
+		bar( sta.smp2msec( labsylpos, run.audiorate ), labsylns / nlabsyls, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 	end
 

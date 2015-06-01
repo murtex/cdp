@@ -59,7 +59,7 @@ function features( run, cfg, outdir, labeled )
 		respser = run.audiodata(resp.range(1):resp.range(2), 1);
 
 			% get full bandwidth fft
-		frame = dsp.msec2smp( cfg.sta_frame, run.audiorate );
+		frame = sta.msec2smp( cfg.sta_frame, run.audiorate );
 
 		noift = sta.framing( noiser, frame, cfg.sta_wnd );
 		[noift, noifreqs] = sta.fft( noift, run.audiorate );
@@ -106,7 +106,7 @@ function features( run, cfg, outdir, labeled )
 		end
 
 			% get subsequence features
-		subfeat = brf.subseq( respfeat, dsp.msec2smp( cfg.feat_intlen, run.audiorate ), cfg.feat_intcount );
+		subfeat = brf.subseq( respfeat, sta.msec2smp( cfg.feat_intlen, run.audiorate ), cfg.feat_intcount );
 
 		if isempty( subfeat )
 			logger.progress( i, n );

@@ -37,7 +37,7 @@ function trial_glottis( run, cfg, trial, plotfile )
 	respser = run.audiodata(trial.detected.range(1):trial.detected.range(2), 1);
 
 		% get subband fft
-	frame = dsp.msec2smp( cfg.sta_frame, run.audiorate );
+	frame = sta.msec2smp( cfg.sta_frame, run.audiorate );
 
 	noift = sta.framing( noiser, frame, cfg.sta_wnd );
 	[noift, noifreqs] = sta.fft( noift, run.audiorate );
@@ -70,18 +70,18 @@ function trial_glottis( run, cfg, trial, plotfile )
 	respclpow = respclpow(1:size( respser, 1 ));
 
 		% get ror and peaks
-	rordt = dsp.msec2smp( cfg.glottis_rordt, run.audiorate );
+	rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
 
 	respror = k15.ror( pow2db( respclpow ), rordt );
 
 	resppeak = k15.peak( respror, cfg.glottis_rorpeak );
 	respglottis = k15.peak_glottis( resppeak, pow2db( respclpow ), respror, ...
-		dsp.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+		sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
 
 		% prepare plot
 	zp = trial.detected.range(1);
 
-	xs = dsp.smp2msec( (trial.detected.range(1):trial.detected.range(2))-zp, run.audiorate ); % axes
+	xs = sta.smp2msec( (trial.detected.range(1):trial.detected.range(2))-zp, run.audiorate ); % axes
 	xl = [min( xs ), max( xs )];
 
 		% plot subband spectrogram
@@ -92,7 +92,7 @@ function trial_glottis( run, cfg, trial, plotfile )
 	ylim( [respfreqs(1), respfreqs(end)] );
 
 	colormap( style.gradient( 64, [1, 1, 1], style.color( 'neutral', -0.5 ) ) );
-	imagesc( dsp.smp2msec( 0:size( respft, 1 )-1, run.audiorate ), respfreqs, log( respft' ) );
+	imagesc( sta.smp2msec( 0:size( respft, 1 )-1, run.audiorate ), respfreqs, log( respft' ) );
 
 		% plot powers
 	subplot( 4, 1, 2 );
@@ -134,13 +134,13 @@ function trial_glottis( run, cfg, trial, plotfile )
 		'LineStyle', '--', 'Color', style.color( 'neutral', +2 ) );
 
 	if ~isempty( resppeak ) % peaks
-		stem( dsp.smp2msec( resppeak-1, run.audiorate ), 2*((respror(resppeak) > 0)-0.5) * yl, ...
+		stem( sta.smp2msec( resppeak-1, run.audiorate ), 2*((respror(resppeak) > 0)-0.5) * yl, ...
 			'Marker', 'o', 'MarkerSize', 2*style.width( +1 ), ...
 			'MarkerEdgeColor', style.color( 'cold', -2 ), 'MarkerFaceColor', style.color( 'cold', +1 ), ...
 			'Color', style.color( 'cold', 0 ) );
 	end
 	if ~isempty( respglottis )
-		stem( dsp.smp2msec( respglottis-1, run.audiorate ), repmat( [1, -1], 1, numel( respglottis )/2 ) * yl, ...
+		stem( sta.smp2msec( respglottis-1, run.audiorate ), repmat( [1, -1], 1, numel( respglottis )/2 ) * yl, ...
 			'Marker', 'o', 'MarkerSize', 2*style.width( +1 ), ...
 			'MarkerEdgeColor', style.color( 'warm', -2 ), 'MarkerFaceColor', style.color( 'warm', +1 ), ...
 			'Color', style.color( 'warm', 0 ) );

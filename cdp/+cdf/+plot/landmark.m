@@ -33,7 +33,7 @@ function landmark( run, detected, labeled, plotfile )
 	fig = style.figure();
 
 		% set burst-onset statistics
-	maxdelta = dsp.msec2smp( 15, run.audiorate ); % limit view to +/-15ms
+	maxdelta = sta.msec2smp( 15, run.audiorate ); % limit view to +/-15ms
 
 	dbos = detected(:, 1) - labeled(:, 1); % data
 	dbos(isnan( dbos )) = [];
@@ -75,16 +75,16 @@ function landmark( run, detected, labeled, plotfile )
 	title( sprintf( 'trials: %d -- landmarks', size( detected, 1 ) ) );
 	xlabel( 'burst-onset (+b) delta in milliseconds' );
 	ylabel( 'rate' );
-	xlim( dsp.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
-	bar( dsp.smp2msec( dbopos, run.audiorate ), dbons / ndbos, ...
+	xlim( sta.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
+	bar( sta.smp2msec( dbopos, run.audiorate ), dbons / ndbos, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, 2 );
 	xlabel( 'abs(delta) in milliseconds' );
 	ylabel( 'cumulative rate' );
-	xlim( [0, dsp.smp2msec( maxdelta, run.audiorate )] );
+	xlim( [0, sta.smp2msec( maxdelta, run.audiorate )] );
 	ylim( [0, 1] );
-	h = bar( dsp.smp2msec( absdbopos, run.audiorate ), cumsum( absdbons ) / ndbos, ...
+	h = bar( sta.smp2msec( absdbopos, run.audiorate ), cumsum( absdbons ) / ndbos, ...
 		'DisplayName', sprintf( '%d', ndbos ), ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
@@ -95,16 +95,16 @@ function landmark( run, detected, labeled, plotfile )
 	subplot( 3, 2, 3 );
 	xlabel( 'voice-onset (+g) delta in milliseconds' );
 	ylabel( 'rate' );
-	xlim( dsp.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
-	bar( dsp.smp2msec( dvopos, run.audiorate ), dvons / ndvos, ...
+	xlim( sta.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
+	bar( sta.smp2msec( dvopos, run.audiorate ), dvons / ndvos, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, 4 );
 	xlabel( 'abs(delta) in milliseconds' );
 	ylabel( 'cumulative rate' );
-	xlim( [0, dsp.smp2msec( maxdelta, run.audiorate )] );
+	xlim( [0, sta.smp2msec( maxdelta, run.audiorate )] );
 	ylim( [0, 1] );
-	h = bar( dsp.smp2msec( absdvopos, run.audiorate ), cumsum( absdvons ) / ndvos, ...
+	h = bar( sta.smp2msec( absdvopos, run.audiorate ), cumsum( absdvons ) / ndvos, ...
 		'DisplayName', sprintf( '%d', ndvos ), ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
@@ -115,16 +115,16 @@ function landmark( run, detected, labeled, plotfile )
 	subplot( 3, 2, 5 );
 	xlabel( 'voice-release (-g) delta in milliseconds' );
 	ylabel( 'rate' );
-	xlim( dsp.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
-	bar( dsp.smp2msec( dvrpos, run.audiorate ), dvrns / ndvrs, ...
+	xlim( sta.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
+	bar( sta.smp2msec( dvrpos, run.audiorate ), dvrns / ndvrs, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, 6 );
 	xlabel( 'abs(delta) in milliseconds' );
 	ylabel( 'cumulative rate' );
-	xlim( [0, dsp.smp2msec( maxdelta, run.audiorate )] );
+	xlim( [0, sta.smp2msec( maxdelta, run.audiorate )] );
 	ylim( [0, 1] );
-	h = bar( dsp.smp2msec( absdvrpos, run.audiorate ), cumsum( absdvrns ) / ndvrs, ...
+	h = bar( sta.smp2msec( absdvrpos, run.audiorate ), cumsum( absdvrns ) / ndvrs, ...
 		'DisplayName', sprintf( '%d', ndvrs ), ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 

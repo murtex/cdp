@@ -28,7 +28,7 @@ function extract( run, detected, labeled, plotfile )
 	fig = style.figure();
 
 		% set start statistics
-	maxdelta = dsp.msec2smp( 80, run.audiorate ); % limit view to +/-80ms
+	maxdelta = sta.msec2smp( 80, run.audiorate ); % limit view to +/-80ms
 
 	dstarts = detected(:, 1) - labeled(:, 1); % data
 	dstarts(isnan( dstarts )) = [];
@@ -86,16 +86,16 @@ function extract( run, detected, labeled, plotfile )
 	title( sprintf( 'trials: %d -- extraction', size( detected, 1 ) ) );
 	xlabel( 'start delta in milliseconds' );
 	ylabel( 'rate' );
-	xlim( dsp.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
-	bar( dsp.smp2msec( dstartpos, run.audiorate ), dstartns / ndstarts, ...
+	xlim( sta.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
+	bar( sta.smp2msec( dstartpos, run.audiorate ), dstartns / ndstarts, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, 2 );
 	xlabel( 'abs(delta) in milliseconds' );
 	ylabel( 'cumulative rate' );
-	xlim( [0, dsp.smp2msec( maxdelta, run.audiorate )] );
+	xlim( [0, sta.smp2msec( maxdelta, run.audiorate )] );
 	ylim( [0, 1] );
-	h = bar( dsp.smp2msec( absdstartpos, run.audiorate ), cumsum( absdstartns ) / ndstarts, ...
+	h = bar( sta.smp2msec( absdstartpos, run.audiorate ), cumsum( absdstartns ) / ndstarts, ...
 		'DisplayName', sprintf( '%d', ndstarts ), ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
@@ -106,16 +106,16 @@ function extract( run, detected, labeled, plotfile )
 	subplot( 3, 2, 3 );
 	xlabel( 'stop delta in milliseconds' );
 	ylabel( 'rate' );
-	xlim( dsp.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
-	bar( dsp.smp2msec( dstoppos, run.audiorate ), dstopns / ndstops, ...
+	xlim( sta.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
+	bar( sta.smp2msec( dstoppos, run.audiorate ), dstopns / ndstops, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, 4 );
 	xlabel( 'abs(delta) in milliseconds' );
 	ylabel( 'cumulative rate' );
-	xlim( [0, dsp.smp2msec( maxdelta, run.audiorate )] );
+	xlim( [0, sta.smp2msec( maxdelta, run.audiorate )] );
 	ylim( [0, 1] );
-	h = bar( dsp.smp2msec( absdstoppos, run.audiorate ), cumsum( absdstopns ) / ndstops, ...
+	h = bar( sta.smp2msec( absdstoppos, run.audiorate ), cumsum( absdstopns ) / ndstops, ...
 		'DisplayName', sprintf( '%d', ndstops ), ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 

@@ -32,9 +32,9 @@ function sync( run, offs, plotfile )
 	xlabel( 'marker position in seconds' );
 	ylabel( 'marker offset in milliseconds' );
 
-	xlim( dsp.smp2sec( [1, run.audiolen]-1, run.audiorate ) );
+	xlim( sta.smp2sec( [1, run.audiolen]-1, run.audiorate ) );
 
-	scatter( dsp.smp2sec( [run.trials.cue], run.audiorate ), dsp.smp2msec( offs, run.audiorate ), ...
+	scatter( sta.smp2sec( [run.trials.cue], run.audiorate ), sta.smp2msec( offs, run.audiorate ), ...
 		'Marker', '+', 'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', style.color( 'warm', 0 ) );
 
 	style.print( plotfile );

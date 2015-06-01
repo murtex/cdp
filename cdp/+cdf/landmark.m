@@ -46,7 +46,7 @@ function landmark( run, cfg )
 		respser = run.audiodata(trial.detected.range(1):trial.detected.range(2), 1);
 
 			% get subband fft
-		frame = dsp.msec2smp( cfg.sta_frame, run.audiorate );
+		frame = sta.msec2smp( cfg.sta_frame, run.audiorate );
 
 		noift = sta.framing( noiser, frame, cfg.sta_wnd );
 		[noift, noifreqs] = sta.fft( noift, run.audiorate );
@@ -71,13 +71,13 @@ function landmark( run, cfg )
 		resppow = resppow(1:size( respser, 1 ));
 
 			% get ror and peaks
-		rordt = dsp.msec2smp( cfg.glottis_rordt, run.audiorate );
+		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
 
 		respror = k15.ror( pow2db( resppow ), rordt );
 
 		resppeak = k15.peak( respror, cfg.glottis_rorpeak );
 		respglottis = k15.peak_glottis( resppeak, pow2db( resppow ), respror, ...
-			dsp.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+			sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
 
 			% set glottis landmarks
 		m = numel( respglottis );
@@ -99,7 +99,7 @@ function landmark( run, cfg )
 
 		resppi = k15.plosion( ...
 			k15.replaygain( resppiser, run.audiorate ), ...
-			dsp.msec2smp( cfg.plosion_delta, run.audiorate ), dsp.msec2smp( cfg.plosion_width, run.audiorate ) );
+			sta.msec2smp( cfg.plosion_delta, run.audiorate ), sta.msec2smp( cfg.plosion_width, run.audiorate ) );
 
 			% set burst landmark
 		boi = find( resppi >= max( cfg.plosion_threshs ), 1, 'first' ); % upper threshold first

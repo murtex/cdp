@@ -43,14 +43,14 @@ function trial_burst( run, cfg, trial, plotfile )
 
 	resppi = k15.plosion( ...
 		k15.replaygain( resppiser, run.audiorate ), ...
-		dsp.msec2smp( cfg.plosion_delta, run.audiorate ), dsp.msec2smp( cfg.plosion_width, run.audiorate ) );
+		sta.msec2smp( cfg.plosion_delta, run.audiorate ), sta.msec2smp( cfg.plosion_width, run.audiorate ) );
 
 	resppi = cat( 1, resppi, zeros( numel( respser )-numel( resppi ), 1 ) );
 
 		% prepare plot
 	zp = trial.detected.range(1);
 
-	xs = dsp.smp2msec( (trial.detected.range(1):trial.detected.range(2))-zp, run.audiorate ); % axes
+	xs = sta.smp2msec( (trial.detected.range(1):trial.detected.range(2))-zp, run.audiorate ); % axes
 	xl = [min( xs ), max( xs )];
 
 		% plot signal

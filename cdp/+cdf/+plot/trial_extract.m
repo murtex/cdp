@@ -37,7 +37,7 @@ function trial_extract( run, cfg, trial, plotfile )
 	respser = run.audiodata(trial.range(1):trial.range(2), 1);
 
 		% get full bandwidth fft
-	frame = dsp.msec2smp( cfg.sta_frame, run.audiorate );
+	frame = sta.msec2smp( cfg.sta_frame, run.audiorate );
 
 	noift = sta.framing( noiser, frame, cfg.sta_wnd );
 	[noift, noifreqs] = sta.fft( noift, run.audiorate );
@@ -72,7 +72,7 @@ function trial_extract( run, cfg, trial, plotfile )
 		% prepare plot
 	zp = trial.cue;
 
-	xs = dsp.smp2msec( (trial.range(1):trial.range(2))-zp, run.audiorate ); % axes
+	xs = sta.smp2msec( (trial.range(1):trial.range(2))-zp, run.audiorate ); % axes
 	xl = [min( xs ), max( xs )];
 
 		% plot signal
