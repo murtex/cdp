@@ -49,7 +49,7 @@ function features( run, cfg, outdir, labeled )
 			resp = trial.detected;
 		end
 
-		if any( isnan( trial.range ) ) || any( isnan( resp.range ) )
+		if any( isnan( trial.range ) ) || any( isnan( resp.range ) ) % skip invalid trials
 			logger.progress( i, n );
 			continue;
 		end

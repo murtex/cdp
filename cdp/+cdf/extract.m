@@ -33,7 +33,7 @@ function extract( run, cfg )
 
 		trial.detected.range = [NaN, NaN];
 
-		if any( isnan( trial.range ) )
+		if any( isnan( trial.range ) ) % skip invalid trials
 			logger.progress( i, n );
 			continue;
 		end
