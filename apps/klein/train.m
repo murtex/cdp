@@ -85,6 +85,8 @@ function train( indir, outdir, ids, seed, ntrees )
 		% cleanup
 	delete( runs );
 
+	logger.log( 'peak memory: %.1fGiB', logger.peakmem() / (1024^3) );
+
 	logger.untab( 'done.' ); % stop logging
 
 end

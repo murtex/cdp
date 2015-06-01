@@ -63,6 +63,8 @@ function convert( indir, outdir, ids )
 	end
 
 		% cleanup
+	logger.log( 'peak memory: %.1fGiB', logger.peakmem() / (1024^3) );
+
 	logger.untab( 'done.' ); % stop logging
 
 end
