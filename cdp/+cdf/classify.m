@@ -1,4 +1,4 @@
-function classify( run, classes, forest );
+function classify( run, classes, forest, labeled );
 % classify labels
 %
 % CLASSIFY( run, classes, forest )
@@ -7,6 +7,7 @@ function classify( run, classes, forest );
 % run : run (scalar object)
 % classes : class labels (cell row char)
 % forest : trees (row struct)
+% DEBUG: labeled : classify labeled features (scalar logical)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
@@ -19,6 +20,10 @@ function classify( run, classes, forest );
 
 	if nargin < 3 || ~isrow( forest) % no type check!
 		error( 'invalid argument: forest' );
+	end
+
+	if nargin < 4 || ~isscalar( labeled ) || ~islogical( labeled )
+		error( 'invalid argument: labeled' );
 	end
 
 	logger = xis.hLogger.instance();
@@ -41,13 +46,19 @@ function classify( run, classes, forest );
 
 		trial.detected.label = '';
 
-		if isempty( trial.detected.featfile )
+		if labeled
+			featfile = trial.labeled.featfile;
+		else
+			featfile = trial.detected.featfile;
+		end
+
+		if isempty( featfile )
 			logger.progress( i, n );
 			continue;
 		end
 
 			% read and classify subsequences
-		load( trial.detected.featfile, 'subfeat' );
+		load( featfile, 'subfeat' );
 
 		labels = brf.classify( forest, subfeat );
 
