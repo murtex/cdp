@@ -40,7 +40,7 @@ function read_audio( run, audiofile, info_only )
 	end
 
 	logger.log( 'rate: %dHz', run.audiorate );
-	logger.log( 'length: %.1fs', dsp.smp2sec( run.audiolen, run.audiorate ) );
+	logger.log( 'length: %.1fs', sta.smp2sec( run.audiolen, run.audiorate ) );
 
 	logger.untab();
 end

@@ -67,7 +67,7 @@ function train( indir, outdir, ids, seed, ntrees )
 	logger.untab();
 
 		% train classifier
-	[classes, forest] = cdf.train_v4( runs, ntrees, seed );
+	[classes, forest] = cdf.train( runs, ntrees, seed, true );
 
 		% write classifier
 	logger.tab( 'write cdf...' );

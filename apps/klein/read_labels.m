@@ -48,9 +48,9 @@ function read_labels( run, labelfile )
 			% response
 		run.trials(i).labeled.label = rl;
 
-		run.trials(i).labeled.bo = run.trials(i).cue + dsp.sec2smp( fdata{i, 8}, run.audiorate );
-		run.trials(i).labeled.vo = run.trials(i).labeled.bo + dsp.sec2smp( fdata{i, 9}, run.audiorate );
-		run.trials(i).labeled.vr = run.trials(i).labeled.vo + dsp.sec2smp( fdata{i, 10}, run.audiorate );
+		run.trials(i).labeled.bo = run.trials(i).cue + sta.sec2smp( fdata{i, 8}, run.audiorate );
+		run.trials(i).labeled.vo = run.trials(i).labeled.bo + sta.sec2smp( fdata{i, 9}, run.audiorate );
+		run.trials(i).labeled.vr = run.trials(i).labeled.vo + sta.sec2smp( fdata{i, 10}, run.audiorate );
 
 		run.trials(i).labeled.range = [run.trials(i).labeled.bo, run.trials(i).labeled.vr];
 

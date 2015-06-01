@@ -52,12 +52,19 @@ function features( indir, outdir, ids )
 		read_audio( run, run.audiofile, false );
 
 			% compute features
-		subdir = fullfile( outdir, sprintf( '%d', run.id ) );
+		subdir = fullfile( outdir, sprintf( '%d_det', run.id ) ); % detected responses
 		if exist( subdir, 'dir' ) ~= 7
 			mkdir( subdir );
 		end
 
-		cdf.features( run, cfg, false, subdir );
+		cdf.features( run, cfg, subdir, false );
+
+		subdir = fullfile( outdir, sprintf( '%d_lab', run.id ) ); % labeled responses
+		if exist( subdir, 'dir' ) ~= 7
+			mkdir( subdir );
+		end
+
+		cdf.features( run, cfg, subdir, true );
 
 			% write cdf data
 		run.audiodata = []; % do not write audio data

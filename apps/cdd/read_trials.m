@@ -49,21 +49,21 @@ function read_trials( run, logfile )
 		trial.distlabel = fdata{9}{i};
 
 			% cue/distractor
-		trial.cue = 1 + dsp.sec2smp( fdata{13}(i), run.audiorate );
+		trial.cue = 1 + sta.sec2smp( fdata{13}(i), run.audiorate );
 
-		trial.soa = dsp.sec2smp( fdata{11}(i), run.audiorate );
-		trial.soa = dsp.msec2smp( 150, run.audiorate ); % TODO: remove this line when Eugen fixed his script!
+		trial.soa = sta.sec2smp( fdata{11}(i), run.audiorate );
+		trial.soa = sta.msec2smp( 150, run.audiorate ); % TODO: remove this line when Eugen fixed his script!
 
 			% range, TODO: use next first cue as range end?
 		trial.range(1) = trial.cue;
 		if i < n
-			nextcue = 1 + dsp.sec2smp( fdata{13}(i+1), run.audiorate );
+			nextcue = 1 + sta.sec2smp( fdata{13}(i+1), run.audiorate );
 			trial.range(2) = nextcue - 1; % TODO: trial overlap?
 		else
 			trial.range(2) = run.audiolen; % last trial ends with audio data, TODO: possibly gets invalidated by syncing
 		end
 
-		maxlen = dsp.sec2smp( 5, run.audiorate ); % limit length to 5s (between blocks)
+		maxlen = sta.sec2smp( 5, run.audiorate ); % limit length to 5s (between blocks)
 		if diff( trial.range )+1 > maxlen
 			trial.range(2) = trial.range(1) + maxlen-1;
 		end

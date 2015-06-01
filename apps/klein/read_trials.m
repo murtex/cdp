@@ -88,22 +88,22 @@ function read_trials( run, logfile )
 		trial.distlabel = distlabel( fdata{12}{i}, fdata{13}{i} );
 
 			% cue/distractor
-		trial.cue = 1 + dsp.sec2smp( max( fdata{9}(i), fdata{10}(i) ), run.audiorate ); % (for some data order has switched)
-		trial.soa = dsp.sec2smp( fdata{14}(i), run.audiorate );
+		trial.cue = 1 + sta.sec2smp( max( fdata{9}(i), fdata{10}(i) ), run.audiorate ); % (for some data order has switched)
+		trial.soa = sta.sec2smp( fdata{14}(i), run.audiorate );
 
 		trial.distbo = 1 + trial.cue + trial.soa;
-		trial.distvo = 1 + trial.distbo + dsp.msec2smp( distvot( fdata{13}{i} ), run.audiorate );
+		trial.distvo = 1 + trial.distbo + sta.msec2smp( distvot( fdata{13}{i} ), run.audiorate );
 
 		% range, TODO: use next first cue as range end?
 		trial.range(1) = trial.cue;
 		if i < n
-			nextcue = 1 + dsp.sec2smp( max( fdata{9}(i+1), fdata{10}(i+1) ), run.audiorate ); % (for some data order has switched)
+			nextcue = 1 + sta.sec2smp( max( fdata{9}(i+1), fdata{10}(i+1) ), run.audiorate ); % (for some data order has switched)
 			trial.range(2) = nextcue - 1; % TODO: trial overlap?
 		else
 			trial.range(2) = run.audiolen; % last trial ends with audio data, TODO: possibly gets invalidated by syncing
 		end
 
-		maxlen = dsp.sec2smp( 5, run.audiorate ); % limit length to 5s (between blocks)
+		maxlen = sta.sec2smp( 5, run.audiorate ); % limit length to 5s (between blocks)
 		if diff( trial.range )+1 > maxlen
 			trial.range(2) = trial.range(1) + maxlen-1;
 		end

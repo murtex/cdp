@@ -42,7 +42,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 	logger.tab( 'classify labels...' );
 
 		% read forests
-	logger.tab( 'read forests...' );
+	logger.tab( 'read cdf...' );
 
 	global_classes = {}; % pre-allocation
 	global_forest = [];
@@ -70,8 +70,12 @@ function classify( indir, outdir, ids, traindir, seeds )
 	logger.untab();
 
 		% proceed subjects
-	global_hits = 0;
-	global_misses = 0;
+	global_hits = zeros( 1, numel( global_classes ) ); % pre-allocation
+	global_misses = zeros( size( global_hits ) );
+
+	function cid = classid( label ) % label to class conversion
+		cid = find( strcmp( label, global_classes ) );
+	end
 
 	for i = ids
 		logger.tab( 'subject: %d', i );
@@ -88,20 +92,23 @@ function classify( indir, outdir, ids, traindir, seeds )
 		load( infile, '-mat', 'run' );
 
 			% classify labels
-		cdf.classify( run, global_classes, global_forest );
+		cdf.classify( run, global_classes, global_forest, false );
 
-			% log classification accuracy
+			% logging classification accuracy
 		n = numel( run.trials );
 
-		hits = 0;
-		misses = 0;
+		hits = zeros( size( global_hits ) );
+		misses = zeros( size( global_misses ) );
 
 		for j = 1:n
 			if ~isempty( run.trials(j).labeled.label )
-				if strcmp( run.trials(j).detected.label, run.trials(j).labeled.label )
-					hits = hits + 1;
+				label = run.trials(j).detected.label;
+				cid = classid( label );
+
+				if strcmp( label, run.trials(j).labeled.label )
+					hits(cid) = hits(cid) + 1;
 				else
-					misses = misses + 1;
+					misses(cid) = misses(cid) + 1;
 				end
 			end
 		end
@@ -109,7 +116,11 @@ function classify( indir, outdir, ids, traindir, seeds )
 		global_hits = global_hits + hits;
 		global_misses = global_misses + misses;
 
-		logger.log( 'accuracy: %.1f%%', hits / (hits + misses) * 100 );
+		logger.tab( 'accuracy: %.1f%%', sum( hits ) / sum( hits + misses ) * 100 );
+		for j = 1:numel( global_classes )
+			logger.log( 'class #%d: %.1f%%', j, hits(j) / (hits(j) + misses(j)) * 100 );
+		end
+		logger.untab();
 
 			% write cdf data
 		run.audiodata = []; % do not write audio data
@@ -124,8 +135,11 @@ function classify( indir, outdir, ids, traindir, seeds )
 		logger.untab();
 	end
 
-	logger.log( 'accuracy: %.1f%%', global_hits / (global_hits + global_misses) * 100 );
-
+	logger.tab( 'accuracy: %.1f%%', sum( global_hits ) / sum( global_hits + global_misses ) * 100 );
+	for i = 1:numel( global_classes )
+		logger.log( 'class #%d: %.1f%%', i, global_hits(i) / (global_hits(i) + global_misses(i)) * 100 );
+	end
+	logger.untab();
 
 		% cleanup
 	logger.untab( 'done.' ); % stop logging
