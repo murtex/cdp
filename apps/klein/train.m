@@ -44,8 +44,8 @@ function train( indir, outdir, ids, seed, ntrees )
 		% configure framework
 	cfg = cdf.hConfig(); % use defaults
 
-		% read data
-	logger.tab( 'read cdf...' );
+		% read training data
+	logger.tab( 'read training data...' );
 
 	runs = cdf.hRun.empty(); % pre-allocation
 
@@ -66,11 +66,11 @@ function train( indir, outdir, ids, seed, ntrees )
 
 	logger.untab();
 
-		% train classifier
+		% train random forest
 	[classes, forest] = cdf.train( runs, ntrees, seed, true );
 
 		% write classifier
-	logger.tab( 'write cdf...' );
+	logger.tab( 'write classifier...' );
 
 	outfile = fullfile( outdir, sprintf( 'classes_%d.cdf', seed ) );
 	logger.log( 'write classes ''%s''...', outfile );

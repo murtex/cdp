@@ -42,7 +42,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 	logger.tab( 'classify labels...' );
 
 		% read forests
-	logger.tab( 'read cdf...' );
+	logger.tab( 'read classifier...' );
 
 	global_classes = {}; % pre-allocation
 	global_forest = [];

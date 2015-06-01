@@ -34,7 +34,7 @@ function [classes, forest] = train( runs, ntrees, seed, labeled )
 	logger.tab( 'train random forest...' );
 
 		% gather training set statistics
-	logger.tab( 'gather statistics...' );
+	logger.tab( 'gather training statistics...' );
 
 	nruns = numel( runs );
 

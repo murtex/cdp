@@ -1,5 +1,5 @@
 function forest = train( features, labels, nclasses, ntrees, logoob )
-% grow forest
+% grow random forest
 %
 % forest = TRAIN( features, labels, nclasses, ntrees, logoob )
 %
@@ -35,7 +35,7 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 	end
 
 	logger = xis.hLogger.instance();
-	logger.tab( 'grow forest...' );
+	logger.tab( 'grow random forest...' );
 
 		% grow trees
 	nfeatures = size( features, 2 );
