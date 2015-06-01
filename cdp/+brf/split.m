@@ -57,7 +57,7 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth )
 
 		mexified = ~ret;
 	end
-
+	
 		% prepare current node
 	nsamples = size( features, 1 );
 
@@ -90,6 +90,12 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth )
 	%logger.log( 'node impurity: %f', impurity );
 	
 	if sum( occs ~= 0 ) == 1 % stop with pure node
+		%logger.untab();
+		return;
+	end
+
+	[si, ~] = dbstack(); % stop before recursion limit
+	if size( si, 1 ) > get( 0, 'RecursionLimit' ) / 2
 		%logger.untab();
 		return;
 	end
