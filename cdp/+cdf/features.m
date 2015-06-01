@@ -1,13 +1,13 @@
-function features( run, cfg, landmarks, outdir )
+function features( run, cfg, outdir, labeled )
 % compute features
 %
-% FEATURES( run, cfg, landmarks, outdir )
+% FEATURES( run, cfg, outdir, labeled )
 %
 % INPUT
 % run : run (scalar object)
 % cfg : configuration (scalar object)
-% landmarks : use landmarks (scalar logical)
 % outdir : output directory (row char)
+% labeled : use labeled response flag (scalar logical)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
@@ -18,12 +18,12 @@ function features( run, cfg, landmarks, outdir )
 		error( 'invalid argument: cfg' );
 	end
 
-	if nargin < 3 || ~isscalar( landmarks ) || ~islogical( landmarks )
-		error( 'invalid argument: landmarks' );
+	if nargin < 3 || ~isrow( outdir ) || ~ischar( outdir )
+		error( 'invalid argument: outdir' );
 	end
 
-	if nargin < 4 || ~isrow( outdir ) || ~ischar( outdir )
-		error( 'invalid argument: outdir' );
+	if nargin < 4 || ~isscalar( labeled ) || ~islogical( labeled )
+		erorr( 'invalid argument: labeled' );
 	end
 
 	logger = xis.hLogger.instance();
@@ -41,26 +41,22 @@ function features( run, cfg, landmarks, outdir )
 			% reset features
 		trial = run.trials(i);
 
-		trial.detected.featfile = '';
-		trial.labeled.featfile = '';
-
-			% set response range
-		resp = trial.detected;
-
-		if landmarks
-			resprange = [resp.bo, resp.vr];
+		if labeled
+			trial.labeled.featfile = '';
+			resp = trial.labeled;
 		else
-			resprange = resp.range;
+			trial.detected.featfile = '';
+			resp = trial.detected;
 		end
 
-		if any( isnan( resprange ) ) % skip invalids
+		if any( isnan( trial.range ) ) || any( isnan( resp.range ) )
 			logger.progress( i, n );
 			continue;
 		end
 
 			% set signals
 		noiser = run.audiodata(trial.cue + (0:trial.soa-1), 1);
-		respser = run.audiodata(resprange(1):resprange(2), 1);
+		respser = run.audiodata(resp.range(1):resp.range(2), 1);
 
 			% get full bandwidth fft
 		frame = dsp.msec2smp( cfg.sta_frame, run.audiorate );
@@ -85,22 +81,22 @@ function features( run, cfg, landmarks, outdir )
 		respfeat = NaN( size( respft, 1 ), 0 ); % pre-allocation
 
 		respfeat(:, end+1) = sum( repmat( respfreqs, size( respft, 1 ), 1 ) .* respft, 2 ) ./ sum( respft, 2 ); % spectral centroid
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band1 ); % band #1
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band2 ); % band #2
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band3 ); % band #3
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band4 ); % band #4
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band5 ); % band #5
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band6 ); % band #6
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band7 ); % band #7
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band8 ); % band #8
-		respfeat(:, end+1) = sum( brespft, 2 );
+		%[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band1 ); % band #1
+		%respfeat(:, end+1) = sum( brespft, 2 );
+		%[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band2 ); % band #2
+		%respfeat(:, end+1) = sum( brespft, 2 );
+		%[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band3 ); % band #3
+		%respfeat(:, end+1) = sum( brespft, 2 );
+		%[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band4 ); % band #4
+		%respfeat(:, end+1) = sum( brespft, 2 );
+		%[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band5 ); % band #5
+		%respfeat(:, end+1) = sum( brespft, 2 );
+		%[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band6 ); % band #6
+		%respfeat(:, end+1) = sum( brespft, 2 );
+		%[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band7 ); % band #7
+		%respfeat(:, end+1) = sum( brespft, 2 );
+		%[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band8 ); % band #8
+		%respfeat(:, end+1) = sum( brespft, 2 );
 
 		respfeat = sta.unframe( respfeat, frame ); % smoothing
 		respfeat = zscore( respfeat, 1, 1 ); % standardization
@@ -120,10 +116,16 @@ function features( run, cfg, landmarks, outdir )
 		trials = trials + 1;
 		subs = subs + size( subfeat, 1 );
 
-			% set and write feature file
-		trial.detected.featfile = fullfile( outdir, sprintf( '%d.mat', trial.id ) );
+			% write feature file (hdf5-format)
+		featfile = fullfile( outdir, sprintf( '%d.mat', trial.id ) );
 
-		save( trial.detected.featfile, 'subfeat', '-v7.3' ); % require hdf5-format
+		if labeled
+			trial.labeled.featfile = featfile;
+		else
+			trial.detected.featfile = featfile;
+		end
+
+		save( featfile, 'subfeat', '-v7.3' );
 
 		logger.progress( i, n );
 	end

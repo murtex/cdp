@@ -36,7 +36,7 @@ function landmark( run, cfg )
 		trial.detected.vo = NaN;
 		trial.detected.vr = NaN;
 
-		if any( isnan( trial.detected.range ) )
+		if any( isnan( trial.range ) ) || any( isnan( trial.detected.range ) )
 			logger.progress( i, n );
 			continue;
 		end
