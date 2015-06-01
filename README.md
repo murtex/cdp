@@ -24,8 +24,8 @@ Framework
 - the framework ([`cdp`](https://github.com/murtex/cdp/tree/maria/cdp)) contains scripts for core functionality
 - its essentials are
   - data structures ([`+cdf`](https://github.com/murtex/cdp/tree/maria/cdp/%2Bcdf))
-  - signal processing ([`+dsp`](https://github.com/murtex/cdp/tree/maria/cdp/%2Bdsp), [`+sta`](https://github.com/murtex/cdp/tree/maria/cdp/%2Bsta)), 
+  - signal processing ([`+sta`](https://github.com/murtex/cdp/tree/maria/cdp/%2Bsta)), 
   - landmark detection ([`+k15`](https://github.com/murtex/cdp/tree/maria/cdp/%2Bk15))
   - label classification ([`+brf`](https://github.com/murtex/cdp/tree/maria/cdp/%2Bbrf))
-  - logging and plotting helpers ([`+xis`](https://github.com/murtex/cdp/tree/maria/cdp/%2Bxis), [`+cdf/+plot`](https://github.com/murtex/cdp/tree/maria/cdp/%2Bcdf/%2Bplot))
+  - logging and plotting ([`+xis`](https://github.com/murtex/cdp/tree/maria/cdp/%2Bxis), [`+cdf/+plot`](https://github.com/murtex/cdp/tree/maria/cdp/%2Bcdf/%2Bplot))
 - if you are interested in how things work behind the curtain please follow these links
