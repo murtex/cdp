@@ -1,7 +1,7 @@
-function tree = split( tree, features, labels, nclasses, curnode, curdepth )
+function tree = split( tree, features, labels, nclasses, curnode, curdepth, previmp )
 % grow tree recursively
 %
-% SPLIT( tree, features, labels, nclasses, curnode, curdepth )
+% SPLIT( tree, features, labels, nclasses, curnode, curdepth, previmp )
 %
 % INPUT
 % tree : tree (scalar struct)
@@ -10,6 +10,7 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth )
 % nclasses : number of classes (scalar numeric)
 % curnode : current node index (scalar numeric)
 % curdepth : current tree depth (scalar numeric)
+% previmp : parent impurity (scalar numeric)
 %
 % OUTPUT
 % tree : tree (scalar struct)
@@ -37,6 +38,10 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth )
 
 	%if nargin < 6 || ~isscalar( curdepth ) || ~isnumeric( curdepth )
 		%error( 'invalid argument: curdepth' );
+	%end
+
+	%if nargin < 7 || ~isscalar( previmp ) || ~isnumeric( previmp )
+		%error( 'invalid argument: previmp' );
 	%end
 
 	%logger = xis.hLogger.instance();
@@ -80,6 +85,8 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth )
 		impurity = impurity - (occs(i) / nsamples)^2;
 	end
 	tree.impurities(curnode) = impurity;
+
+	tree.gains(curnode) = previmp - tree.impurities(curnode); % impurity gain
 
 	tree.features(curnode) = NaN; % split properties
 	tree.values(curnode) = NaN;
@@ -182,7 +189,7 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth )
 
 			tree = brf.split( tree, ...
 				features(lsamples, :), labels(lsamples), nclasses, ...
-				tree.lefts(curnode), curdepth+1 ); % recursion
+				tree.lefts(curnode), curdepth+1, tree.impurities(curnode) ); % recursion
 
 		end
 
@@ -197,7 +204,7 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth )
 
 			tree = brf.split( tree, ...
 				features(rsamples, :), labels(rsamples), nclasses, ...
-				tree.rights(curnode), curdepth+1 ); % recursion
+				tree.rights(curnode), curdepth+1, tree.impurities(curnode) ); % recursion
 
 		end
 
