@@ -277,7 +277,7 @@ classdef (Sealed = true) hLogger < handle
 				error( 'invalid argument: this' );
 			end
 
-				% stop command window logging
+				% stop logging
 			diary( 'off' );
 
 		end
