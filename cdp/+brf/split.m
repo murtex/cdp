@@ -1,7 +1,7 @@
-function tree = split( tree, features, labels, nclasses, curnode, curdepth, previmp )
+function tree = split( tree, features, labels, nclasses, curnode, curdepth )
 % grow tree recursively
 %
-% SPLIT( tree, features, labels, nclasses, curnode, curdepth, previmp )
+% SPLIT( tree, features, labels, nclasses, curnode, curdepth )
 %
 % INPUT
 % tree : tree (scalar struct)
@@ -10,7 +10,6 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth, prev
 % nclasses : number of classes (scalar numeric)
 % curnode : current node index (scalar numeric)
 % curdepth : current tree depth (scalar numeric)
-% previmp : parent impurity (scalar numeric)
 %
 % OUTPUT
 % tree : tree (scalar struct)
@@ -40,10 +39,6 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth, prev
 		%error( 'invalid argument: curdepth' );
 	%end
 
-	%if nargin < 7 || ~isscalar( previmp ) || ~isnumeric( previmp )
-		%error( 'invalid argument: previmp' );
-	%end
-
 	%logger = xis.hLogger.instance();
 	%logger.tab( 'split node...' );
 
@@ -64,11 +59,15 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth, prev
 	end
 	
 		% prepare current node
-	nsamples = size( features, 1 );
+	tree.depths(curnode) = curdepth; % node depth
 
-	tree.depths(curnode) = curdepth;
+	nnsamples = size( features, 1 ); % node samples
+	persistent nsamples; % total samples
+	if curnode == 1
+		nsamples = nnsamples;
+	end
 
-	classinds = false( nclasses, nsamples ); % class indicators
+	classinds = false( nclasses, nnsamples ); % class indicators
 	for i = 1:nclasses
 		classinds(i, :) = labels == i;
 	end
@@ -82,20 +81,16 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth, prev
 
 	impurity = 1; % gini impurity
 	for i = 1:nclasses
-		impurity = impurity - (occs(i) / nsamples)^2;
+		impurity = impurity - (occs(i) / nnsamples)^2;
 	end
 	tree.impurities(curnode) = impurity;
 
-	tree.gains(curnode) = previmp - tree.impurities(curnode); % impurity gain
-
 	tree.features(curnode) = NaN; % split properties
 	tree.values(curnode) = NaN;
+	tree.gains(curnode) = NaN;
 	tree.lefts(curnode) = NaN;
 	tree.rights(curnode) = NaN;
 
-	%logger.log( 'node label: %d', label );
-	%logger.log( 'node impurity: %f', impurity );
-	
 	if sum( occs ~= 0 ) == 1 % stop with pure node
 		%logger.untab();
 		return;
@@ -133,7 +128,7 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth, prev
 		%for j = 1:nvis
 
 			%nlsamples = vis(j) - 1;
-			%nrsamples = nsamples - nlsamples;
+			%nrsamples = nnsamples - nlsamples;
 
 			%limp = 1; % child gini impurities
 			%rimp = 1;
@@ -142,7 +137,7 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth, prev
 				%rimp = rimp - ((occs(k, end)-occs(k, nlsamples)) / nrsamples)^2;
 			%end
 
-			%fimps(j) = (limp*nlsamples + rimp*nrsamples) / nsamples; % overall impurity
+			%fimps(j) = (limp*nlsamples + rimp*nrsamples) / nnsamples; % overall impurity
 
 		%end
 
@@ -177,6 +172,9 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth, prev
 
 		tree.features(curnode) = fis(si); % split properties
 		tree.values(curnode) = svals(si);
+		tree.gains(curnode) = (tree.impurities(curnode) - simps(si)) * nnsamples/nsamples;
+
+		%logger.log( 'gain: %f', tree.gains(curnode) );
 
 			% proceed left child
 		lsamples = features(:, tree.features(curnode)) < tree.values(curnode);
@@ -189,7 +187,7 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth, prev
 
 			tree = brf.split( tree, ...
 				features(lsamples, :), labels(lsamples), nclasses, ...
-				tree.lefts(curnode), curdepth+1, tree.impurities(curnode) ); % recursion
+				tree.lefts(curnode), curdepth+1 ); % recursion
 
 		end
 
@@ -204,7 +202,7 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth, prev
 
 			tree = brf.split( tree, ...
 				features(rsamples, :), labels(rsamples), nclasses, ...
-				tree.rights(curnode), curdepth+1, tree.impurities(curnode) ); % recursion
+				tree.rights(curnode), curdepth+1 ); % recursion
 
 		end
 
@@ -214,11 +212,15 @@ function tree = split( tree, features, labels, nclasses, curnode, curdepth, prev
 end
 
 function tree = expand( tree )
+
 	tree.labels(end+1) = NaN;
 	tree.impurities(end+1) = NaN;
+
 	tree.features(end+1) = NaN;
 	tree.values(end+1) = NaN;
+	tree.gains(end+1) = NaN;
 	tree.lefts(end+1) = NaN;
 	tree.rights(end+1) = NaN;
+
 end
 

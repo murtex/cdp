@@ -45,9 +45,9 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 		'depths', NaN, ... % current node
 		'labels', NaN, ...
 		'impurities', NaN, ...
-		'gains', NaN, ...
 		'features', NaN, ... % node split
 		'values', NaN, ...
+		'gains', NaN, ...
 		'lefts', NaN, ...
 		'rights', NaN );
 	forest = repmat( forest, 1, ntrees );
@@ -63,7 +63,7 @@ function forest = train( features, labels, nclasses, ntrees, logoob )
 		hiermax = logger.hierarchymax;
 		logger.hierarchymax = logger.hierarchy + 2; % limit logging depth
 
-		forest(i) = brf.split( forest(i), features(bagi, :), labels(bagi), nclasses, 1, 0, 1 );
+		forest(i) = brf.split( forest(i), features(bagi, :), labels(bagi), nclasses, 1, 0 );
 
 		logger.hierarchymax = hiermax; % restore logging depth
 
