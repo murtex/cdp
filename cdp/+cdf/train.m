@@ -171,7 +171,7 @@ function [classes, forest] = train( runs, ntrees, seed, labeled )
 		% train random forest
 	rng( seed ); % seed randomness
 
-	%dbgi = randsample( size( subs, 1 ), 20 );
+	%dbgi = randsample( size( subs, 1 ), 100 );
 	%forest = brf.train( subs(dbgi, :), sublabels(dbgi), nclasses, ntrees, false );
 	%error( 'DEBUG' );
 
