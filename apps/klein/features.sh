@@ -2,7 +2,7 @@
 
 	# data directories
 INDIR='../../data/klein/landmark/'
-OUTDIR='../../data/klein/features-8/'
+OUTDIR='../../data/klein/features/'
 
 	# spread workload
 matlab -nosplash -nodesktop -r "features( '$INDIR', '$OUTDIR', 1:10 ); exit();" &
