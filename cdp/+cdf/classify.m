@@ -1,13 +1,16 @@
-function classify( run, classes, forest, labeled );
-% classify labels
+function cumlabels = classify( run, classes, forest, labeled );
+% classify sublabels
 %
-% CLASSIFY( run, classes, forest )
+% cumlabels = CLASSIFY( run, classes, forest )
 %
 % INPUT
 % run : run (scalar object)
-% classes : class labels (cell row char)
+% classes : class sublabels (cell row char)
 % forest : trees (row struct)
 % DEBUG: labeled : classify labeled features (scalar logical)
+%
+% OUTPUT
+% cumlabels : cumulative labels (matrix numeric)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
@@ -35,8 +38,7 @@ function classify( run, classes, forest, labeled );
 	ntrees = numel( forest );
 	nclasses = numel( classes );
 
-	tlabels = NaN( ntrees, 1 ); % pre-allocation
-	classoccs = zeros( nclasses, 1 );
+	cumlabels = NaN( ntrees, n ); % pre-allocation
 
 	logger.progress();
 	for i = 1:n
@@ -60,35 +62,36 @@ function classify( run, classes, forest, labeled );
 			% read and classify subsequences
 		load( featfile, 'subfeat' );
 
-		labels = brf.classify( forest, subfeat );
+		sublabels = brf.classify( forest, subfeat );
 
-			% set majority vote
-		for j = 1:ntrees
+			% vote for majority
+		majlabels = NaN( 1, ntrees ); % pre-allocation
+		classoccs = zeros( 1, nclasses );
 
+		for j = 1:ntrees % tree majorities
 			for k = 1:nclasses
-				classoccs(k) = sum( labels(j, :) == k );
+				classoccs(k) = sum( sublabels(j, :) == k );
 			end
-
-			label = find( classoccs == max( classoccs ) );
-			if numel( label ) > 1
-				label = randsample( label, 1 ); % random majority
+			majlabel = find( classoccs == max( classoccs ) );
+			if numel( majlabel ) > 1
+				majlabel = randsample( majlabel, 1 ); % random majority
 			end
-
-			tlabels(j) = label; % subsequence majority
-
+			majlabels(j) = majlabel;
 		end
 
-		for j = 1:nclasses
-			classoccs(j) = sum( tlabels == j );
-		end
-
-		label = find( classoccs == max( classoccs ) );
-		if numel( label ) > 1
-			label = randsample( label, 1 ); % random majority
+		for j = 1:ntrees % cumulative majorities
+			for k = 1:nclasses
+				classoccs(k) = sum( majlabels(1:j) == k );
+			end
+			cumlabel = find( classoccs == max( classoccs ) );
+			if numel( cumlabel ) > 1
+				cumlabel = randsample( cumlabel, 1 ); % random majority
+			end
+			cumlabels(j, i) = cumlabel;
 		end
 
 			% set detected label
-		trial.detected.label = classes{label}; % forest majority
+		trial.detected.label = classes{cumlabels(ntrees, i)};
 
 		logger.progress( i, n );
 	end
