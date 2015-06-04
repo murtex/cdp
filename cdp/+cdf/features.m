@@ -29,6 +29,11 @@ function features( run, cfg, outdir, labeled )
 	logger = xis.hLogger.instance();
 	logger.tab( 'compute features ''%s''...', outdir );
 
+		% spectral centroid
+	function c = centroid( freqs, ft )
+		c = sum( repmat( freqs, size( ft, 1 ), 1 ) .* ft, 2 ) ./ sum( ft, 2 );
+	end
+
 		% proceed trials
 	n = numel( run.trials );
 
@@ -49,14 +54,16 @@ function features( run, cfg, outdir, labeled )
 			resp = trial.detected;
 		end
 
-		if any( isnan( trial.range ) ) || any( isnan( resp.range ) ) % skip invalid trials
+		if any( isnan( trial.range ) ) || any( isnan( resp.range ) ) ... % skip invalid trials
+				|| isnan( resp.bo ) || isnan( resp.vo )
 			logger.progress( i, n );
 			continue;
 		end
 
 			% set signals
 		noiser = run.audiodata(trial.cue + (0:trial.soa-1), 1);
-		respser = run.audiodata(resp.range(1):resp.range(2), 1);
+		%respser = run.audiodata(resp.range(1):resp.range(2), 1);
+		respser = run.audiodata(resp.bo:resp.vo, 1);
 
 			% get full bandwidth fft
 		frame = sta.msec2smp( cfg.sta_frame, run.audiorate );
@@ -81,25 +88,13 @@ function features( run, cfg, outdir, labeled )
 		respfeat = NaN( size( respft, 1 ), 0 ); % pre-allocation
 
 		respfeat(:, end+1) = sum( repmat( respfreqs, size( respft, 1 ), 1 ) .* respft, 2 ) ./ sum( respft, 2 ); % spectral centroid
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band1 ); % band #1
+		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band1 ); % band #1 power
 		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band2 ); % band #2
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band3 ); % band #3
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band4 ); % band #4
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band5 ); % band #5
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band6 ); % band #6
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band7 ); % band #7
-		respfeat(:, end+1) = sum( brespft, 2 );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band8 ); % band #8
+		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band2 ); % band #2 power
 		respfeat(:, end+1) = sum( brespft, 2 );
 
 		respfeat = sta.unframe( respfeat, frame ); % smoothing
-		respfeat = zscore( respfeat, 1, 1 ); % standardization
+		%respfeat = zscore( respfeat, 1, 1 ); % standardization
 
 		if any( isnan( respfeat(:) ) ) || any( isinf( respfeat(:) ) )
 			warning( 'NaN/Inf features' );
