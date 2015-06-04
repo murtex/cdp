@@ -35,12 +35,14 @@ function classify( hits, misses, plotfile )
 	xlabel( 'number of trees' );
 	ylabel( 'classification error' );
 
+	xlim( [1, ntrees] );
+
 	for i = 1:nclasses
-		stairs( 1:ntrees, misses(:, i) ./ (hits(:, i) + misses(:, i)), ...
+		stairs( (1:ntrees) - 0.5, misses(:, i) ./ (hits(:, i) + misses(:, i)), ...
 			'DisplayName', sprintf( 'class #%d', i ) );
 	end
 
-	stairs( 1:ntrees, sum( misses, 2 ) ./ sum( hits + misses, 2 ), ...
+	stairs( (1:ntrees) - 0.5, sum( misses, 2 ) ./ sum( hits + misses, 2 ), ...
 		'DisplayName', 'overall' );
 
 	legend( 'Location', 'NorthEast' );
