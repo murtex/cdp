@@ -38,6 +38,11 @@ function classify( indir, outdir, ids, traindir, seeds )
 		mkdir( outdir );
 	end
 
+	plotdir = fullfile( outdir, 'plot' );
+	if exist( plotdir, 'dir' ) ~= 7
+		mkdir( plotdir );
+	end
+
 	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'classify_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
 	logger.tab( 'classify labels...' );
 
@@ -64,18 +69,21 @@ function classify( indir, outdir, ids, traindir, seeds )
 
 	end
 
-	logger.log( 'classes: %d', numel( global_classes ) );
-	logger.log( 'trees: %d', numel( global_forest ) );
+	nclasses = numel( global_classes );
+	ntrees = numel( global_forest );
+
+	logger.log( 'classes: %d', nclasses );
+	logger.log( 'trees: %d', ntrees );
 
 	logger.untab();
 
 		% proceed subjects
-	global_hits = zeros( 1, numel( global_classes ) ); % pre-allocation
-	global_misses = zeros( size( global_hits ) );
-
 	function cid = classid( label ) % label to class conversion
 		cid = find( strcmp( label, global_classes ) );
 	end
+
+	global_hits = zeros( ntrees, nclasses ); % pre-allocation
+	global_misses = zeros( ntrees, nclasses );
 
 	for i = ids
 		logger.tab( 'subject: %d', i );
@@ -91,24 +99,22 @@ function classify( indir, outdir, ids, traindir, seeds )
 		logger.log( 'read cdf ''%s''...', infile );
 		load( infile, '-mat', 'run' );
 
-			% classify labels
-		cdf.classify( run, global_classes, global_forest, false );
+			% classify labels and log/plot
+		cumlabels = cdf.classify( run, global_classes, global_forest, false );
 
-			% logging classification accuracy
+		hits = zeros( ntrees, nclasses ); % pre-allocation
+		misses = zeros( ntrees, nclasses );
+
 		n = numel( run.trials );
-
-		hits = zeros( size( global_hits ) );
-		misses = zeros( size( global_misses ) );
-
 		for j = 1:n
-			if ~isempty( run.trials(j).labeled.label )
-				label = run.trials(j).detected.label;
-				cid = classid( label );
-
-				if strcmp( label, run.trials(j).labeled.label )
-					hits(cid) = hits(cid) + 1;
-				else
-					misses(cid) = misses(cid) + 1;
+			cid = classid( run.trials(j).labeled.label );
+			if ~isempty( cid )
+				for k = 1:ntrees
+					if cumlabels(k, j) == cid
+						hits(k, cid) = hits(k, cid) + 1;
+					else
+						misses(k, cid) = misses(k, cid) + 1;
+					end
 				end
 			end
 		end
@@ -116,11 +122,13 @@ function classify( indir, outdir, ids, traindir, seeds )
 		global_hits = global_hits + hits;
 		global_misses = global_misses + misses;
 
-		logger.tab( 'accuracy: %.1f%%', sum( hits ) / sum( hits + misses ) * 100 );
-		for j = 1:numel( global_classes )
-			logger.log( 'class #%d: %.1f%%', j, hits(j) / (hits(j) + misses(j)) * 100 );
+		logger.tab( 'error: %.2f%%', sum( misses(ntrees, :) ) / sum( hits(ntrees, :) + misses(ntrees, :) ) * 100 );
+		for j = 1:nclasses
+			logger.log( 'class #%d: %.2f%%', j, misses(ntrees, j) / (hits(ntrees, j) + misses(ntrees, j)) * 100 );
 		end
 		logger.untab();
+
+		cdf.plot.classify( hits, misses, fullfile( plotdir, sprintf( '%d.png', run.id ) ) );
 
 			% write cdf data
 		run.audiodata = []; % do not write audio data
@@ -135,11 +143,13 @@ function classify( indir, outdir, ids, traindir, seeds )
 		logger.untab();
 	end
 
-	logger.tab( 'accuracy: %.1f%%', sum( global_hits ) / sum( global_hits + global_misses ) * 100 );
-	for i = 1:numel( global_classes )
-		logger.log( 'class #%d: %.1f%%', i, global_hits(i) / (global_hits(i) + global_misses(i)) * 100 );
+	logger.tab( 'error: %.2f%%', sum( global_misses(ntrees, :) ) / sum( global_hits(ntrees, :) + global_misses(ntrees, :) ) * 100 );
+	for j = 1:nclasses
+		logger.log( 'class #%d: %.2f%%', j, global_misses(ntrees, j) / (global_hits(ntrees, j) + global_misses(ntrees, j)) * 100 );
 	end
 	logger.untab();
+
+	cdf.plot.classify( global_hits, global_misses, fullfile( plotdir, 'global.png' ) );
 
 		% cleanup
 	logger.log( 'peak memory: %.1fGiB', logger.peakmem() / (1024^3) );

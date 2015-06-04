@@ -1,14 +1,12 @@
 #!/bin/sh
 
 	# data directories
-INDIR='../../data/klein/features/'
-OUTDIR='../../data/klein/train/'
+INDIR='../../data/klein/test-features/'
+OUTDIR='../../data/klein/test-train/'
 
 	# spread workload
-IDS='setdiff( 1:20, 4 )'
-#IDS='21:47'
-#IDS='[16, 17]'
-NTREES=5
+IDS='setdiff( 1:8, 4 )'
+NTREES=10
 
 matlab -nosplash -nodesktop -r "train( '$INDIR', '$OUTDIR', $IDS, 1, $NTREES ); exit();" &
 sleep 3

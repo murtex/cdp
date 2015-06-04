@@ -38,6 +38,11 @@ function train( indir, outdir, ids, seed, ntrees )
 		mkdir( outdir );
 	end
 
+	plotdir = fullfile( outdir, 'plot' );
+	if exist( plotdir, 'dir' ) ~= 7
+		mkdir( plotdir );
+	end
+
 	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'train_%d.log', seed ) ) ); % start logging
 	logger.tab( 'train classifier...' );
 
@@ -66,8 +71,15 @@ function train( indir, outdir, ids, seed, ntrees )
 
 	logger.untab();
 
-		% train random forest
-	[classes, forest] = cdf.train( runs, ntrees, seed, true );
+		% train random forest and plot
+	[classes, forest] = cdf.train( runs, ntrees, seed, false );
+
+	ntrees = numel( forest );
+	for i = 1:ntrees
+		cdf.plot.train( forest(i), fullfile( plotdir, sprintf( '%d_%d.png', seed, i ) ) );
+	end
+
+	cdf.plot.train( forest, fullfile( plotdir, sprintf( 'forest_%d.png', seed ) ) );
 
 		% write classifier
 	logger.tab( 'write classifier...' );
