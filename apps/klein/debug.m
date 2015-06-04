@@ -62,7 +62,7 @@ function debug( indir, outdir, ids )
 		trials = [run.trials.detected];
 		lens = diff( cat( 1, trials.range ), 1, 2 );
 		trials = run.trials(~isnan( lens ));
-		trials = randsample( trials, min( numel( trials ), 10 ) ); % 10 trials
+		trials = randsample( trials, min( numel( trials ), 20 ) ); % 20 trials
 
 		n = numel( trials );
 		for j = 1:n

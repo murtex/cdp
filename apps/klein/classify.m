@@ -46,7 +46,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'classify_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
 	logger.tab( 'classify labels...' );
 
-		% read forests
+		% read forests and plot
 	logger.tab( 'read classifier...' );
 
 	global_classes = {}; % pre-allocation
@@ -72,8 +72,14 @@ function classify( indir, outdir, ids, traindir, seeds )
 	nclasses = numel( global_classes );
 	ntrees = numel( global_forest );
 
-	logger.log( 'classes: %d', nclasses );
+	logger.tab( 'classes: %d', nclasses );
+	for i = 1:nclasses
+		logger.log( 'class #%d: ''%s''', i, global_classes{i} );
+	end
+	logger.untab();
 	logger.log( 'trees: %d', ntrees );
+
+	cdf.plot.train( global_forest, fullfile( plotdir, 'forest.png' ) );
 
 	logger.untab();
 

@@ -72,7 +72,7 @@ function train( indir, outdir, ids, seed, ntrees )
 	logger.untab();
 
 		% train random forest and plot
-	[classes, forest] = cdf.train( runs, ntrees, seed, false );
+	[classes, forest] = cdf.train( runs, ntrees, seed, true );
 
 	ntrees = numel( forest );
 	for i = 1:ntrees
