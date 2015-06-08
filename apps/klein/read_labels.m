@@ -40,7 +40,8 @@ function read_labels( run, labelfile )
 			continue;
 		end
 
-		if fdata{i, 8} > 10 || fdata{i, 9} > 1 || fdata{i, 10} > 10 % skip unreasonables (typos)
+		if fdata{i, 8} > 10 || fdata{i, 9} > 1 || fdata{i, 10} > 10 || ... % skip unreasonables (typos)
+				fdata{i, 8} < 0 || fdata{i, 9} < 0 || fdata{i, 10} < 0
 			% reaction time, voice-onset time, vowel length in seconds
 			continue;
 		end
