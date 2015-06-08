@@ -89,9 +89,9 @@ function features( run, cfg, outdir, labeled )
 
 		respfeat(:, end+1) = sum( repmat( respfreqs, size( respft, 1 ), 1 ) .* respft, 2 ) ./ sum( respft, 2 ); % spectral centroid
 		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band1 ); % band #1 power
-		respfeat(:, end+1) = sum( brespft, 2 );
+		respfeat(:, end+1) = pow2db( sum( brespft, 2 ) );
 		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band2 ); % band #2 power
-		respfeat(:, end+1) = sum( brespft, 2 );
+		respfeat(:, end+1) = pow2db( sum( brespft, 2 ) );
 
 		respfeat = sta.unframe( respfeat, frame ); % smoothing
 		%respfeat = zscore( respfeat, 1, 1 ); % standardization
