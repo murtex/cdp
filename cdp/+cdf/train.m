@@ -103,7 +103,7 @@ function [classes, forest, trained] = train( runs, ntrees, seed, ratio )
 
 	rng( 1 ); % fixed randomness
 
-	trained = cell( nruns, 0 ); % pre-allocation
+	trained = {}; % pre-allocation
 	subs = [];
 	sublabels = [];
 
@@ -125,7 +125,7 @@ function [classes, forest, trained] = train( runs, ntrees, seed, ratio )
 			rtrained = randsample( rtrained, ceil( ratio * numel( rtrained ) ) );
 		end
 
-		trained{i} = rtrained; % set output
+		trained{runs(i).id} = rtrained; % set output
 
 			% read subsequences
 		rsubs = NaN( 0, nfeatures ); % pre-allocation
