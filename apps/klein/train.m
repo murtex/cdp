@@ -24,7 +24,7 @@ function train( indir, outdir, ids, seed, ntrees )
 	end
 
 	if nargin < 4 || ~isscalar( seed ) || ~isnumeric( seed )
-		error( 'invalid argument: ids' );
+		error( 'invalid argument: seed' );
 	end
 
 	if nargin < 5 || ~isscalar( ntrees ) || ~isnumeric( ntrees )
@@ -72,7 +72,7 @@ function train( indir, outdir, ids, seed, ntrees )
 	logger.untab();
 
 		% train random forest and plot
-	[classes, forest] = cdf.train( runs, ntrees, seed, true );
+	[classes, forest, trained] = cdf.train( runs, ntrees, seed, 0.8 );
 
 	ntrees = numel( forest );
 	for i = 1:ntrees
@@ -91,6 +91,10 @@ function train( indir, outdir, ids, seed, ntrees )
 	outfile = fullfile( outdir, sprintf( 'forest_%d.cdf', seed ) );
 	logger.log( 'write forest ''%s''...', outfile );
 	save( outfile, 'forest', '-v7' );
+
+	outfile = fullfile( outdir, sprintf( 'trained_%d.cdf', seed ) );
+	logger.log( 'write identifiers ''%s''...', outfile );
+	save( outfile, 'trained', '-v7' );
 
 	logger.untab();
 
