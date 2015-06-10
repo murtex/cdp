@@ -51,6 +51,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 
 	global_classes = {}; % pre-allocation
 	global_forest = [];
+	global_trained = {};
 
 	for i = seeds
 
@@ -63,9 +64,14 @@ function classify( indir, outdir, ids, traindir, seeds )
 		logger.log( 'read forest ''%s''...', infile );
 		load( infile, '-mat', 'forest' );
 
+		infile = fullfile( traindir, sprintf( 'trained_%d.cdf', i ) );
+		logger.log( 'read identifiers ''%s''...', infile );
+		load( infile, '-mat', 'trained' );
+
 			% accumulate forests
 		global_classes = unique( cat( 2, global_classes, classes ), 'stable' );
 		global_forest = cat( 2, global_forest, forest );
+		global_trained = trained; % TODO: merge ids!
 
 	end
 
@@ -91,6 +97,9 @@ function classify( indir, outdir, ids, traindir, seeds )
 	global_hits = zeros( ntrees, nclasses ); % pre-allocation
 	global_misses = zeros( ntrees, nclasses );
 
+	global_nclassified = 0;
+	global_ntotal = 0;
+
 	for i = ids
 		logger.tab( 'subject: %d', i );
 
@@ -106,14 +115,18 @@ function classify( indir, outdir, ids, traindir, seeds )
 		load( infile, '-mat', 'run' );
 
 			% classify labels and log/plot
-		cumlabels = cdf.classify( run, global_classes, global_forest, false );
+		cumlabels = cdf.classify( run, global_classes, global_forest );
 
 		hits = zeros( ntrees, nclasses ); % pre-allocation
 		misses = zeros( ntrees, nclasses );
 
 		n = numel( run.trials );
 		for j = 1:n
-			cid = classid( run.trials(j).labeled.label );
+			if any( global_trained{run.id} == run.trials(j).id ) % skip training data
+				continue;
+			end
+
+			cid = classid( run.trials(j).labeled.label ); % accumulate accuracy
 			if ~isempty( cid )
 				for k = 1:ntrees
 					if cumlabels(k, j) == cid
@@ -125,16 +138,24 @@ function classify( indir, outdir, ids, traindir, seeds )
 			end
 		end
 
-		global_hits = global_hits + hits;
-		global_misses = global_misses + misses;
+		nclassified = sum( hits(end, :) ) + sum( misses(end, :) );
+		ntotal = nclassified + numel( trained{run.id} );
 
-		logger.tab( 'error: %.2f%%', sum( misses(ntrees, :) ) / sum( hits(ntrees, :) + misses(ntrees, :) ) * 100 );
+		logger.log( 'classified: %d/%d (%.2f%%)', nclassified, ntotal, 100 * nclassified / ntotal );
+		logger.tab( 'error: %.2f%%', sum( misses(end, :) ) / sum( hits(end, :) + misses(end, :) ) * 100 );
 		for j = 1:nclasses
-			logger.log( 'class #%d: %.2f%%', j, misses(ntrees, j) / (hits(ntrees, j) + misses(ntrees, j)) * 100 );
+			logger.log( 'class #%d: %.2f%%', j, misses(end, j) / (hits(end, j) + misses(end, j)) * 100 );
 		end
 		logger.untab();
 
 		cdf.plot.classify( hits, misses, fullfile( plotdir, sprintf( '%d.png', run.id ) ) );
+
+			% accumulate accuracies
+		global_hits = global_hits + hits;
+		global_misses = global_misses + misses;
+
+		global_nclassified = global_nclassified + nclassified;
+		global_ntotal = global_ntotal + ntotal;
 
 			% write cdf data
 		run.audiodata = []; % do not write audio data
@@ -149,9 +170,10 @@ function classify( indir, outdir, ids, traindir, seeds )
 		logger.untab();
 	end
 
-	logger.tab( 'error: %.2f%%', sum( global_misses(ntrees, :) ) / sum( global_hits(ntrees, :) + global_misses(ntrees, :) ) * 100 );
+	logger.log( 'classified: %d/%d (%.2f%%)', global_nclassified, global_ntotal, 100 * global_nclassified / global_ntotal );
+	logger.tab( 'error: %.2f%%', sum( global_misses(end, :) ) / sum( global_hits(end, :) + global_misses(end, :) ) * 100 );
 	for j = 1:nclasses
-		logger.log( 'class #%d: %.2f%%', j, global_misses(ntrees, j) / (global_hits(ntrees, j) + global_misses(ntrees, j)) * 100 );
+		logger.log( 'class #%d: %.2f%%', j, global_misses(end, j) / (global_hits(end, j) + global_misses(end, j)) * 100 );
 	end
 	logger.untab();
 

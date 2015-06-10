@@ -1,4 +1,4 @@
-function cumlabels = classify( run, classes, forest, labeled );
+function cumlabels = classify( run, classes, forest )
 % classify sublabels
 %
 % cumlabels = CLASSIFY( run, classes, forest )
@@ -7,7 +7,6 @@ function cumlabels = classify( run, classes, forest, labeled );
 % run : run (scalar object)
 % classes : class sublabels (cell row char)
 % forest : trees (row struct)
-% DEBUG: labeled : classify labeled features (scalar logical)
 %
 % OUTPUT
 % cumlabels : cumulative labels (matrix numeric)
@@ -23,10 +22,6 @@ function cumlabels = classify( run, classes, forest, labeled );
 
 	if nargin < 3 || ~isrow( forest) % no type check!
 		error( 'invalid argument: forest' );
-	end
-
-	if nargin < 4 || ~isscalar( labeled ) || ~islogical( labeled )
-		error( 'invalid argument: labeled' );
 	end
 
 	logger = xis.hLogger.instance();
@@ -48,19 +43,13 @@ function cumlabels = classify( run, classes, forest, labeled );
 
 		trial.detected.label = '';
 
-		if labeled
-			featfile = trial.labeled.featfile;
-		else
-			featfile = trial.detected.featfile;
-		end
-
-		if isempty( featfile )
+		if isempty( trial.detected.featfile )
 			logger.progress( i, n );
 			continue;
 		end
 
 			% read and classify subsequences
-		load( featfile, 'subfeat' );
+		load( trial.detected.featfile, 'subfeat' );
 
 		sublabels = brf.classify( forest, subfeat );
 
