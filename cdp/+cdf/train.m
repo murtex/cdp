@@ -125,7 +125,7 @@ function [classes, forest, trained] = train( runs, ntrees, seed, ratio )
 			rtrained = randsample( rtrained, ceil( ratio * numel( rtrained ) ) );
 		end
 
-		trained{runs(i).id} = rtrained; % set output
+		trained{runs(i).id} = runs(i).trials(rtrained).id; % set output
 
 			% read subsequences
 		rsubs = NaN( 0, nfeatures ); % pre-allocation
