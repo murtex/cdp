@@ -36,7 +36,7 @@ function landmark( run, cfg )
 		trial.detected.vo = NaN;
 		trial.detected.vr = NaN;
 
-		if any( isnan( trial.detected.range ) )
+		if any( isnan( trial.detected.range ) ) || any( isnan( trial.range ) )
 			logger.progress( i, n );
 			continue;
 		end
@@ -95,6 +95,10 @@ function landmark( run, cfg )
 		resppiser = respser;
 		if ~isnan( trial.detected.vo )
 			resppiser(trial.detected.vo-trial.detected.range(1)+1:end) = []; % restrict detection range
+		end
+
+		if isempty( resppiser ) % TODO: empty buffer for eye-tracking exp. 2, subj. 1
+			continue;
 		end
 
 		resppi = k15.plosion( ...

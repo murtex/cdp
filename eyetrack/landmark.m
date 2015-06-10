@@ -8,7 +8,7 @@ addpath( '../' ); % set path to cue-distractor package
 logger = xis.hLogger.instance( '../data/eyetrack/landmark.log' ); % start logging
 
 	% proceed experiments
-for i = 1:2
+for i = 2
 	logger.tab( 'experiment: %d', i );
 
 		% prepare directories
@@ -31,7 +31,7 @@ for i = 1:2
 	cfg = cdf.hConfig(); % use defaults
 
 		% proceed subjects
-	ids = 16;
+	ids = 1:31;
 
 	for id = ids
 		logger.tab( 'subject: %d', id );
