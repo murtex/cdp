@@ -6,7 +6,7 @@ function [classes, forest, trained] = train( runs, ntrees, seed, ratio )
 % INPUT
 % runs : runs (row object)
 % ntrees : number of trees (scalar object)
-% seed : randomization seed (scalar numeric)
+% seed : training seed (scalar numeric)
 % ratio : training ratio (scalar numeric)
 %
 % OUTPUT
