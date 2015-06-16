@@ -34,66 +34,72 @@ function [classes, forest, trained] = train( runs, ntrees, seed, ratio )
 	logger = xis.hLogger.instance();
 	logger.tab( 'train random forest...' );
 
-		% gather training set statistics
-	logger.tab( 'gather training set statistics...' );
+		% set dataset statistics
+	logger.tab( 'dataset statistics...' );
 
 	nruns = numel( runs );
 
-	ntrials = 0;
-	nlabeled = 0;
-	nfeatured = 0;
+	nclasses = 0; % pre-allocation
+	classes = {};
 
-	nclasses = 0;
+	nsamples = [];
+	nsubsamples = [];
 	nfeatures = 0;
-
-	classes = {}; % pre-allocation
-	nsubs = [];
-
-	function cid = classid( label ) % label to class conversion
-		cid = find( strcmp( label, classes ) );
-	end
 
 	logger.progress();
 	for i = 1:nruns
-		n = numel( runs(i).trials );
-		ntrials = ntrials + n;
+		run = runs(i);
 
-		for j = 1:n
-			label = runs(i).trials(j).labeled.label;
-			if ~isempty( label )
-				nlabeled = nlabeled + 1;
+			% proceed trials
+		ntrials = numel( run.trials );
 
-					% add new class
-				if ~any( strcmp( label, classes ) )
-					nclasses = nclasses + 1;
-					classes{end+1} = label;
+		for j = 1:ntrials
+			trial = run.trials(j);
 
-					nsubs(end+1) = 0;
-				end
+				% skip unlabeled/unfeatured
+			label = trial.labeled.label;
+			featfile = trial.labeled.featfile;
 
-					% count subsequences
-				featfile = runs(i).trials(j).labeled.featfile;
-				if ~isempty( featfile )
-					nfeatured = nfeatured + 1;
-
-					mf = matfile( featfile );
-					cid = classid( label );
-					nsubs(cid) = nsubs(cid) + size( mf, 'subfeat', 1 );
-
-					nfeatures = size( mf, 'subfeat', 2 );
-				end
-
+			if isempty( label ) || isempty( featfile )
+				continue;
 			end
+
+				% prepare for new class label
+			if ~any( strcmp( label, classes ) )
+				nclasses = nclasses + 1;
+
+				classes{nclasses} = label;
+				nsamples(nclasses) = 0;
+				nsubsamples(nclasses) = 0;
+			end
+
+				% count samples
+			cid = find( strcmp( label, classes ) );
+
+			load( featfile, 'subfeat' );
+			
+			nsamples(cid) = nsamples(cid) + 1;
+			nsubsamples(cid) = nsubsamples(cid) + size( subfeat, 1 );
+			nfeatures = size( subfeat, 2 );
+
 		end
 
 		logger.progress( i, nruns );
 	end
 
-	logger.log( 'subjects: %d', nruns );
-	logger.log( 'trials: %d/%d/%d', nfeatured, nlabeled, ntrials );
+			% log statistics
+	logger.tab( 'classes: %d', numel( classes ) );
 	for i = 1:nclasses
-		logger.log( 'class #%d samples: %d', i, nsubs(i) );
+		logger.log( 'class #%d: %s', i, classes{i} );
 	end
+	logger.untab();
+
+	logger.tab( 'samples: %d [%d]', sum( nsubsamples ), sum( nsamples ) );
+	for i = 1:nclasses
+		logger.log( 'class #%d: %d [%d]', i, nsubsamples(i), nsamples(i) );
+	end
+	logger.untab();
+
 	logger.log( 'features: %d', nfeatures );
 
 	logger.untab();
@@ -101,83 +107,107 @@ function [classes, forest, trained] = train( runs, ntrees, seed, ratio )
 		% sample training set
 	logger.tab( 'sample training set...' );
 
-	rng( 1 ); % fixed randomness
+	rng( 1 ); % fixed randomness, TODO: configure!
 
 	trained = {}; % pre-allocation
-	subs = [];
+
+	ntsamples = zeros( 1, nclasses );
+
+	subsamples = [];
 	sublabels = [];
 
 	logger.progress();
 	for i = 1:nruns
+		run = runs(i);
 
-			% sample trials by training ratio
-		rtrained = []; % pre-allocation
+			% sample training ratio
+		ntrials = numel( run.trials );
 
-		n = numel( runs(i).trials );
-		for j = 1:n
-			if ~isempty( runs(i).trials(j).labeled.label ) && ...
-					~isempty( runs(i).trials(j).labeled.featfile )
-				rtrained(end+1) = j; % count valid trial
+		rsamples = cell( nclasses, 1 ); % pre-allocation
+
+		for j = 1:ntrials
+			trial = run.trials(j);
+
+				% skip unlabeled/unfeatured
+			label = trial.labeled.label;
+			featfile = trial.labeled.featfile;
+
+			if isempty( label ) || isempty( featfile )
+				continue;
+			end
+
+				% append valid trial
+			cid = find( strcmp( label, classes ) );
+
+			rsamples{cid} = cat( 2, rsamples{cid}, j );
+
+		end
+
+		ntrain = ceil( ratio * min( cellfun( @numel, rsamples ) ) ); % evenly labeled trials
+		if isempty( ntrain ) || ntrain == 0
+			logger.progress( i, nruns );
+			continue;
+		end
+
+		for j = 1:nclasses % sample ratio
+			if numel( rsamples{j} ) > 1
+				rsamples{j} = randsample( rsamples{j}, ntrain );
 			end
 		end
 
-		if numel( rtrained ) > 1
-			rtrained = randsample( rtrained, ceil( ratio * numel( rtrained ) ) );
+		trained{run.id} = []; % set output
+		for j = 1:nclasses
+			trained{run.id} = cat( 2, trained{run.id}, [run.trials(rsamples{j}).id] );
 		end
-
-		trained{runs(i).id} = [runs(i).trials(rtrained).id]; % set output
+		
+		for j = 1:nclasses % count samples
+			ntsamples(j) = ntsamples(j) + numel( rsamples{j} );
+		end
 
 			% read subsequences
-		rsubs = NaN( 0, nfeatures ); % pre-allocation
+		rsubsamples = []; % pre-allocation
 		rsublabels = [];
 
-		for j = rtrained
-			load( runs(i).trials(j).labeled.featfile, 'subfeat' );
-			s = size( subfeat, 1 );
+		trials = [rsamples{:}];
+		for j = trials
+			trial = run.trials(j);
 
-			rsubs(end+1:end+s, :) = subfeat;
-			rsublabels(end+1:end+s) = classid( runs(i).trials(j).labeled.label );
+			label = trial.labeled.label;
+			featfile = trial.labeled.featfile;
+
+			load( featfile, 'subfeat' );
+
+			rsubsamples = cat( 1, rsubsamples, subfeat );
+			rsublabels = cat( 2, rsublabels, repmat( find( strcmp( label, classes ) ), 1, size( subfeat, 1 ) ) );
 		end
 
-			% sample even labeled subsequences
-		nmax = Inf;
-		for j = 1:nclasses
-			nmax = min( nmax, sum( rsublabels == j ) );
-		end
-
-		for j = 1:nclasses
-			ci = find( rsublabels == j );
-
-			n = numel( ci );
-			if n > nmax
-				si = randsample( ci, n-nmax ); % limit subsequences randomly
-
-				rsubs(si, :) = [];
-				rsublabels(si) = [];
-			end
-		end
-
-		subs = cat( 1, subs, rsubs );
+		subsamples = cat( 1, subsamples, rsubsamples );
 		sublabels = cat( 2, sublabels, rsublabels );
 
 		logger.progress( i, nruns );
 	end
 
+			% log training set
+	logger.tab( 'samples: %d (%.1f%%) [%d (%.1f%%)]', ...
+		numel( sublabels ), 100 * numel( sublabels ) / sum( nsubsamples ), ...
+		sum( ntsamples ), 100 * sum( ntsamples ) / sum( nsamples ) );
 	for i = 1:nclasses
-		n = sum( sublabels == i );
-		logger.log( 'class #%d samples: %d (%.1f%%)', i, n, 100 * n / nsubs(i) );
+		logger.log( 'class #%d: %d (%.1f%%) [%d (%.1f%%)]', i, ...
+			sum( sublabels == i ), 100 * sum( sublabels == i ) / nsubsamples(i), ...
+			ntsamples(i), 100 * ntsamples(i) / nsamples(i) );
 	end
+	logger.untab();
 
 	logger.untab();
 
 		% train random forest
 	rng( seed ); % seed randomness
 
-	%dbgi = randsample( size( subs, 1 ), 100 );
-	%forest = brf.train( subs(dbgi, :), sublabels(dbgi), nclasses, ntrees, false );
+	%dbgi = randsample( size( subsamples, 1 ), 100 );
+	%forest = brf.train( subsamples(dbgi, :), sublabels(dbgi), nclasses, ntrees, false );
 	%error( 'DEBUG' );
 
-	forest = brf.train( subs, sublabels, nclasses, ntrees, false );
+	forest = brf.train( subsamples, sublabels, nclasses, ntrees, false );
 
 	logger.untab();
 end

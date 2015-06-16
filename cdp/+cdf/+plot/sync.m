@@ -28,16 +28,24 @@ function sync( run, offs, plotfile )
 	fig = style.figure();
 
 		% plot
-	title( sprintf( 'subject: %d, syncs: %d/%d', run.id, sum( ~isnan( offs ) ), numel( run.trials ) ) );
-	xlabel( 'marker position in seconds' );
+	title( sprintf( '[sync] id: %d, trials: %d', run.id, numel( run.trials ) ) );
+	xlabel( 'detected marker position in seconds' );
 	ylabel( 'marker offset in milliseconds' );
 
 	xlim( sta.smp2sec( [1, run.audiolen]-1, run.audiorate ) );
 
-	scatter( sta.smp2sec( [run.trials.cue], run.audiorate ), sta.smp2msec( offs, run.audiorate ), ...
+	h = scatter( sta.smp2sec( [run.trials.cue], run.audiorate ), sta.smp2msec( offs, run.audiorate ), ...
+		'DisplayName', sprintf( '%d', sum( ~isnan( offs ) ) ), ...
 		'Marker', '+', 'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', style.color( 'warm', 0 ) );
 
+	l = legend( h, 'Location', 'SouthEast' );
+	set( l, 'Color', style.color( 'grey', 0.96 ) );
+
+		% print
 	style.print( plotfile );
+
+		% clean-up
 	delete( fig );
+
 end
 

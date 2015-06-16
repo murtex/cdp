@@ -21,14 +21,15 @@ function debug( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-	addpath( '../../cdp/' ); % include cue-distractor package
+		% include cue-distractor package
+	addpath( '../../cdp/' );
 
 		% prepare for output
 	if exist( outdir, 'dir' ) ~= 7
 		mkdir( outdir );
 	end
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'debug_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
 	logger.tab( 'debug data...' );
 
 		% configure framework
@@ -39,10 +40,10 @@ function debug( indir, outdir, ids )
 		logger.tab( 'subject: %d', i );
 
 			% read cdf data
-		infile = fullfile( indir, sprintf( '%03d.cdf', i ) );
+		infile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
 
-		if exist( infile, 'file' ) ~= 2
-			logger.untab( 'skipping' ); % skip non-existing
+		if exist( infile, 'file' ) ~= 2 % skip non-existing
+			logger.untab( 'skipping' );
 			continue;
 		end
 
@@ -51,14 +52,13 @@ function debug( indir, outdir, ids )
 
 		read_audio( run, run.audiofile, false );
 
-			% prepare for output
-		plotdir = fullfile( outdir, sprintf( '%d', run.id ) );
+			% plot random trials
+		plotdir = fullfile( outdir, sprintf( 'run_%d', i ) ); % prepare for output
 		if exist( plotdir, 'dir' ) == 7
-			rmdir( plotdir, s );
+			rmdir( plotdir, 's' );
 		end
 		mkdir( plotdir );
 
-			% plot random trials
 		trials = [run.trials.detected];
 		lens = diff( cat( 1, trials.range ), 1, 2 );
 		trials = run.trials(~isnan( lens ));
@@ -70,7 +70,7 @@ function debug( indir, outdir, ids )
 				min( trials(j).detected.range(1), trials(j).labeled.range(1) ), ...
 				max( trials(j).detected.range(2), trials(j).labeled.range(2) )], ...
 				trials(j).detected.range(1), ...
-				fullfile( plotdir, sprintf( '%d.png', trials(j).id ) ) );
+				fullfile( plotdir, sprintf( 'trial_%d.png', trials(j).id ) ) );
 		end
 
 			% cleanup

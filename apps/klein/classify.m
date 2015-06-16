@@ -31,7 +31,8 @@ function classify( indir, outdir, ids, traindir, seeds )
 		error( 'invalid argument: seeds' );
 	end
 
-	addpath( '../../cdp/' ); % include cue-distractor package
+		% include cue-distractor package
+	addpath( '../../cdp/' );
 
 		% prepare for output
 	if exist( outdir, 'dir' ) ~= 7
@@ -43,7 +44,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 		mkdir( plotdir );
 	end
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'classify_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
 	logger.tab( 'classify labels...' );
 
 		% read forests and plot
@@ -56,15 +57,15 @@ function classify( indir, outdir, ids, traindir, seeds )
 	for i = seeds
 
 			% read forest
-		infile = fullfile( traindir, sprintf( 'classes_%d.cdf', i ) );
+		infile = fullfile( traindir, sprintf( 'classes_%d.mat', i ) );
 		logger.log( 'read classes ''%s''...', infile );
 		load( infile, '-mat', 'classes' );
 
-		infile = fullfile( traindir, sprintf( 'forest_%d.cdf', i ) );
+		infile = fullfile( traindir, sprintf( 'forest_%d.mat', i ) );
 		logger.log( 'read forest ''%s''...', infile );
 		load( infile, '-mat', 'forest' );
 
-		infile = fullfile( traindir, sprintf( 'trained_%d.cdf', i ) );
+		infile = fullfile( traindir, sprintf( 'trained_%d.mat', i ) );
 		logger.log( 'read identifiers ''%s''...', infile );
 		load( infile, '-mat', 'trained' );
 
@@ -104,7 +105,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 		logger.tab( 'subject: %d', i );
 
 			% read cdf data
-		infile = fullfile( indir, sprintf( '%03d.cdf', i ) );
+		infile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
 
 		if exist( infile, 'file' ) ~= 2
 			logger.untab( 'skipping' ); % skip non-existing
@@ -141,14 +142,14 @@ function classify( indir, outdir, ids, traindir, seeds )
 		nclassified = sum( hits(end, :) ) + sum( misses(end, :) );
 		ntotal = nclassified + numel( trained{run.id} );
 
-		logger.log( 'classified: %d/%d (%.2f%%)', nclassified, ntotal, 100 * nclassified / ntotal );
+		logger.log( 'classified: %d/%d (%.1f%%)', nclassified, ntotal, 100 * nclassified / ntotal );
 		logger.tab( 'error: %.2f%%', sum( misses(end, :) ) / sum( hits(end, :) + misses(end, :) ) * 100 );
 		for j = 1:nclasses
 			logger.log( 'class #%d: %.2f%%', j, misses(end, j) / (hits(end, j) + misses(end, j)) * 100 );
 		end
 		logger.untab();
 
-		cdf.plot.classify( hits, misses, fullfile( plotdir, sprintf( '%d.png', run.id ) ) );
+		cdf.plot.classify( hits, misses, fullfile( plotdir, sprintf( 'run_%d_classify.png', i ) ) );
 
 			% accumulate accuracies
 		global_hits = global_hits + hits;
@@ -160,7 +161,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 			% write cdf data
 		run.audiodata = []; % do not write audio data
 
-		outfile = fullfile( outdir, sprintf( '%03d.cdf', run.id ) );
+		outfile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
 		logger.log( 'write cdf ''%s''...', outfile );
 		save( outfile, 'run', '-v7' );
 
@@ -170,7 +171,7 @@ function classify( indir, outdir, ids, traindir, seeds )
 		logger.untab();
 	end
 
-	logger.log( 'classified: %d/%d (%.2f%%)', global_nclassified, global_ntotal, 100 * global_nclassified / global_ntotal );
+	logger.log( 'classified: %d/%d (%.1f%%)', global_nclassified, global_ntotal, 100 * global_nclassified / global_ntotal );
 	logger.tab( 'error: %.2f%%', sum( global_misses(end, :) ) / sum( global_hits(end, :) + global_misses(end, :) ) * 100 );
 	for j = 1:nclasses
 		logger.log( 'class #%d: %.2f%%', j, global_misses(end, j) / (global_hits(end, j) + global_misses(end, j)) * 100 );

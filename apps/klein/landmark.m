@@ -21,7 +21,8 @@ function landmark( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-	addpath( '../../cdp/' ); % include cue-distractor package
+		% include cue-distractor package
+	addpath( '../../cdp/' );
 
 		% prepare for output
 	if exist( outdir, 'dir' ) ~= 7
@@ -33,7 +34,7 @@ function landmark( indir, outdir, ids )
 		mkdir( plotdir );
 	end
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'landmark_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
 	logger.tab( 'detect landmarks...' );
 
 		% configure framework
@@ -44,10 +45,10 @@ function landmark( indir, outdir, ids )
 		logger.tab( 'subject: %d', i );
 
 			% read cdf data
-		infile = fullfile( indir, sprintf( '%03d.cdf', i ) );
+		infile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
 
-		if exist( infile, 'file' ) ~= 2
-			logger.untab( 'skipping' ); % skip non-existing
+		if exist( infile, 'file' ) ~= 2 % skip non-existing
+			logger.untab( 'skipping' );
 			continue;
 		end
 
@@ -56,20 +57,21 @@ function landmark( indir, outdir, ids )
 
 		read_audio( run, run.audiofile, false );
 
-			% detect landmarks and plot
+			% detect landmarks
 		cdf.landmark( run, cfg );
 
+			% plot detection statistics
 		trials = [run.trials.detected];
 		detected = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
 		trials = [run.trials.labeled];
 		labeled = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
-		cdf.plot.landmark( run, detected, labeled, fullfile( plotdir, sprintf( '%d_landmarks.png', run.id ) ) );
-		cdf.plot.timing( run, detected, labeled, fullfile( plotdir, sprintf( '%d_timing.png', run.id ) ) );
+		cdf.plot.landmark( run, detected, labeled, fullfile( plotdir, sprintf( 'run_%d_landmark.png', i ) ) );
+		cdf.plot.timing( run, detected, labeled, fullfile( plotdir, sprintf( 'run_%d_timing.png', i ) ) );
 
 			% write cdf data
 		run.audiodata = []; % do not write audio data
 
-		outfile = fullfile( outdir, sprintf( '%03d.cdf', run.id ) );
+		outfile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
 		logger.log( 'write cdf ''%s''...', outfile );
 		save( outfile, 'run', '-v7' );
 

@@ -83,11 +83,12 @@ function extract( run, detected, labeled, plotfile )
 
 		% plot start deltas
 	subplot( 3, 2, 1 );
-	title( sprintf( 'trials: %d -- extraction', size( detected, 1 ) ) );
+	title( sprintf( '[extract] id: %d, trials: %d', run.id, size( detected, 1 ) ) );
 	xlabel( 'start delta in milliseconds' );
 	ylabel( 'rate' );
 	xlim( sta.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
-	bar( sta.smp2msec( dstartpos, run.audiorate ), dstartns / ndstarts, ...
+	h = bar( sta.smp2msec( dstartpos, run.audiorate ), dstartns / ndstarts, ...
+		'DisplayName', sprintf( '%d', ndstarts ), ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, 2 );
@@ -95,11 +96,10 @@ function extract( run, detected, labeled, plotfile )
 	ylabel( 'cumulative rate' );
 	xlim( [0, sta.smp2msec( maxdelta, run.audiorate )] );
 	ylim( [0, 1] );
-	h = bar( sta.smp2msec( absdstartpos, run.audiorate ), cumsum( absdstartns ) / ndstarts, ...
-		'DisplayName', sprintf( '%d', ndstarts ), ...
+	bar( sta.smp2msec( absdstartpos, run.audiorate ), cumsum( absdstartns ) / ndstarts, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
-	l = legend( h, 'Location', 'SouthEast' );
+	l = legend( h, 'Location', 'NorthEast' );
 	set( l, 'Color', style.color( 'grey', 0.96 ) );
 
 		% plot stop deltas
@@ -107,7 +107,8 @@ function extract( run, detected, labeled, plotfile )
 	xlabel( 'stop delta in milliseconds' );
 	ylabel( 'rate' );
 	xlim( sta.smp2msec( maxdelta, run.audiorate ) * [-1, 1] );
-	bar( sta.smp2msec( dstoppos, run.audiorate ), dstopns / ndstops, ...
+	h = bar( sta.smp2msec( dstoppos, run.audiorate ), dstopns / ndstops, ...
+		'DisplayName', sprintf( '%d', ndstops ), ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, 4 );
@@ -115,11 +116,10 @@ function extract( run, detected, labeled, plotfile )
 	ylabel( 'cumulative rate' );
 	xlim( [0, sta.smp2msec( maxdelta, run.audiorate )] );
 	ylim( [0, 1] );
-	h = bar( sta.smp2msec( absdstoppos, run.audiorate ), cumsum( absdstopns ) / ndstops, ...
-		'DisplayName', sprintf( '%d', ndstops ), ...
+	bar( sta.smp2msec( absdstoppos, run.audiorate ), cumsum( absdstopns ) / ndstops, ...
 		'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
-	l = legend( h, 'Location', 'SouthEast' );
+	l = legend( h, 'Location', 'NorthWest' );
 	set( l, 'Color', style.color( 'grey', 0.96 ) );
 
 		% plot overlaps

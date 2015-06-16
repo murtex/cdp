@@ -1,9 +1,9 @@
 #!/bin/sh
 
 	# data directories
-INDIR='../../data/klein/test-features/'
-OUTDIR='../../data/klein/test-classify/'
-TRAINDIR='../../data/klein/test-train/'
+INDIR='../../data/klein/features/'
+OUTDIR='../../data/klein/classify/'
+TRAINDIR='../../data/klein/train/'
 
 	# spread workload
 IDS='setdiff( 1:47, 4 )'

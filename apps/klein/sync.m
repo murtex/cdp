@@ -21,7 +21,8 @@ function sync( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-	addpath( '../../cdp/' ); % include cue-distractor package
+		% include cue-distractor package
+	addpath( '../../cdp/' );
 
 		% prepare for output
 	if exist( outdir, 'dir' ) ~= 7
@@ -33,7 +34,7 @@ function sync( indir, outdir, ids )
 		mkdir( plotdir );
 	end
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'sync_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
 	logger.tab( 'sync timings...' );
 
 		% configure framework
@@ -44,10 +45,10 @@ function sync( indir, outdir, ids )
 		logger.tab( 'subject: %d', i );
 
 			% read cdf data
-		infile = fullfile( indir, sprintf( '%03d.cdf', i ) );
+		infile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
 
-		if exist( infile, 'file' ) ~= 2
-			logger.untab( 'skipping' ); % skip non-existing
+		if exist( infile, 'file' ) ~= 2 % skip non-existing
+			logger.untab( 'skipping' );
 			continue;
 		end
 
@@ -56,15 +57,16 @@ function sync( indir, outdir, ids )
 
 		read_audio( run, run.audiofile, false );
 
-			% sync timings and plot
+			% sync timings
 		offs = cdf.sync( run, cfg, false );
 
-		cdf.plot.sync( run, offs, fullfile( plotdir, sprintf( '%d.png', run.id ) ) );
+			% plot sync offsets
+		cdf.plot.sync( run, offs, fullfile( plotdir, sprintf( 'run_%d_sync.png', i ) ) );
 
 			% write cdf data
 		run.audiodata = []; % do not write audio data
 
-		outfile = fullfile( outdir, sprintf( '%03d.cdf', run.id ) );
+		outfile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
 		logger.log( 'write cdf ''%s''...', outfile );
 		save( outfile, 'run', '-v7' );
 

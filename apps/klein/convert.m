@@ -21,14 +21,15 @@ function convert( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-	addpath( '../../cdp/' ); % include cue-distractor package
+		% include cue-distractor package
+	addpath( '../../cdp/' );
 
 		% prepare for output
 	if exist( outdir, 'dir' ) ~= 7
 		mkdir( outdir );
 	end
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'convert_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
 	logger.tab( 'convert raw data...' );
 
 		% proceed subjects
@@ -52,7 +53,7 @@ function convert( indir, outdir, ids )
 		read_labels( run, labelfile );
 
 			% write cdf data
-		outfile = fullfile( outdir, sprintf( '%03d.cdf', run.id ) );
+		outfile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
 		logger.log( 'write cdf ''%s''...', outfile );
 		save( outfile, 'run', '-v7' );
 

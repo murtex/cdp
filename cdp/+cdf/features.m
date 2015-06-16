@@ -111,8 +111,8 @@ function features( run, cfg, outdir, labeled )
 		trials = trials + 1;
 		subs = subs + size( subfeat, 1 );
 
-			% write feature file (hdf5-format)
-		featfile = fullfile( outdir, sprintf( '%d.mat', trial.id ) );
+			% write feature file
+		featfile = fullfile( outdir, sprintf( 'trial_%d.mat', i ) );
 
 		if labeled
 			trial.labeled.featfile = featfile;
@@ -120,7 +120,7 @@ function features( run, cfg, outdir, labeled )
 			trial.detected.featfile = featfile;
 		end
 
-		save( featfile, 'subfeat', '-v7.3' );
+		save( featfile, 'subfeat', '-v7' );
 
 		logger.progress( i, n );
 	end

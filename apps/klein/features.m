@@ -21,14 +21,15 @@ function features( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-	addpath( '../../cdp/' ); % include cue-distractor package
+		% include cue-distractor package
+	addpath( '../../cdp/' );
 
 		% prepare for output
 	if exist( outdir, 'dir' ) ~= 7
 		mkdir( outdir );
 	end
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'features_%03d-%03d.log', min( ids ), max( ids ) ) ) ); % start logging
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
 	logger.tab( 'compute features...' );
 
 		% configure framework
@@ -39,7 +40,7 @@ function features( indir, outdir, ids )
 		logger.tab( 'subject: %d', i );
 
 			% read cdf data
-		infile = fullfile( indir, sprintf( '%03d.cdf', i ) );
+		infile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
 
 		if exist( infile, 'file' ) ~= 2
 			logger.untab( 'skipping' ); % skip non-existing
@@ -52,14 +53,14 @@ function features( indir, outdir, ids )
 		read_audio( run, run.audiofile, false );
 
 			% compute features
-		subdir = fullfile( outdir, sprintf( '%d_det', run.id ) ); % detected responses
+		subdir = fullfile( outdir, sprintf( 'run_%d_detected', i ) ); % detected responses
 		if exist( subdir, 'dir' ) ~= 7
 			mkdir( subdir );
 		end
 
 		cdf.features( run, cfg, subdir, false );
 
-		subdir = fullfile( outdir, sprintf( '%d_lab', run.id ) ); % labeled responses
+		subdir = fullfile( outdir, sprintf( 'run_%d_labeled', i ) ); % labeled responses
 		if exist( subdir, 'dir' ) ~= 7
 			mkdir( subdir );
 		end
@@ -69,7 +70,7 @@ function features( indir, outdir, ids )
 			% write cdf data
 		run.audiodata = []; % do not write audio data
 
-		outfile = fullfile( outdir, sprintf( '%03d.cdf', run.id ) );
+		outfile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
 		logger.log( 'write cdf ''%s''...', outfile );
 		save( outfile, 'run', '-v7' );
 

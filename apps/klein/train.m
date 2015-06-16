@@ -1,7 +1,7 @@
-function train( indir, outdir, ids, seed, ntrees )
+function train( indir, outdir, ids, seed, ntrees, ratio )
 % train classifier
 %
-% TRAIN( indir, outdir, ids, ntrees )
+% TRAIN( indir, outdir, ids, ntrees, ratio )
 %
 % INPUT
 % indir : input directory (row char)
@@ -9,6 +9,7 @@ function train( indir, outdir, ids, seed, ntrees )
 % ids : subject identifiers (row numeric)
 % seed : randomization seed (scalar numeric)
 % ntrees : number of trees (scalar numeric)
+% ratio : training ratio (scalar numeric)
 
 		% safeguard
 	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
@@ -31,7 +32,12 @@ function train( indir, outdir, ids, seed, ntrees )
 		error( 'invaid argument: ntrees' );
 	end
 
-	addpath( '../../cdp/' ); % include cue-distractor package
+	if nargin < 6 || ~isscalar( ratio ) || ~isnumeric( ratio )
+		error( 'invalid argument: ratio' );
+	end
+
+		% include cue-distractor package
+	addpath( '../../cdp/' );
 
 		% prepare for output
 	if exist( outdir, 'dir' ) ~= 7
@@ -43,7 +49,7 @@ function train( indir, outdir, ids, seed, ntrees )
 		mkdir( plotdir );
 	end
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'train_%d.log', seed ) ) ); % start logging
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( '%d.log', seed ) ) ); % start logging
 	logger.tab( 'train classifier...' );
 
 		% configure framework
@@ -55,9 +61,7 @@ function train( indir, outdir, ids, seed, ntrees )
 	runs = cdf.hRun.empty(); % pre-allocation
 
 	for i = ids
-
-		infile = fullfile( indir, sprintf( '%03d.cdf', i ) );
-
+		infile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
 		if exist( infile, 'file' ) ~= 2
 			continue; % skip non-existing
 		end
@@ -66,13 +70,12 @@ function train( indir, outdir, ids, seed, ntrees )
 		load( infile, '-mat', 'run' );
 
 		runs(end+1) = run;
-
 	end
 
 	logger.untab();
 
 		% train random forest and plot
-	[classes, forest, trained] = cdf.train( runs, ntrees, seed, 0.8 );
+	[classes, forest, trained] = cdf.train( runs, ntrees, seed, ratio );
 
 	ntrees = numel( forest );
 	for i = 1:ntrees
@@ -84,15 +87,15 @@ function train( indir, outdir, ids, seed, ntrees )
 		% write classifier
 	logger.tab( 'write classifier...' );
 
-	outfile = fullfile( outdir, sprintf( 'classes_%d.cdf', seed ) );
+	outfile = fullfile( outdir, sprintf( 'classes_%d.mat', seed ) );
 	logger.log( 'write classes ''%s''...', outfile );
 	save( outfile, 'classes', '-v7' );
 
-	outfile = fullfile( outdir, sprintf( 'forest_%d.cdf', seed ) );
+	outfile = fullfile( outdir, sprintf( 'forest_%d.mat', seed ) );
 	logger.log( 'write forest ''%s''...', outfile );
 	save( outfile, 'forest', '-v7' );
 
-	outfile = fullfile( outdir, sprintf( 'trained_%d.cdf', seed ) );
+	outfile = fullfile( outdir, sprintf( 'trained_%d.mat', seed ) );
 	logger.log( 'write identifiers ''%s''...', outfile );
 	save( outfile, 'trained', '-v7' );
 
