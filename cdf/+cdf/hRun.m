@@ -1,4 +1,4 @@
-classdef hRun < handle
+classdef (Sealed = true) hRun < handle
 % cue-distractor run
 
 		% properties

@@ -1,4 +1,4 @@
-classdef hTrial < handle
+classdef (Sealed = true) hTrial < handle
 % cue-distractor trial
 
 		% properties
@@ -7,7 +7,6 @@ classdef hTrial < handle
 			% general
 		cuepos = NaN; % cue position (scalar numeric)
 		distpos = NaN; % distractor position (scalar numeric)
-		length = NaN; % trial length (scalar numeric)
 
 		cuelabel = ''; % cue label (row char)
 		distlabel = ''; % distractor label (row char)

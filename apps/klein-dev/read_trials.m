@@ -78,14 +78,8 @@ function read_trials( run, trialfile )
 		trial = run.trials(i);
 
 			% general
-		trial.cuepos = dsp.sec2smp( max( fdata{9}(i), fdata{10}(i) ), run.audiorate ) + 1; % cue/distractor fields have swapped during experiments
-		trial.distpos = dsp.sec2smp( (max( fdata{9}(i), fdata{10}(i) ) + fdata{14}(i)), run.audiorate ) + 1;
-
-		if i < ntrials
-			trial.length = run.trials(i+1).cuepos - trial.cuepos - 1; % trial ends at next cue
-		else
-			trial.length = run.audiosize(1) - trial.cuepos; % last trial ends with recording
-		end
+		trial.cuepos = max( fdata{9}(i), fdata{10}(i) ); % cue/distractor fields have swapped during experiments
+		trial.distpos = max( fdata{9}(i), fdata{10}(i) ) + fdata{14}(i);
 
 		trial.cuelabel = cuelabel( fdata{11}{i}, fdata{6}{i} );
 		trial.distlabel = distlabel( fdata{12}{i}, fdata{13}{i} );
