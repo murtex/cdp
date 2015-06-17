@@ -1,14 +1,14 @@
-function msec = smp2msec( smp, rate )
-% samples to milliseconds
+function sec = smp2sec( smp, rate )
+% samples to seconds
 %
-% msec = SMP2MSEC( smp, rate )
+% sec = SMP2sec( smp, rate )
 %
 % INPUT
 % smp : samples (numeric)
 % rate : sampling rate (scalar numeric)
 %
 % OUTPUT
-% msec : milliseconds (numeric)
+% sec : seconds (numeric)
 
 		% safeguard
 	if nargin < 1 || ~isnumeric( smp )
@@ -20,7 +20,7 @@ function msec = smp2msec( smp, rate )
 	end
 
 		% convert scale
-	msec = smp / rate * 1000;
+	sec = smp / rate;
 
 end
 
