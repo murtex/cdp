@@ -50,7 +50,7 @@ function [sync0, syncs] = sync( run, cfg )
 		error( 'invalid value: noimu | noisigma' );
 	end
 
-		% normalize and smooth cue/distractor audio data (mahalanobis distance to noise)
+		% normalize and smooth cue/distractor (mahalanobis distance to noise)
 	cdts = abs( run.audiodata(:, 2) - noimu ) / noisigma;
 	cdtslen = numel( cdts );
 
