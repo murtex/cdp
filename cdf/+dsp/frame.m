@@ -4,7 +4,7 @@ function fr = frame( ts, length, overlap, window, varargin )
 % fr = FRAME( ts, length, overlap, window, ... )
 %
 % INPUT
-% ts : signal/time series (row numeric)
+% ts : signal/time series (column numeric)
 % length : frame length (scalar numeric)
 % overlap : frame overlap (scalar numeric)
 % window : window function (scalar object)
@@ -14,7 +14,7 @@ function fr = frame( ts, length, overlap, window, varargin )
 % fr : signal frames (matrix numeric)
 
 		% safeguard
-	if nargin < 1 || ~isrow( ts ) || ~isnumeric( ts )
+	if nargin < 1 || ~iscolumn( ts ) || ~isnumeric( ts )
 		error( 'invalid argument: ts' );
 	end
 
@@ -42,13 +42,13 @@ function fr = frame( ts, length, overlap, window, varargin )
 	starts = (0:nframes-1) * stride + 1;
 	stops = starts + length - 1;
 
-	ts = cat( 2, ts, zeros( 1, stops(end) - tslen ) ); % zero-padding
-	window = transpose( window( length, varargin{:} ) ); % apodization
+	ts = cat( 1, ts, zeros( stops(end) - tslen, 1 ) ); % zero-padding
+	window = window( length, varargin{:} ); % apodization
 
-	fr = zeros( nframes, length ); % pre-allocation
+	fr = zeros( length, nframes ); % pre-allocation
 
 	for i = 1:nframes
-		fr(i, :) = window .* ts(starts(i):stops(i));
+		fr(:, i) = window .* ts(starts(i):stops(i));
 	end
 
 end
