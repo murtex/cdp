@@ -30,11 +30,18 @@ function sync( indir, outdir, ids )
 		mkdir( outdir );
 	end
 
+	plotdir = fullfile( outdir, 'plot/' );
+	if exist( plotdir, 'dir' ) ~= 7
+		mkdir( plotdir );
+	end
+
 		% initialize framework
 	addpath( '../../cdf/' );
 
 	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'sync_%d-%d.log', min( ids ), max( ids ) ) ) );
 	logger.tab( 'sync timings...' );
+
+	cfg = cdf.hConfig(); % use defaults
 
 		% proceed subject identifiers
 	for i = ids
@@ -52,8 +59,10 @@ function sync( indir, outdir, ids )
 
 		read_audio( run, run.audiofile, true );
 
-			% sync timings
-		cdf.sync( run );
+			% sync timings and plot offsets
+		[sync0, syncs] = cdf.sync( run, cfg );
+
+		cdf.plot.sync( run, sync0, syncs, fullfile( plotdir, sprintf( 'run_%d_sync.png', i ) ) );
 
 			% write output data
 		run.audiodata = []; % do not write redundant audio data
@@ -61,6 +70,10 @@ function sync( indir, outdir, ids )
 		cdffile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
 		logger.log( 'write cdf data (''%s'')...', cdffile );
 		save( cdffile, 'run' );
+
+		syncfile = fullfile( outdir, sprintf( 'syncs_%d.mat', i ) );
+		logger.log( 'write sync data (''%s'')...', syncfile );
+		save( syncfile, 'sync0', 'syncs' );
 
 			% clean up
 		delete( run );
