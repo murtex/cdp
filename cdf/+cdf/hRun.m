@@ -15,6 +15,10 @@ classdef (Sealed = true) hRun < handle
 			% trials
 		trials = cdf.hTrial.empty(); % cue-distractor trials (row object)
 
+			% responses
+		resps_det = cdf.hResponse.empty(); % detected responses (row object)
+		resps_lab = cdf.hResponse.empty(); % labeled responses (row object)
+
 	end
 
 end % classdef
