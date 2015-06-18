@@ -59,6 +59,12 @@ function debug( indir, outdir, ids, seed )
 
 		read_audio( run, run.audiofile, true );
 
+			% prepare plot directory
+		plotdir = fullfile( outdir, sprintf( 'run_%d_plot', i ) );
+		if exist( plotdir, 'dir' ) ~= 7
+			mkdir( plotdir );
+		end
+
 			% plot random trials
 		nsrctrials = numel( run.trials );
 		ndsttrials = 20; % number of random trials
@@ -72,7 +78,7 @@ function debug( indir, outdir, ids, seed )
 		end
 
 		for j = trialids % plot trials
-			cdf.plot.trial( run, cfg, j, fullfile( outdir, sprintf( 'run_%d_trial_%d.png', i, j ) ) );
+			cdf.plot.trial( run, cfg, j, fullfile( plotdir, sprintf( 'run_%d_trial_%d.png', i, j ) ) );
 		end
 
 		rng( rs ); % pop randomness
