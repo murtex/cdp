@@ -10,6 +10,9 @@ function [ft, freqs] = fft( fr, rate )
 % OUTPUT
 % ft : signal (frames) fourier transform (matrix numeric)
 % freqs : frequencies (column numeric)
+%
+% SEE
+% A Guide to the FFT -- 2nd Edition Plus (https://www.mathworks.com/matlabcentral/fileexchange/5654-a-guide-to-the-fft-2nd-edition-plus)
 
 		% safeguard
 	if nargin < 1 || ~ismatrix( fr ) || ~isnumeric( fr ) || size( fr, 1 ) < 1
@@ -20,11 +23,23 @@ function [ft, freqs] = fft( fr, rate )
 		error( 'invalid argument: rate' );
 	end
 
-		% fourier transform
-	ncoeffs = 2 ^ nextpow2( size( fr, 1 ) );
-
-	ft = fft( fr, ncoeffs );
-	freqs = rate/2 * linspace( 0, 1, ncoeffs/2 + 1 );
+		% zero-padding
+	nfrs = size( fr, 1 );
+	ncoeffs = 2^nextpow2( nfrs );
 	
+	zs = zeros( ceil( (ncoeffs-nfrs)/2 ), size( fr, 2 ) );
+	if mod( nfrs, 2 ) == 0
+		fr = cat( 1, zs, fr, zs );
+	else
+		fr = cat( 1, zs, fr, zs(1:end-1, :) );
+	end
+
+		% fourier transform
+	ft = fftshift( fft( fftshift( fr ) ) ) / ncoeffs;
+
+	fmax = rate/2;
+	df = rate/ncoeffs;
+	freqs = -fmax:df:fmax-df;
+
 end
 
