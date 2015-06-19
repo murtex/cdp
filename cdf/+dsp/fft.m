@@ -1,21 +1,21 @@
 function [ft, freqs] = fft( fr, rate )
-% fourier transform signal (frames)
+% fourier transform signal frames
 %
 % [ft, freqs] = FFT( fr, rate )
 %
 % INPUT
-% fr : signal (frames) (matrix numeric)
+% fr : signal frames (matrix numeric)
 % rate : sampling rate (scalar numeric)
 %
 % OUTPUT
-% ft : signal (frames) fourier transform (matrix numeric)
+% ft : signal frames fourier transform (matrix numeric)
 % freqs : frequencies (column numeric)
 %
 % SEE
 % A Guide to the FFT -- 2nd Edition Plus (https://www.mathworks.com/matlabcentral/fileexchange/5654-a-guide-to-the-fft-2nd-edition-plus)
 
 		% safeguard
-	if nargin < 1 || ~ismatrix( fr ) || ~isnumeric( fr ) || size( fr, 1 ) < 1
+	if nargin < 1 || ~ismatrix( fr ) || ~isnumeric( fr ) || any( size( fr ) < 1 )
 		error( 'invalid argument: fr' );
 	end
 
