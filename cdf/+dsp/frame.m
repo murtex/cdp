@@ -1,5 +1,5 @@
 function fr = frame( ts, length, overlap, window, varargin )
-% frame signal
+% short-time framing
 %
 % fr = FRAME( ts, length, overlap, window, ... )
 %
@@ -38,7 +38,7 @@ function fr = frame( ts, length, overlap, window, varargin )
 
 	nframes = ceil( tslen / stride );
 
-		% frame signal
+		% short-time framing
 	starts = (0:nframes-1) * stride + 1;
 	stops = starts + length - 1;
 
