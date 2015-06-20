@@ -5,9 +5,9 @@ classdef (Sealed = true) hConfig < handle
 	properties (Access = public)
 
 			% syncing
-		sync_range = [-0.075, 0.025]; % sync search range (row numeric)
-		sync_smooth = 0.0005; % sync smoothing (scalar numeric)
-		sync_thresh = 3; % sync mahalanobis threshold (scalar numeric)
+		sync_range = [-0.075, 0.025]; % search range (row numeric)
+		sync_smooth = 0.0005; % smoothing (scalar numeric)
+		sync_thresh = 3; % mahalanobis threshold (scalar numeric)
 
 			% voice activity detection
 		vad_frlength = 0.025; % short-time framing length (scalar numeric)
