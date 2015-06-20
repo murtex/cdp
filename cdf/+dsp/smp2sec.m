@@ -15,7 +15,7 @@ function sec = smp2sec( smp, rate )
 		error( 'invalid argument: smp' );
 	end
 
-	if nargin < 2 || ~isscalar( rate ) || ~isnumeric( rate )
+	if nargin < 2 || ~isscalar( rate ) || ~isnumeric( rate ) || rate <= 0
 		error( 'invalid argument: rate' );
 	end
 
