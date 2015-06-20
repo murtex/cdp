@@ -9,6 +9,14 @@ classdef (Sealed = true) hConfig < handle
 		sync_smooth = 0.0005; % sync smoothing (scalar numeric)
 		sync_thresh = 3; % sync mahalanobis threshold (scalar numeric)
 
+			% voice activity detection
+		vad_frlength = 0.025; % short-time framing length (scalar numeric)
+		vad_froverlap = 15/25; % short-time framing overlap (scalar numeric)
+		vad_frwindow = @hann; % short-time framing window function (scalar object)
+
+		vad_adjacency = 6; % long-term adjacency (scalar numeric)
+		vad_hangover = 8; % activity hangover (scalar numeric)
+
 	end
 
 end
