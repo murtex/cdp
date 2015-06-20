@@ -1,5 +1,5 @@
 function sec = fr2sec( fr, length, overlap, rate )
-% frame number to seconds
+% frame number to position/seconds
 %
 % sec = FR2SEC( fr, length, overlap, rate )
 %
@@ -10,7 +10,7 @@ function sec = fr2sec( fr, length, overlap, rate )
 % rate : sampling rate (scalar numeric)
 %
 % OUTPUT
-% sec : seconds (numeric)
+% sec : position/seconds (numeric)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( fr ) || ~isnumeric( fr )
