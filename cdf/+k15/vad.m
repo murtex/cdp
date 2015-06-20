@@ -81,15 +81,15 @@ function [va, sd, dd, sdthresh, ddthresh] = vad( ft, noift, ltadj, hang )
 	hithresh = lothresh + 0.25 * (mean( dd(dd >= lothresh) ) - lothresh);
 	ddthresh = log( lothresh * hithresh ) / 2;
 
-	sd = log( sd );
+	sd = log( sd ); % scale conversion
 	dd = log( dd );
 
 		% set voice activity
-	vasrc = sd >= sdthresh & dd >= ddthresh;
-	va = vasrc;
+	vapre = sd >= sdthresh & dd >= ddthresh; % thresholding
+	va = vapre;
 
 	for i = 1:nfrs-1 % apply hangover
-		if vasrc(i) && ~vasrc(i+1)
+		if vapre(i) && ~vapre(i+1)
 			hangstart = i + 1;
 			hangstop = min( nfrs, i + hang );
 			va(hangstart:hangstop) = true;
