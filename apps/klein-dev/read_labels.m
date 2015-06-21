@@ -32,6 +32,7 @@ function read_labels( run, labelfile )
 
 		% setup responses
 	for i = 1:ntrials
+		trial = run.trials(i);
 		resp = run.resps_lab(i);
 
 			% skip unlabeled/unreasonable
@@ -47,7 +48,7 @@ function read_labels( run, labelfile )
 		end
 
 			% activity
-		resp.startpos = run.trials(i).cuepos + fdata{i, 8};
+		resp.startpos = trial.cuepos + fdata{i, 8};
 		resp.stoppos = resp.startpos + fdata{i, 9} + fdata{i, 10};
 
 	end
