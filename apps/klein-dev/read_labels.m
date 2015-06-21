@@ -18,7 +18,40 @@ function read_labels( run, labelfile )
 
 	logger = xis.hLogger.instance();
 	logger.tab( 'read label data (''%s'')...', labelfile );
-	
+
+		% read file content
+	ntrials = numel( run.trials );
+
+	[~, ~, fdata] = xlsread( labelfile );
+	fdata(1, :) = []; % remove header
+
+	if size( fdata, 1 ) ~= ntrials || size( fdata, 2 ) ~= 14
+		logger.untab();
+		error( 'invalid value: fdata' );
+	end
+
+		% setup responses
+	for i = 1:ntrials
+		resp = run.resps_lab(i);
+
+			% skip unlabeled/unreasonable
+		resplabel = fdata{i, 7};
+		if strcmp( resplabel, 'NA' )
+			continue;
+		end
+
+		if fdata{i, 8} > 10 || fdata{i, 9} > 1 || fdata{i, 10} > 10 || ...
+				fdata{i, 8} < 0 || fdata{i, 9} < 0 || fdata{i, 10} < 0
+			% reaction time, voice-onset time, vowel length in seconds
+			continue;
+		end
+
+			% activity
+		resp.startpos = run.trials(i).cuepos + fdata{i, 8};
+		resp.stoppos = resp.startpos + fdata{i, 9} + fdata{i, 10};
+
+	end
+
 	logger.untab();
 end
 

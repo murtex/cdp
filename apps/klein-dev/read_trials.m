@@ -28,7 +28,7 @@ function read_trials( run, trialfile )
 
 	if size( fdata, 1 ) ~= 1 || size( fdata, 2 ) ~= 14 % single block, 14 fields
 		logger.untab();
-		error( 'invalid argument: trialfile' );
+		error( 'invalid value: fdata' );
 	end
 
 	ntrials = numel( fdata{1} );
