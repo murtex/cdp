@@ -123,6 +123,7 @@ classdef (Sealed = true) hStyle < handle
 					case +2
 						rgb = hex2dec( {'6d', '8f', 'c2'} )/255;
 				end
+				rgb = transpose( rgb );
 			end
 
 			function rgb = warm( shade )
@@ -138,6 +139,7 @@ classdef (Sealed = true) hStyle < handle
 					case +2
 						rgb = hex2dec( {'ff', 'a4', '84'} )/255;
 				end
+				rgb = transpose( rgb );
 			end
 
 			function rgb = neutral( shade )
