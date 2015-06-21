@@ -59,8 +59,10 @@ function activity( indir, outdir, ids )
 
 		read_audio( run, run.audiofile, true );
 
-			% detect activities
+			% detect activities and plot statistics
 		cdf.activity( run, cfg );
+
+		cdf.plot.activity( run, cfg, fullfile( plotdir, sprintf( 'run_%d_activity.png', i ) ) );
 
 			% write output data
 		run.audiodata = []; % do not write redundant audio data

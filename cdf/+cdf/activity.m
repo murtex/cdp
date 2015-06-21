@@ -31,7 +31,7 @@ function activity( run, cfg )
 		resp.startpos = NaN;
 		resp.stoppos = NaN;
 
-			% set noise and response signals
+			% set local noise and response signal
 		noir = dsp.sec2smp( [trial.cuepos, trial.distpos], run.audiorate ) + 1; % noise range
 		if any( isnan( noir ) ) || any( noir < 1 ) || any( noir > run.audiosize(1) )
 			logger.progress( i, ntrials );
@@ -50,52 +50,43 @@ function activity( run, cfg )
 		noits = run.audiodata(noir(1):noir(2), 1); % signals
 		respts = run.audiodata(respr(1):respr(2), 1);
 
-		if isempty( noits ) || isempty( respts ) % TODO: allow empty noise signal!
+		if isempty( noits ) || isempty( respts )
 			logger.progress( i, ntrials );
 			continue;
 		end
 
 			% get short-time fourier transforms
-		frlength = dsp.sec2smp( 0.01, run.audiorate ); % TODO: configure!
-		froverlap = 0.5;
-		frwindow = @rectwin;
+		frlen = dsp.sec2smp( cfg.vad_frlength, run.audiorate );
 
-		noifr = dsp.frame( noits, frlength, froverlap, frwindow ); % short-time framing
-		respfr = dsp.frame( respts, frlength, froverlap, frwindow );
+		noifr = dsp.frame( noits, frlen, cfg.vad_froverlap, cfg.vad_frwindow ); % short-time framing
+		respfr = dsp.frame( respts, frlen, cfg.vad_froverlap, cfg.vad_frwindow );
 
 		[noift, noifreqs] = dsp.fft( noifr, run.audiorate ); % fourier transforms
 		[respft, respfreqs] = dsp.fft( respfr, run.audiorate );
 
-			% DEBUG
-		size( noifr )
-		size( noift )
-		size( noifreqs )
+			% get voice activity
+		[va, ~, ~, ~, ~] = k15.vad( respft, noift, cfg.vad_adjacency, cfg.vad_hangover );
 
-		size( respfr )
-		size( respft )
-		size( respfreqs )
+			% set response to first activity
+		vaswaps = diff( cat( 1, false, va ) );
 
-			% DEBUG
-		figure();
+		vastart = find( vaswaps == 1, 1 );
+		if ~isempty( vastart )
+			resp.startpos = trial.cuepos + dsp.fr2sec( vastart, frlen, cfg.vad_froverlap, run.audiorate );
 
-		subplot( 4, 1, 1 );
-		plot( noits );
-
-		subplot( 4, 1, 2 );
-		imagesc( log( abs( noift ) ) );
-
-		subplot( 4, 1, 3 );
-		plot( respts );
-
-		subplot( 4, 1, 4 );
-		imagesc( log( abs( respft ) ) );
-
-		print( 'bla.png', '-dpng', '-r120' );
-
-		error( 'DEBUG' );
+			vastop = find( vaswaps == -1, 1 ) - 1;
+			if ~isempty( vastop )
+				resp.stoppos = trial.cuepos + dsp.fr2sec( vastop, frlen, cfg.vad_froverlap, run.audiorate );
+			else
+				resp.stoppos = dsp.smp2sec( respr(2), run.audiorate ); % fallback: stop with trial end
+			end
+		end
 
 		logger.progress( i, ntrials );
 	end
+
+		% log detections
+	logger.log( 'activities: %d/%d', sum( ~isnan( [run.resps_det.startpos] ) ), ntrials );
 
 	logger.untab();
 end

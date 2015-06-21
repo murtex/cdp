@@ -14,8 +14,8 @@ classdef (Sealed = true) hConfig < handle
 		vad_froverlap = 15/25; % short-time framing overlap (scalar numeric)
 		vad_frwindow = @hann; % short-time framing window function (scalar object)
 
-		vad_adjacency = 6; % long-term adjacency (scalar numeric)
-		vad_hangover = 8; % activity hangover (scalar numeric)
+		vad_adjacency = 12; % long-term adjacency (scalar numeric)
+		vad_hangover = 4; % activity hangover (scalar numeric)
 
 	end
 
