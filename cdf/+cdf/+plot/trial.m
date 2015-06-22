@@ -31,56 +31,59 @@ function trial( run, cfg, id, plotfile )
 
 	style = xis.hStyle.instance();
 
-		% set trial range
-	tr = [dsp.sec2smp( run.trials(id).cuepos, run.audiorate ) + 1, run.audiosize(1)];
-	if id < numel( run.trials )
-		tr(2) = dsp.sec2smp( run.trials(id+1).cuepos, run.audiorate );
-	end
+		% prepare data
+	trial = run.trials(id);
+	resp_det = run.resps_det(id);
+	resp_lab = run.resps_lab(id);
 
-	if any( isnan( tr ) ) || any( tr < 1 ) || any( tr > run.audiosize(1) )
+	tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0];
+	if any( isnan( tr ) )
 		error( 'invalid value: tr' );
 	end
 
-		% prepare audio data (time series)
-	cdts = run.audiodata(tr(1):tr(2), 2);
+	cdts = run.audiodata(tr(1):tr(2), 2); % signals
 	respts = run.audiodata(tr(1):tr(2), 1);
 
-	tslen = numel( cdts );
-	if tslen < 1
-		error( 'invalid value: tslen' );
-	end
+	frlen = dsp.sec2smp( cfg.dbg_frlength, run.audiorate ); % short-time fft
+	respfr = dsp.frame( respts, frlen, cfg.dbg_froverlap, cfg.dbg_frwindow );
+	[respft, respfreqs] = dsp.fft( respfr, run.audiorate );
+
+	respft = dsp.unframe( respft, frlen, cfg.dbg_froverlap );
+
+	xl = 1000 * [0, diff( trial.range )]; % axes scaling
+	xs = 1000 * dsp.smp2sec( 0:diff( tr ), run.audiorate );
+	frxs = 1000 * dsp.smp2sec( 0:size( respft, 2 )-1, run.audiorate );
+	yl = max( abs( cat( 1, cdts, respts ) ) ) * style.width( 1/2 ) * [-1, 1];
 
 		% plot
 	fig = style.figure();
 
-			% cue/distractor (acoustics)
-	subplot( 2, 1, 1 );
+	subplot( 4, 2, 1:2, 'XTickLabel', {} ); % cue/distractor signal
+	ylabel( 'distractor' );
+	xlim( xl );
+	ylim( yl );
+	plot( xs, cdts, ...
+		'Color', style.color( 'cold', +1 ) );
 
-	xlabel( 'milliseconds' );
-	ylabel( 'cue/distractor' );
-
-	xlim( [0, 1000 * dsp.smp2sec( tslen-1, run.audiorate )] );
-	ylim( style.width( 1 ) * max( max( abs( cdts ) ), max( abs( respts ) ) ) * [-1, 1] );
-
-	plot( 1000 * dsp.smp2sec( 0:tslen-1, run.audiorate ), cdts, ...
-		'Color', style.color( 'neutral', 0 ) );
-
-			% response (acoustics)
-	subplot( 2, 1, 2 );
-
-	xlabel( 'milliseconds' );
+	subplot( 4, 2, 3:4, 'XTickLabel', {} ); % response signal
 	ylabel( 'response' );
+	xlim( xl );
+	ylim( yl );
+	plot( xs, respts, ...
+		'Color', style.color( 'cold', +1 ) );
 
-	xlim( [0, 1000 * dsp.smp2sec( tslen-1, run.audiorate )] );
-	ylim( style.width( 1 ) * max( max( abs( cdts ) ), max( abs( respts ) ) ) * [-1, 1] );
-
-	plot( 1000 * dsp.smp2sec( 0:tslen-1, run.audiorate ), respts, ...
-		'Color', style.color( 'neutral', 0 ) );
-
-		% response (spectrogram), TODO
+	subplot( 4, 2, 5:8 ); % response spectrogram
+	xlabel( 'trial time in milliseconds' );
+	ylabel( 'frequency in hertz' );
+	xlim( xl );
+	ylim( [-8000, 0] );
+	colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) );
+	imagesc( frxs, respfreqs, log( respft .* conj( respft ) ) );
 
 		% print
 	style.print( plotfile );
+
+	delete( fig );
 
 	logger.untab();
 end

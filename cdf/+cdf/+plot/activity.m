@@ -26,10 +26,14 @@ function activity( run, cfg, plotfile )
 
 	style = xis.hStyle.instance();
 
-		% detection start statistics
+		% prepare activity ranges
 	maxdelta = 200; % limit view to +/-200ms
 
-	dstarts = 1000 * ([run.resps_det.startpos] - [run.resps_lab.startpos]); % data
+	detrs = cat( 1, run.resps_det.range );
+	labrs = cat( 1, run.resps_lab.range );
+
+		% detection start statistics
+	dstarts = 1000 * (detrs(:, 1) - labrs(:, 1)); % data
 	dstarts(isnan( dstarts )) = [];
 	ndstarts = numel( dstarts );
 	dstarts(abs( dstarts ) > maxdelta) = [];
@@ -38,7 +42,7 @@ function activity( run, cfg, plotfile )
 	dstartns = hist( dstarts, dstartpos );
 
 		% detection stop statistics
-	dstops = 1000 * ([run.resps_det.stoppos] - [run.resps_lab.stoppos]); % data
+	dstops = 1000 * (detrs(:, 2) - labrs(:, 2)); % data
 	dstops(isnan( dstops )) = [];
 	ndstops = numel( dstops );
 	dstops(abs( dstops ) > maxdelta) = [];
@@ -47,13 +51,13 @@ function activity( run, cfg, plotfile )
 	dstopns = hist( dstops, dstoppos );
 
 		% plot
-	style.figure();
+	fig = style.figure();
 
 	subplot( 3, 1, 1 ); % detection starts
 	title( ...
 		sprintf( 'start deltas: %d/%d, stop deltas: %d/%d', ...
-		ndstarts, sum( ~isnan( [run.resps_lab.startpos] ) ), ...
-		ndstops, sum( ~isnan( [run.resps_lab.stoppos] ) ) ) );
+		ndstarts, sum( ~isnan( labrs(:, 1) ) ), ...
+		ndstops, sum( ~isnan( labrs(:, 2) ) ) ) );
 	xlabel( 'start delta in milliseconds' );
 	ylabel( 'rate' );
 	xlim( maxdelta * [-1, 1] );
@@ -69,6 +73,8 @@ function activity( run, cfg, plotfile )
 
 		% print
 	style.print( plotfile );
+
+	delete( fig );
 
 	logger.untab();
 end

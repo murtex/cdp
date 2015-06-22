@@ -44,12 +44,14 @@ function sync( run, sync0, syncs, plotfile )
 
 	xlim( [0, dsp.smp2sec( run.audiosize(1), run.audiorate)] );
 
-	scatter( [run.trials.cuepos], 1000 * syncs, ...
+	scatter( [run.trials.cue], 1000 * syncs, ...
 		'Marker', '+', ...
 		'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', style.color( 'warm', 0 ) );
 
 		% print
 	style.print( plotfile );
+
+	delete( fig );
 
 	logger.untab();
 end
