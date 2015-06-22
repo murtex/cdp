@@ -59,6 +59,7 @@ function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
 
 		% proceed subject identifiers
 	for i = ids
+		logger.tab( 'subject: %d', i );
 
 			% read input data
 		cdffile = fullfile( cdfindir, sprintf( 'run_%d.mat', i ) );
@@ -77,8 +78,11 @@ function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
 
 		read_audio( run, run.audiofile, true );
 
-			% prepare plot directory
-		plotdir = fullfile( outdir, sprintf( 'run_%d_plot', i ) );
+			% plot sync offsets
+		cdf.plot.sync( run, sync0, syncs, fullfile( outdir, sprintf( 'run_%d_sync.png', i ) ) );
+
+			% prepare trial plot directory
+		plotdir = fullfile( outdir, sprintf( 'run_%d', i ) );
 		if exist( plotdir, 'dir' ) == 7
 			rmdir( plotdir, 's' );
 		end
@@ -103,12 +107,16 @@ function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
 
 		rng( rs ); % pop randomness
 
-			% plot trial sync 
+			% plot trials
 		for j = trialids
 			cdf.plot.trial_sync( run, cfg, j, sync0, synchints(j), syncs(j), ...
 				fullfile( plotdir, sprintf( 'run_%d_trial_%d_sync.png', i, j ) ) );
 		end
 
+			% clean up
+		delete( run );
+
+		logger.untab();
 	end
 
 		% done
