@@ -1,7 +1,7 @@
-function [sync0, syncs] = sync( run, cfg )
+function [sync0, synchints, syncs] = sync( run, cfg )
 % sync timings
 %
-% [sync0, syncs] = SYNC( run, cfg )
+% [sync0, synchints, syncs] = SYNC( run, cfg )
 %
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -9,6 +9,7 @@ function [sync0, syncs] = sync( run, cfg )
 %
 % OUTPUT
 % sync0 : sync start offset (scalar numeric)
+% synchints : offset hints (row numeric)
 % syncs : sync marker offsets (row numeric)
 %
 % SEE
@@ -53,7 +54,7 @@ function [sync0, syncs] = sync( run, cfg )
 	end
 
 		% normalize and smooth cue/distractor data (mahalanobis distance to noise)
-	cdts = abs( run.audiodata(:, 2) - noimu ) / noisigma;
+	cdts = (run.audiodata(:, 2) - noimu) / noisigma;
 	cdtslen = numel( cdts );
 
 	smooth = dsp.sec2smp( cfg.sync_smooth, run.audiorate );
@@ -64,7 +65,7 @@ function [sync0, syncs] = sync( run, cfg )
 
 	for i = 1:cdtslen
 		cdr = i:min( cdtslen, i + smooth );
-		if sum( cdts(cdr) ) >= cfg.sync_thresh
+		if sum( abs( cdts(cdr) ) ) >= cfg.sync_thresh
 			sync0 = i - 1;
 			break;
 		end
@@ -77,6 +78,7 @@ function [sync0, syncs] = sync( run, cfg )
 		% track sync markers
 	synclast = 0;
 
+	synchints = zeros( 1, ntrials );
 	syncs = NaN( 1, ntrials );
 
 	logger.progress()
@@ -85,7 +87,9 @@ function [sync0, syncs] = sync( run, cfg )
 
 			% set search range
 		sr = dsp.sec2smp( trial.cue + cfg.sync_range, run.audiorate ) + 1;
-		sr = sync0 + synclast + sr; % apply last sync offset as hint
+
+		synchints(i) = synclast; % use last sync offset as hint
+		sr = sync0 + synchints(i) + sr;
 
 		if any( isnan( sr ) )
 			continue;
@@ -98,12 +102,24 @@ function [sync0, syncs] = sync( run, cfg )
 		sr = sr(1):sr(2);
 		for j = sr
 			cdr = j:min( sr(end), j + smooth );
-			if sum( cdts(cdr) ) >= cfg.sync_thresh
+			tmp = cdts(cdr);
+			tmp = sum( abs( tmp - mean( tmp ) ) ); % center snippet (highpass)
+			if tmp >= cfg.sync_thresh
 				expected = sync0 + dsp.sec2smp( trial.cue, run.audiorate ) + 1;
 				synclast = j - 1 - expected;
 				syncs(i) = synclast;
 				break;
 			end
+		end
+
+			% lost sync
+		if isnan( syncs(i) )
+			logger.untab( 'LOST SYNC!' );
+			if i > 1
+				logger.log( 'last marker: %.3fs', ...
+					dsp.smp2sec( sync0 + syncs(i-1), run.audiorate ) + run.trials(i-1).cue );
+			end
+			break;
 		end
 
 		logger.progress( i, ntrials );
@@ -112,6 +128,7 @@ function [sync0, syncs] = sync( run, cfg )
 		% convert sync scale
 	sync0 = dsp.smp2sec( sync0, run.audiorate );
 	syncs = dsp.smp2sec( syncs, run.audiorate );
+	synchints = dsp.smp2sec( synchints, run.audiorate );
 
 	logger.log( 'sync start: %.1fms', 1000 * sync0 );
 	logger.log( 'sync markers: %d/%d', sum( ~isnan( syncs ) ), ntrials );

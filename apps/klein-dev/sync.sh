@@ -25,5 +25,9 @@ matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 41:45 ); exit();" &
 sleep 3
 matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 46:47 ); exit();" &
 
+	# DEBUG
+#IDS=5
+#matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, $IDS ); exit();" &
+
 wait
 

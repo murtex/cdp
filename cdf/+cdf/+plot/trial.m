@@ -36,7 +36,7 @@ function trial( run, cfg, id, plotfile )
 	resp_det = run.resps_det(id);
 	resp_lab = run.resps_lab(id);
 
-	tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0];
+	tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % trial range
 	if any( isnan( tr ) )
 		error( 'invalid value: tr' );
 	end

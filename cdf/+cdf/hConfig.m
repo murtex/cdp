@@ -5,7 +5,7 @@ classdef (Sealed = true) hConfig < handle
 	properties (Access = public)
 
 			% syncing
-		sync_range = [-0.075, 0.025]; % search range (row numeric)
+		sync_range = [-0.125, 0.025]; % search range (row numeric)
 		sync_smooth = 0.0005; % smoothing (scalar numeric)
 		sync_thresh = 3.0; % mahalanobis threshold (scalar numeric)
 

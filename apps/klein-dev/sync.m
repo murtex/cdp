@@ -60,7 +60,7 @@ function sync( indir, outdir, ids )
 		read_audio( run, run.audiofile, true );
 
 			% sync timings and plot offsets
-		[sync0, syncs] = cdf.sync( run, cfg );
+		[sync0, synchints, syncs] = cdf.sync( run, cfg );
 
 		cdf.plot.sync( run, sync0, syncs, fullfile( plotdir, sprintf( 'run_%d_sync.png', i ) ) );
 
@@ -73,7 +73,7 @@ function sync( indir, outdir, ids )
 
 		syncfile = fullfile( outdir, sprintf( 'syncs_%d.mat', i ) );
 		logger.log( 'write sync data (''%s'')...', syncfile );
-		save( syncfile, 'sync0', 'syncs' );
+		save( syncfile, 'sync0', 'synchints', 'syncs' );
 
 			% clean up
 		delete( run );
