@@ -5,8 +5,7 @@ classdef (Sealed = true) hResponse < handle
 	properties (Access = public)
 
 			% activity
-		startpos = NaN; % activity start position (scalar numeric)
-		stoppos = NaN; % activity stop position (scalar numeric)
+		range = [NaN, NaN]; % voice activity range (row numeric)
 
 	end
 

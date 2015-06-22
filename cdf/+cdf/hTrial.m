@@ -5,15 +5,17 @@ classdef (Sealed = true) hTrial < handle
 	properties (Access = public)
 
 			% general
-		cuepos = NaN; % cue position (scalar numeric)
-		distpos = NaN; % distractor position (scalar numeric)
+		range = [NaN, NaN]; % trial range (row numeric)
+
+		cue = NaN; % cue position (scalar numeric)
+		dist = NaN; % distractor position (scalar numeric)
 
 		cuelabel = ''; % cue label (row char)
 		distlabel = ''; % distractor label (row char)
 
 			% experimental features
-		distsoa = NaN; % stimulus-onset asynchrony (scalar numeric)
-		distvot = NaN; % voice-onset time (scalar numeric)
+		soa = NaN; % stimulus-onset asynchrony (scalar numeric)
+		vot = NaN; % distractor voice-onset time (scalar numeric)
 
 	end
 
