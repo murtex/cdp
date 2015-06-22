@@ -28,20 +28,16 @@ function activity( run, cfg )
 		resp = run.resps_det(i);
 
 			% reset activity
-		resp.startpos = NaN;
-		resp.stoppos = NaN;
+		resp.range = [NaN, NaN];
 
 			% set local noise and response signal
-		noir = dsp.sec2smp( [trial.cuepos, trial.distpos], run.audiorate ) + 1; % noise range
+		noir = dsp.sec2smp( [trial.cue, trial.dist], run.audiorate ) + [1, 0]; % noise range
 		if any( isnan( noir ) ) || any( noir < 1 ) || any( noir > run.audiosize(1) )
 			logger.progress( i, ntrials );
 			continue;
 		end
 
-		respr = [dsp.sec2smp( trial.cuepos, run.audiorate ) + 1, run.audiosize(1)]; % response range
-		if i < ntrials
-			respr(2) = dsp.sec2smp( run.trials(i+1).cuepos, run.audiorate );
-		end
+		respr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % response range
 		if any( isnan( respr ) ) || any( respr < 1 ) || any( respr > run.audiosize(1) )
 			logger.progress( i, ntrials );
 			continue;
@@ -72,13 +68,13 @@ function activity( run, cfg )
 
 		vastart = find( vaswaps == 1, 1 );
 		if ~isempty( vastart )
-			resp.startpos = trial.cuepos + dsp.fr2sec( vastart, frlen, cfg.vad_froverlap, run.audiorate );
+			resp.range(1) = trial.range(1) + dsp.fr2sec( vastart, frlen, cfg.vad_froverlap, run.audiorate );
 
 			vastop = find( vaswaps == -1, 1 ) - 1;
 			if ~isempty( vastop )
-				resp.stoppos = trial.cuepos + dsp.fr2sec( vastop, frlen, cfg.vad_froverlap, run.audiorate );
+				resp.range(2) = trial.range(1) + dsp.fr2sec( vastop, frlen, cfg.vad_froverlap, run.audiorate );
 			else
-				resp.stoppos = dsp.smp2sec( respr(2), run.audiorate ); % fallback: stop with trial end
+				resp.range(2) = trial.range(2); % fallback: stop with trial end
 			end
 		end
 
@@ -86,7 +82,8 @@ function activity( run, cfg )
 	end
 
 		% log detections
-	logger.log( 'activities: %d/%d', sum( ~isnan( [run.resps_det.startpos] ) ), ntrials );
+	ndets = sum( ~isnan( diff( cat( 1, run.resps_det.range ), 1, 2 ) ) );
+	logger.log( 'activities: %d/%d', ndets, ntrials );
 
 	logger.untab();
 end
