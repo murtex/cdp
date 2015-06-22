@@ -84,14 +84,18 @@ function features( run, cfg, outdir, labeled )
 		end
 		respft(respft < eps) = eps;
 
+			% normalization (power spectral density)
+		for j = 1:m
+			respft(j, :) = respft(j, :) / sum( respft(j, :) );
+		end
+
 			% set prime features
 		respfeat = NaN( size( respft, 1 ), 0 ); % pre-allocation
 
-		respfeat(:, end+1) = sum( repmat( respfreqs, size( respft, 1 ), 1 ) .* respft, 2 ) ./ sum( respft, 2 ); % spectral centroid
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band1 ); % band #1 power
-		respfeat(:, end+1) = pow2db( sum( brespft, 2 ) );
-		[brespft, ~] = sta.banding( respft, respfreqs, cfg.feat_band2 ); % band #2 power
-		respfeat(:, end+1) = pow2db( sum( brespft, 2 ) );
+		respfeat(:, end+1) = l1( respft, respfreqs );
+		respfeat(:, end+1) = l2( respft, respfreqs );
+		respfeat(:, end+1) = l3( respft, respfreqs );
+		respfeat(:, end+1) = l4( respft, respfreqs );
 
 		respfeat = sta.unframe( respfeat, frame ); % smoothing
 		%respfeat = zscore( respfeat, 1, 1 ); % standardization
@@ -129,5 +133,41 @@ function features( run, cfg, outdir, labeled )
 	logger.log( 'subsequences: %d', subs );
 
 	logger.untab();
+end
+
+	% prime feature generation
+function ret = l1( ft, freqs ) % center of mass
+	nfrs = size( ft, 1 );
+	ret = zeros( nfrs, 1 );
+	for i = 1:nfrs
+		ret(i) = sum( freqs .* ft(i, :) );
+	end
+end
+
+function ret = l2( ft, freqs ) % variance
+	nfrs = size( ft, 1 );
+	ret = zeros( nfrs, 1 );
+	tmp = l1( ft, freqs );
+	for i = 1:nfrs
+		ret(i) = sum( (freqs - tmp(i)).^2 .* ft(i, :) );
+	end
+end
+
+function ret = l3( ft, freqs ) % skewness
+	nfrs = size( ft, 1 );
+	ret = zeros( nfrs, 1 );
+	tmp = l1( ft, freqs );
+	for i = 1:nfrs
+		ret(i) = sum( (freqs - tmp(i)).^3 .* ft(i, :) );
+	end
+end
+
+function ret = l4( ft, freqs ) % curtosis
+	nfrs = size( ft, 1 );
+	ret = zeros( nfrs, 1 );
+	tmp = l1( ft, freqs );
+	for i = 1:nfrs
+		ret(i) = sum( (freqs - tmp(i)).^4 .* ft(i, :) );
+	end
 end
 

@@ -6,7 +6,7 @@ OUTDIR='../../data/klein/train/'
 
 	# spread workload
 IDS='setdiff( 1:47, 4 )'
-NTREES=1
+NTREES=25
 RATIO=0.8
 
 matlab -nosplash -nodesktop -r "train( '$INDIR', '$OUTDIR', $IDS, 1, $NTREES, $RATIO ); exit();" &
