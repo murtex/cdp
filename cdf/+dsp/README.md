@@ -1,3 +1,0 @@
-Digital signal processing
-=========================
-

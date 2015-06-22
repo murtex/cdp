@@ -1,3 +1,0 @@
-Cue-distractor framework
-========================
-

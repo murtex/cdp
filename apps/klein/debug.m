@@ -1,12 +1,14 @@
-function debug( indir, outdir, ids )
-% debug data
+function debug( indir, outdir, ids, seed, ntrials )
+% plot debuggings
 %
-% DEBUG( indir, outdir, ids )
+% DEBUG( indir, outdir, ids, seed, ntrials )
 %
 % INPUT
 % indir : input directory (row char)
-% outdir : output directory (row char)
+% outdir : plot directory (row char)
 % ids : subject identifiers (row numeric)
+% seed : randomization seed (scalar numeric)
+% ntrials : number of trials (scalar numeric)
 
 		% safeguard
 	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
@@ -21,66 +23,93 @@ function debug( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-		% include cue-distractor package
-	addpath( '../../cdp/' );
+	if nargin < 4 || ~isscalar( seed ) || ~isnumeric( seed )
+		error( 'invalid argument: seed' );
+	end
 
-		% prepare for output
+	if nargin < 5 || ~isscalar( ntrials ) || ~isnumeric( ntrials )
+		error( 'invalid argument: ntrials' );
+	end
+
+		% prepare directories
+	if exist( indir, 'dir' ) ~= 7
+		error( 'invalid argument: indir' );
+	end
+
 	if exist( outdir, 'dir' ) ~= 7
 		mkdir( outdir );
 	end
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
-	logger.tab( 'debug data...' );
+		% initialize framework
+	addpath( '../../cdf/' );
 
-		% configure framework
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'debug_%d-%d.log', min( ids ), max( ids ) ) ) );
+	logger.tab( 'plot debuggings...' );
+
 	cfg = cdf.hConfig(); % use defaults
 
-		% proceed subjects
+		% proceed subject identifiers
 	for i = ids
 		logger.tab( 'subject: %d', i );
 
-			% read cdf data
-		infile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
-
-		if exist( infile, 'file' ) ~= 2 % skip non-existing
-			logger.untab( 'skipping' );
+			% read input data
+		cdffile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
+		if exist( cdffile, 'file' ) ~= 2
+			logger.untab( 'skipping...' );
 			continue;
 		end
 
-		logger.log( 'read cdf ''%s''...', infile );
-		load( infile, '-mat', 'run' );
+		logger.log( 'read cdf data (''%s'')...', cdffile );
+		load( cdffile, 'run' );
 
-		read_audio( run, run.audiofile, false );
+		read_audio( run, run.audiofile, true );
 
-			% plot random trials
-		plotdir = fullfile( outdir, sprintf( 'run_%d', i ) ); % prepare for output
+			% prepare plot directory
+		plotdir = fullfile( outdir, sprintf( 'run_%d_plot', i ) );
 		if exist( plotdir, 'dir' ) == 7
 			rmdir( plotdir, 's' );
 		end
 		mkdir( plotdir );
 
-		trials = [run.trials.detected];
-		lens = diff( cat( 1, trials.range ), 1, 2 );
-		trials = run.trials(~isnan( lens ));
-		trials = randsample( trials, min( numel( trials ), 20 ) ); % 20 trials
+			% sample random trials
+		rs = rng(); % push randomness
+		rng( seed, 'twister' );
 
-		n = numel( trials );
-		for j = 1:n
-			cdf.plot.trial_range( run, cfg, trials(j), [...
-				min( trials(j).detected.range(1), trials(j).labeled.range(1) ), ...
-				max( trials(j).detected.range(2), trials(j).labeled.range(2) )], ...
-				trials(j).detected.range(1), ...
-				fullfile( plotdir, sprintf( 'trial_%d.png', trials(j).id ) ) );
+		trialids = 1:numel( run.trials );
+		invalids = [];
+
+		for j = trialids % skip invalids
+			trial = run.trials(j);
+			resp_det = run.resps_det(j);
+			resp_lab = run.resps_lab(j);
+
+			if any( isnan( trial.range ) ) || any( isnan( resp_det.range ) ) || any( isnan( resp_lab.range ) )
+				invalids(end+1) = j;
+			end
 		end
 
-			% cleanup
+		trialids(invalids) = [];
+
+		if numel( trialids ) > ntrials && numel( trialids ) > 1 % sample trials
+			trialids = randsample( trialids, ntrials );
+		end
+
+		rng( rs ); % pop randomness
+
+			% plot trials
+		for j = trialids
+			cdf.plot.trial( run, cfg, j, fullfile( plotdir, sprintf( 'run_%d_trial_%d.png', i, j ) ) );
+			%cdf.plot.trial_activity( run, cfg, j, fullfile( plotdir, sprintf( 'run_%d_trial_%d_activity.png', i, j ) ) );
+		end
+
+			% clean up
 		delete( run );
 
 		logger.untab();
 	end
 
-		% cleanup
-	logger.untab( 'done.' ); % stop logging
+		% done
+	logger.untab( 'done' );
 
 end
 

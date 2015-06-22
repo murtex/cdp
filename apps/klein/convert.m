@@ -21,52 +21,55 @@ function convert( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-		% include cue-distractor package
-	addpath( '../../cdp/' );
+		% prepare directories
+	if exist( indir, 'dir' ) ~= 7
+		error( 'invalid argument: indir' );
+	end
 
-		% prepare for output
 	if exist( outdir, 'dir' ) ~= 7
 		mkdir( outdir );
 	end
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
+		% initialize framework
+	addpath( '../../cdf/' );
+
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'convert_%d-%d.log', min( ids ), max( ids ) ) ) );
 	logger.tab( 'convert raw data...' );
 
-		% proceed subjects
+		% proceed subject identifiers
 	for i = ids
 		logger.tab( 'subject: %d', i );
 
-			% read raw data
+			% prepare raw filenames
 		audiofile = fullfile( indir, sprintf( 'participant_%d_1.wav', i ) );
-		logfile = fullfile( indir, sprintf( 'participant_%d.txt', i ) );
+		trialfile = fullfile( indir, sprintf( 'participant_%d.txt', i ) );
 		labelfile = fullfile( indir, sprintf( 'participant_%d.xlsx', i ) );
 
-		if exist( audiofile, 'file' ) ~= 2 || exist( logfile, 'file' ) ~= 2 || exist( labelfile, 'file' ) ~= 2
-			logger.untab( 'skipping' ); % skip partial data
+		if exist( audiofile, 'file' ) ~= 2 || exist( trialfile, 'file' ) ~= 2 || exist( labelfile, 'file' ) ~= 2
+			logger.untab( 'skipping...' );
 			continue;
 		end
 
+			% read raw data
 		run = cdf.hRun();
 
-		read_audio( run, audiofile, true );
-		read_trials( run, logfile );
+		read_audio( run, audiofile, false );
+		read_trials( run, trialfile );
 		read_labels( run, labelfile );
 
 			% write cdf data
-		outfile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
-		logger.log( 'write cdf ''%s''...', outfile );
-		save( outfile, 'run', '-v7' );
+		cdffile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
+		logger.log( 'write cdf data (''%s'')...', cdffile );
+		save( cdffile, 'run' );
 
-			% cleanup
+			% clean up
 		delete( run );
 
 		logger.untab();
 	end
 
-		% cleanup
-	logger.log( 'peak memory: %.1fGiB', logger.peakmem() / (1024^3) );
-
-	logger.untab( 'done.' ); % stop logging
+		% done
+	logger.untab( 'done' );
 
 end
 

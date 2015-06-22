@@ -1,42 +1,40 @@
-function read_trials( run, logfile )
+function read_trials( run, trialfile )
 % read trial data
 %
-% READ_TRIALS( run, logfile )
+% READ_TRIALS( run, trialfile )
 %
 % INPUT
-% run : run (scalar object)
-% logfile : log logfile (row char)
+% run : cue-distractor run (scalar object)
+% trialfile : trial filename (row char)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
 		error( 'invalid argument: run' );
 	end
 
-	if nargin < 2 || ~isrow( logfile ) || ~ischar( logfile ) || exist( logfile, 'file' ) ~= 2
-		error( 'invalid argument: logfile' );
+	if nargin < 2 || ~isrow( trialfile ) || ~ischar( trialfile )
+		error( 'invalid argument: trialfile' );
 	end
 
 	logger = xis.hLogger.instance();
-	logger.tab( 'read trials ''%s''...', logfile );
-
-		% read logfile content
-	f = fopen( logfile );
+	logger.tab( 'read trial data (''%s'')...', trialfile );
+	
+		% read file content
+	f = fopen( trialfile );
 	fdata = textscan( f, ...
-		'%n %n %s %s %s %s %n %n %n %n %s %s %s %n %*[^\n]', ... % 14 fields (some data have more)
+		'%n %n %s %s %s %s %n %n %n %n %s %s %s %n %*[^\n]', ... % 14 fields
 		'Delimiter', ',' ); % comma separated
 	fclose( f );
 
 	if size( fdata, 1 ) ~= 1 || size( fdata, 2 ) ~= 14 % single block, 14 fields
 		logger.untab();
-		error( 'invalid argument: logfile' );
+		error( 'invalid value: fdata' );
 	end
 
-	n = numel( fdata{1} );
-	logger.log( 'trials: %d', n );
+	ntrials = numel( fdata{1} );
+	logger.log( 'trials: %d', ntrials );
 
 		% content parsing
-	blocksize = max( fdata{8} );
-
 	function cl = cuelabel( symbol, hashlabel )
 		switch symbol
 			case '##'
@@ -73,40 +71,31 @@ function read_trials( run, logfile )
 		end
 	end
 
-		% setup run and trials
-	run.id = fdata{1}(1);
+		% setup trials
+	run.trials(ntrials) = cdf.hTrial(); % pre-allocation
+	run.resps_det(ntrials) = cdf.hResponse();
+	run.resps_lab(ntrials) = cdf.hResponse();
 
-	run.trials(n) = cdf.hTrial(); % pre-allocation
-
-	for i = 1:n
+	for i = ntrials:-1:1
 		trial = run.trials(i);
 
-		trial.id = blocksize*(fdata{7}(i)-1) + fdata{8}(i);
+			% experimental features
+		trial.soa = fdata{14}(i);
+		trial.vot = distvot( fdata{13}{i} );
 
-			% labels
+			% general
+		trial.cue = max( fdata{9}(i), fdata{10}(i) ); % cue/distractor fields have swapped during experiments
+		trial.dist = trial.cue + trial.soa;
+
+		trial.range(1) = trial.cue;
+		if i < ntrials
+			trial.range(2) = run.trials(i+1).cue;
+		else
+			trial.range(2) = dsp.smp2sec( run.audiosize(1), run.audiorate );
+		end
+
 		trial.cuelabel = cuelabel( fdata{11}{i}, fdata{6}{i} );
 		trial.distlabel = distlabel( fdata{12}{i}, fdata{13}{i} );
-
-			% cue/distractor
-		trial.cue = 1 + sta.sec2smp( max( fdata{9}(i), fdata{10}(i) ), run.audiorate ); % (for some data order has switched)
-		trial.soa = sta.sec2smp( fdata{14}(i), run.audiorate );
-
-		trial.distbo = 1 + trial.cue + trial.soa;
-		trial.distvo = 1 + trial.distbo + sta.msec2smp( distvot( fdata{13}{i} ), run.audiorate );
-
-		% range, TODO: use next first cue as range end?
-		trial.range(1) = trial.cue;
-		if i < n
-			nextcue = 1 + sta.sec2smp( max( fdata{9}(i+1), fdata{10}(i+1) ), run.audiorate ); % (for some data order has switched)
-			trial.range(2) = nextcue - 1; % TODO: trial overlap?
-		else
-			trial.range(2) = run.audiolen; % last trial ends with audio data, TODO: possibly gets invalidated by syncing
-		end
-
-		maxlen = sta.sec2smp( 5, run.audiorate ); % limit length to 5s (between blocks)
-		if diff( trial.range )+1 > maxlen
-			trial.range(2) = trial.range(1) + maxlen-1;
-		end
 
 	end
 

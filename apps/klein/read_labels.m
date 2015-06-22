@@ -4,7 +4,7 @@ function read_labels( run, labelfile )
 % READ_LABELS( run, labelfile )
 %
 % INPUT
-% run : run (scalar object)
+% run : cue-distractor run (scalar object)
 % labelfile : label filename (row char)
 
 		% safeguard
@@ -12,53 +12,46 @@ function read_labels( run, labelfile )
 		error( 'invalid argument: run' );
 	end
 
-	if nargin < 2 || ~isrow( labelfile ) || ~ischar( labelfile ) || exist( labelfile, 'file' ) ~= 2
+	if nargin < 2 || ~isrow( labelfile ) || ~ischar( labelfile )
 		error( 'invalid argument: labelfile' );
 	end
 
 	logger = xis.hLogger.instance();
-	logger.tab( 'read labels ''%s''...', labelfile );
+	logger.tab( 'read label data (''%s'')...', labelfile );
 
-		% read labelfile content
-	n = numel( run.trials );
+		% read file content
+	ntrials = numel( run.trials );
 
 	[~, ~, fdata] = xlsread( labelfile );
 	fdata(1, :) = []; % remove header
 
-	if size( fdata, 1 ) ~= n || size( fdata, 2 ) ~= 14 % n trials, 14 fields
+	if size( fdata, 1 ) ~= ntrials || size( fdata, 2 ) ~= 14
 		logger.untab();
-		error( 'invalid argument: labelfile' );
+		error( 'invalid value: fdata' );
 	end
 
-		% setup trials
-	valids = 0;
+		% setup responses
+	for i = 1:ntrials
+		trial = run.trials(i);
+		resp = run.resps_lab(i);
 
-	for i = 1:n
-
-		rl = fdata{i, 7}; % skip unlabeled
-		if strcmp( rl, 'NA' )
+			% skip unlabeled/unreasonable data
+		resplabel = fdata{i, 7};
+		if strcmp( resplabel, 'NA' )
 			continue;
 		end
 
-		if fdata{i, 8} > 10 || fdata{i, 9} > 1 || fdata{i, 10} > 10 || ... % skip unreasonables (typos)
+		if fdata{i, 8} > 10 || fdata{i, 9} > 1 || fdata{i, 10} > 10 || ...
 				fdata{i, 8} < 0 || fdata{i, 9} < 0 || fdata{i, 10} < 0
 			% reaction time, voice-onset time, vowel length in seconds
 			continue;
 		end
 
-			% response
-		run.trials(i).labeled.label = rl;
+			% activity
+		resp.range(1) = trial.cue + fdata{i, 8};
+		resp.range(2) = resp.range(1) + fdata{i, 9} + fdata{i, 10};
 
-		run.trials(i).labeled.bo = run.trials(i).cue + sta.sec2smp( fdata{i, 8}, run.audiorate );
-		run.trials(i).labeled.vo = run.trials(i).labeled.bo + sta.sec2smp( fdata{i, 9}, run.audiorate );
-		run.trials(i).labeled.vr = run.trials(i).labeled.vo + sta.sec2smp( fdata{i, 10}, run.audiorate );
-
-		run.trials(i).labeled.range = [run.trials(i).labeled.bo, run.trials(i).labeled.vr];
-
-		valids = valids + 1;
 	end
-
-	logger.log( 'trials: %d/%d', valids, n );
 
 	logger.untab();
 end

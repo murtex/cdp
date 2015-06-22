@@ -1,52 +1,48 @@
-function read_audio( run, audiofile, info_only )
+function read_audio( run, audiofile, readdata )
 % read audio data
 %
-% READ_AUDIO( run, audiofile )
+% READ_AUDIO( run, audiofile, readdata )
 %
 % INPUT
-% run : run (scalar object)
+% run : cue-distractor run (scalar object)
 % audiofile : audio filename (row char)
-% info_only : read audio info only (scalar logical)
+% readdata : read data flag (scalar logical)
+%
+% TODO
+% wavread is deprecated, use audioread!
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
 		error( 'invalid argument: run' );
 	end
 
-	if nargin < 2 || ~isrow( audiofile ) || ~ischar( audiofile ) || exist( audiofile, 'file' ) ~= 2
+	if nargin < 2 || ~isrow( audiofile ) || ~ischar( audiofile )
 		error( 'invalid argument: audiofile' );
 	end
 
-	if nargin < 3 || ~isscalar( info_only ) || ~islogical( info_only )
-		error( 'invalid argument: info_only' );
+	if nargin < 3 || ~isscalar( readdata ) || ~islogical( readdata )
+		error( 'invalid argument: readdata' );
 	end
 
 	logger = xis.hLogger.instance();
-	logger.tab( 'read audio ''%s''...', audiofile );
+	logger.tab( 'read audio data (''%s'')...', audiofile );
 
-		% read audio data/info
-	ws = warning( 'query' ); % TODO: wavread is deprecated for >= R2012b
-	warning( 'off' );
+	ws = warning(); % disable warnings
+	warning( 'off', 'all' );
 
+		% read audio info
 	run.audiofile = audiofile;
 
-	if info_only
-		[~, rate] = wavread( audiofile, 1 );
-		len = wavread( audiofile, 'size' );
+	run.audiosize = wavread( audiofile, 'size' );
+	[~, run.audiorate, ~] = wavread( audiofile, 0 );
 
-		run.audiodata = [];
-		run.audiolen = len(1);
-		run.audiorate = rate;	
-	else
-		[run.audiodata, run.audiorate] = wavread( audiofile, 'double' );
-		run.audiolen = size( run.audiodata, 1 );
+		% read audio data
+	if readdata
+		run.audiodata = wavread( audiofile, 'double' );
 	end
 
-	warning( ws );
-
-	logger.log( 'rate: %dHz', run.audiorate );
-	logger.log( 'length: %.1fs', sta.smp2sec( run.audiolen, run.audiorate ) );
-
+	warning( ws ); % (re-)enable warnings
+	
 	logger.untab();
 end
 

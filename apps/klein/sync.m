@@ -21,65 +21,68 @@ function sync( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-		% include cue-distractor package
-	addpath( '../../cdp/' );
+		% prepare directories
+	if exist( indir, 'dir' ) ~= 7
+		error( 'invalid argument: indir' );
+	end
 
-		% prepare for output
 	if exist( outdir, 'dir' ) ~= 7
 		mkdir( outdir );
 	end
 
-	plotdir = fullfile( outdir, 'plot' );
+	plotdir = fullfile( outdir, 'plot/' );
 	if exist( plotdir, 'dir' ) ~= 7
 		mkdir( plotdir );
 	end
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
+		% initialize framework
+	addpath( '../../cdf/' );
+
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'sync_%d-%d.log', min( ids ), max( ids ) ) ) );
 	logger.tab( 'sync timings...' );
 
-		% configure framework
 	cfg = cdf.hConfig(); % use defaults
 
-		% proceed subjects
+		% proceed subject identifiers
 	for i = ids
 		logger.tab( 'subject: %d', i );
 
-			% read cdf data
-		infile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
-
-		if exist( infile, 'file' ) ~= 2 % skip non-existing
-			logger.untab( 'skipping' );
+			% read input data
+		cdffile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
+		if exist( cdffile, 'file' ) ~= 2
+			logger.untab( 'skipping...' );
 			continue;
 		end
 
-		logger.log( 'read cdf ''%s''...', infile );
-		load( infile, '-mat', 'run' );
+		logger.log( 'read cdf data (''%s'')...', cdffile );
+		load( cdffile, 'run' );
 
-		read_audio( run, run.audiofile, false );
+		read_audio( run, run.audiofile, true );
 
-			% sync timings
-		offs = cdf.sync( run, cfg, false );
+			% sync timings and plot offsets
+		[sync0, synchints, syncs] = cdf.sync( run, cfg );
 
-			% plot sync offsets
-		cdf.plot.sync( run, offs, fullfile( plotdir, sprintf( 'run_%d_sync.png', i ) ) );
+		cdf.plot.sync( run, sync0, syncs, fullfile( plotdir, sprintf( 'run_%d_sync.png', i ) ) );
 
-			% write cdf data
-		run.audiodata = []; % do not write audio data
+			% write output data
+		run.audiodata = []; % do not write redundant audio data
 
-		outfile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
-		logger.log( 'write cdf ''%s''...', outfile );
-		save( outfile, 'run', '-v7' );
+		cdffile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
+		logger.log( 'write cdf data (''%s'')...', cdffile );
+		save( cdffile, 'run' );
 
-			% cleanup
+		syncfile = fullfile( outdir, sprintf( 'syncs_%d.mat', i ) );
+		logger.log( 'write sync data (''%s'')...', syncfile );
+		save( syncfile, 'sync0', 'synchints', 'syncs' );
+
+			% clean up
 		delete( run );
 
 		logger.untab();
 	end
 
-		% cleanup
-	logger.log( 'peak memory: %.1fGiB', logger.peakmem() / (1024^3) );
-
-	logger.untab( 'done.' ); % stop logging
+		% done
+	logger.untab( 'done' );
 
 end
 
