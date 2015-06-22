@@ -1,13 +1,14 @@
-function debug( indir, outdir, ids, seed )
+function debug( indir, outdir, ids, seed, ntrials )
 % plot debuggings
 %
-% DEBUG( indir, outdir, ids, seed )
+% DEBUG( indir, outdir, ids, seed, ntrials )
 %
 % INPUT
 % indir : input directory (row char)
 % outdir : plot directory (row char)
 % ids : subject identifiers (row numeric)
 % seed : randomization seed (scalar numeric)
+% ntrials : number of trials (scalar numeric)
 
 		% safeguard
 	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
@@ -24,6 +25,10 @@ function debug( indir, outdir, ids, seed )
 
 	if nargin < 4 || ~isscalar( seed ) || ~isnumeric( seed )
 		error( 'invalid argument: seed' );
+	end
+
+	if nargin < 5 || ~isscalar( ntrials ) || ~isnumeric( ntrials )
+		error( 'invalid argument: ntrials' );
 	end
 
 		% prepare directories
@@ -61,27 +66,41 @@ function debug( indir, outdir, ids, seed )
 
 			% prepare plot directory
 		plotdir = fullfile( outdir, sprintf( 'run_%d_plot', i ) );
-		if exist( plotdir, 'dir' ) ~= 7
-			mkdir( plotdir );
+		if exist( plotdir, 'dir' ) == 7
+			rmdir( plotdir, 's' );
 		end
+		mkdir( plotdir );
 
-			% plot random trials
-		nsrctrials = numel( run.trials );
-		ndsttrials = 20; % number of random trials
-
+			% sample random trials
 		rs = rng(); % push randomness
 		rng( seed, 'twister' );
 
-		trialids = 1:nsrctrials; % sample trials
-		if nsrctrials > 1
-			trialids = sort( randsample( trialids, min( nsrctrials, ndsttrials ) ) );
+		trialids = 1:numel( run.trials );
+		invalids = [];
+
+		for j = trialids % skip invalids
+			trial = run.trials(j);
+			resp_det = run.resps_det(j);
+			resp_lab = run.resps_lab(j);
+
+			if any( isnan( trial.range ) ) || any( isnan( resp_det.range ) ) || any( isnan( resp_lab.range ) )
+				invalids(end+1) = j;
+			end
 		end
 
-		for j = trialids % plot trials
-			cdf.plot.trial( run, cfg, j, fullfile( plotdir, sprintf( 'run_%d_trial_%d.png', i, j ) ) );
+		trialids(invalids) = [];
+
+		if numel( trialids ) > ntrials && numel( trialids ) > 1 % sample trials
+			trialids = randsample( trialids, ntrials );
 		end
 
 		rng( rs ); % pop randomness
+
+			% plot trials
+		for j = trialids
+			cdf.plot.trial( run, cfg, j, fullfile( plotdir, sprintf( 'run_%d_trial_%d.png', i, j ) ) );
+			%cdf.plot.trial_activity( run, cfg, j, fullfile( plotdir, sprintf( 'run_%d_trial_%d_activity.png', i, j ) ) );
+		end
 
 			% clean up
 		delete( run );
