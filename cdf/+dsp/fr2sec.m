@@ -13,7 +13,7 @@ function sec = fr2sec( fr, length, overlap, rate )
 % sec : position/seconds (numeric)
 
 		% safeguard
-	if nargin < 1 || ~isscalar( fr ) || ~isnumeric( fr )
+	if nargin < 1 || ~isnumeric( fr )
 		error( 'invalid argument: fr' );
 	end
 
