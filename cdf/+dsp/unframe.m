@@ -1,19 +1,19 @@
-function uft = unframe( ft, length, overlap )
-% unframe short-time fourier transform
+function ufr = unframe( fr, length, overlap )
+% unframe short-time frames
 % 
-% uft = UNFRAME( ft, length, overlap )
+% ufr = UNFRAME( fr, length, overlap )
 %
 % INPUT
-% ft : signal frames fourier transform (matrix numeric)
+% fr : signal frames (matrix numeric)
 % length : frame length (scalar numeric)
 % overlap : frame overlap (scalar numeric)
 %
 % OUTPUT
-% uft : unframed fourier transform (matrix numeric)
+% ufr : unframed frames (matrix numeric)
 
 		% safeguard
-	if nargin < 1 || ~ismatrix( ft ) || ~isnumeric( ft )
-		error( 'invalid argument: ft' );
+	if nargin < 1 || ~ismatrix( fr ) || ~isnumeric( fr ) || any( size( fr ) == 0 )
+		error( 'invalid argument: fr' );
 	end
 
 	if nargin < 2 || ~isscalar( length ) || ~isnumeric( length ) || length < 1
@@ -25,29 +25,29 @@ function uft = unframe( ft, length, overlap )
 	end
 
 		% accumulate expanded frames
-	nfreqs = size( ft, 1 );
-	nfrs = size( ft, 2 );
+	nvals = size( fr, 1 );
+	nfrs = size( fr, 2 );
 
 	overlap = floor( overlap * length );
 	stride = length - overlap;
 
-	uft = zeros( nfreqs, (nfrs-1)*stride + length ); % pre-allocation
-	accs = zeros( 1, size( uft, 2 ) );
+	ufr = zeros( nvals, (nfrs-1)*stride + length ); % pre-allocation
+	accs = zeros( 1, size( ufr, 2 ) );
 
 	frstarts = (0:nfrs-1)*stride + 1;
 	frstops = frstarts + length - 1;
 
 	for i = 1:nfrs
 		for j = frstarts(i):frstops(i)
-			uft(:, j) = uft(:, j) + ft(:, i);
+			ufr(:, j) = ufr(:, j) + fr(:, i);
 			accs(j) = accs(j) + 1;
 		end
 	end
 
 		% average accumulation
-	n = size( uft, 2 );
+	n = size( ufr, 2 );
 	for i = 1:n
-		uft(:, i) = uft(:, i) / accs(i);
+		ufr(:, i) = ufr(:, i) / accs(i);
 	end
 
 end
