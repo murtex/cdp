@@ -17,11 +17,6 @@ classdef (Sealed = true) hConfig < handle
 		vad_adjacency = 12; % long-term adjacency (scalar numeric)
 		vad_hangover = 4; % activity hangover (scalar numeric)
 
-			% debugging
-		dbg_frlength = 0.025; % short-time length (scalar numeric)
-		dbg_froverlap = 15/25; % short-time overlap (scalar numeric)
-		dbg_frwindow = @hann; % short-time window function (scalar object)
-
 	end
 
 end
