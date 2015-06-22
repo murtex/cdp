@@ -79,16 +79,23 @@ function read_trials( run, trialfile )
 	for i = ntrials:-1:1
 		trial = run.trials(i);
 
+			% experimental features
+		trial.soa = fdata{14}(i);
+		trial.vot = distvot( fdata{13}{i} );
+
 			% general
-		trial.cuepos = max( fdata{9}(i), fdata{10}(i) ); % cue/distractor fields have swapped during experiments
-		trial.distpos = max( fdata{9}(i), fdata{10}(i) ) + fdata{14}(i);
+		trial.cue = max( fdata{9}(i), fdata{10}(i) ); % cue/distractor fields have swapped during experiments
+		trial.dist = trial.cue + trial.soa;
+
+		trial.range(1) = trial.cue;
+		if i < ntrials
+			trial.range(2) = run.trials(i+1).cue;
+		else
+			trial.range(2) = dsp.smp2sec( run.audiosize(1), run.audiorate );
+		end
 
 		trial.cuelabel = cuelabel( fdata{11}{i}, fdata{6}{i} );
 		trial.distlabel = distlabel( fdata{12}{i}, fdata{13}{i} );
-
-			% experimental features
-		trial.distsoa = fdata{14}(i);
-		trial.distvot = distvot( fdata{13}{i} );
 
 	end
 

@@ -35,7 +35,7 @@ function read_labels( run, labelfile )
 		trial = run.trials(i);
 		resp = run.resps_lab(i);
 
-			% skip unlabeled/unreasonable
+			% skip unlabeled/unreasonable data
 		resplabel = fdata{i, 7};
 		if strcmp( resplabel, 'NA' )
 			continue;
@@ -48,8 +48,8 @@ function read_labels( run, labelfile )
 		end
 
 			% activity
-		resp.startpos = trial.cuepos + fdata{i, 8};
-		resp.stoppos = resp.startpos + fdata{i, 9} + fdata{i, 10};
+		resp.range(1) = trial.cue + fdata{i, 8};
+		resp.range(2) = resp.range(1) + fdata{i, 9} + fdata{i, 10};
 
 	end
 
