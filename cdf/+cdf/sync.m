@@ -32,25 +32,27 @@ function [sync0, syncs] = sync( run, cfg )
 
 	ntrials = numel( run.trials );
 	for i = 1:ntrials
+		trial = run.trials(i);
 
-			% set search range statistics
-		sr = dsp.sec2smp( run.trials(i).cuepos + cfg.sync_range, run.audiorate ) + 1;
-
-		if any( isnan( sr ) ) || any( sr < 1 ) || any( sr > run.audiosize(1) )
+			% set search range
+		sr = dsp.sec2smp( trial.cue + cfg.sync_range, run.audiorate ) + [1, 0];
+		if any( isnan( sr ) ) || any( sr < 1 ) || any( sr > run.audiosize(1) ) || isempty( sr(1):sr(2) )
 			continue;
 		end
 
+			% set statistics
 		noimu = mean( run.audiodata(sr(1):sr(2), 2) );
 		noisigma = std( run.audiodata(sr(1):sr(2), 2), 1 );
 
-		break; % got statistics
+		break;
+
 	end
 
 	if isnan( noimu ) || isnan( noisigma )
 		error( 'invalid value: noimu | noisigma' );
 	end
 
-		% normalize and smooth cue/distractor (mahalanobis distance to noise)
+		% normalize and smooth cue/distractor data (mahalanobis distance to noise)
 	cdts = abs( run.audiodata(:, 2) - noimu ) / noisigma;
 	cdtslen = numel( cdts );
 
@@ -79,21 +81,25 @@ function [sync0, syncs] = sync( run, cfg )
 
 	logger.progress()
 	for i = 1:ntrials
+		trial = run.trials(i);
 
 			% set search range
-		sr = dsp.sec2smp( run.trials(i).cuepos + cfg.sync_range, run.audiorate ) + 1;
+		sr = dsp.sec2smp( trial.cue + cfg.sync_range, run.audiorate ) + 1;
 		sr = sync0 + synclast + sr; % apply last sync offset as hint
 
-		if any( isnan( sr ) ) || any( sr < 1 ) || any( sr > run.audiosize(1) )
+		if any( isnan( sr ) )
 			continue;
 		end
+
+		sr(sr < 1) = 1; % clamp range
+		sr(sr > run.audiosize(1)) = run.audiosize(1);
 
 			% track marker
 		sr = sr(1):sr(2);
 		for j = sr
 			cdr = j:min( sr(end), j + smooth );
 			if sum( cdts(cdr) ) >= cfg.sync_thresh
-				expected = sync0 + dsp.sec2smp( run.trials(i).cuepos, run.audiorate ) + 1;
+				expected = sync0 + dsp.sec2smp( trial.cue, run.audiorate ) + 1;
 				synclast = j - 1 - expected;
 				syncs(i) = synclast;
 				break;
@@ -111,12 +117,18 @@ function [sync0, syncs] = sync( run, cfg )
 	logger.log( 'sync markers: %d/%d', sum( ~isnan( syncs ) ), ntrials );
 
 		% apply sync offsets
+	maxt = dsp.smp2sec( run.audiosize(1), run.audiorate );
+
 	for i = 1:ntrials
 		trial = run.trials(i);
 
 			% general
-		trial.cuepos = trial.cuepos + sync0 + syncs(i);
-		trial.distpos = trial.distpos + sync0 + syncs(i);
+		trial.range = trial.range + sync0 + syncs(i);
+		trial.range(trial.range < 0) = 0;
+		trial.range(trial.range > maxt) = maxt;
+
+		trial.cue = trial.cue + sync0 + syncs(i);
+		trial.dist = trial.dist + sync0 + syncs(i);
 
 	end
 
