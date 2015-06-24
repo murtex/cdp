@@ -87,9 +87,9 @@ function read_trials( run, trialfile )
 		trial.cue = max( fdata{9}(i), fdata{10}(i) ); % cue/distractor fields have swapped during experiments
 		trial.dist = trial.cue + trial.soa;
 
-		trial.range(1) = trial.cue;
+		trial.range(1) = min( fdata{9}(i), fdata{10}(i) ); % cue/distractor fields have swapped during experiments
 		if i < ntrials
-			trial.range(2) = run.trials(i+1).cue;
+			trial.range(2) = run.trials(i+1).range(1);
 		else
 			trial.range(2) = dsp.smp2sec( run.audiosize(1), run.audiorate );
 		end
