@@ -62,7 +62,7 @@ function trial_activity( run, cfg, id, plotfile )
 	xsufr = 1000 * dsp.smp2sec( 0:numel( respva )-1, run.audiorate );
 	xsfr = 1000 * dsp.fr2sec( 0:size( respft, 2 )-1, frlen, cfg.vad_froverlap, run.audiorate );
 	xl = [min( xs ), max( xs )];
-	yl = max( abs( cat( 1, cdts, respts ) ) ) * style.width( 1/2 ) * [-1, 1];
+	yl = max( abs( respts ) ) * style.width( 1/2 ) * [-1, 1];
 
 		% plot
 	fig = style.figure();
@@ -70,7 +70,7 @@ function trial_activity( run, cfg, id, plotfile )
 	subplot( 4, 2, 1, 'XTickLabel', {} ); % cue/distractor signal
 	ylabel( 'cue/distractor' );
 	xlim( xl );
-	ylim( yl );
+	ylim( max( abs( cdts ) ) * style.width( 1/2 ) * [-1, 1] );
 	plot( xs, cdts, ...
 		'Color', style.color( 'cold', -1 ) );
 

@@ -56,13 +56,13 @@ function [vafr, sdfr, ddfr, sdthresh, ddthresh] = vad( ft, noift, ltadj, hang )
 			% set spectral features
 		ltpow = max( ftpow(:, i-ltadj:i+ltadj), [], 2 ); % long-term envelope
 
-		sdfr(i) = mean( (ltpow - noipowmu).^2 ); % static distance
+		sdfr(i) = sum( (ltpow - noipowmu).^2 ); % static distance
 
-		tmp = zeros( size( ft, 1 ), 1 ); % dynamic distance
+		tmp = zeros( size( ft, 1 ), 1 ); % dynamic distance (fall)
 		for j = 1:ltadj
-			tmp = tmp + ftpow(:, i+j-1) - ftpow(:, i-j);
+			tmp = tmp + (ftpow(:, i+j-1) - ftpow(:, i-j)).^2;
 		end
-		ddfr(i) = mean( (tmp / ltadj).^2 );
+		ddfr(i) = sum( tmp / ltadj );
 
 	end
 
@@ -93,6 +93,6 @@ function [vafr, sdfr, ddfr, sdthresh, ddthresh] = vad( ft, noift, ltadj, hang )
 			vafr(hangstart:hangstop) = 1;
 		end
 	end
-
+	
 end
 

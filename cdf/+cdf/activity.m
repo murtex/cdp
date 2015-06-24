@@ -68,7 +68,7 @@ function activity( run, cfg )
 
 		respva = round( dsp.unframe( respvafr, frlen, cfg.vad_froverlap ) ); % unframing
 
-			% set response to first activity
+			% set response to first activity, TODO: skip first activity in case
 		vadiffs = diff( cat( 2, 0, respva ) );
 
 		vastart = find( vadiffs == 1, 1 );
