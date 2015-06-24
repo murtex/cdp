@@ -14,6 +14,8 @@ classdef (Sealed = true) hConfig < handle
 		vad_froverlap = 15/25; % short-time overlap (scalar numeric)
 		vad_frwindow = @hann; % short-time window function (scalar object)
 
+		vad_freqband = [150, 8000]; % frequency band (row numeric)
+
 		vad_adjacency = 12; % long-term adjacency (scalar numeric)
 		vad_hangover = 4; % activity hangover (scalar numeric)
 
