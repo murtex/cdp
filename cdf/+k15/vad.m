@@ -1,18 +1,18 @@
-function [va, sd, dd, sdthresh, ddthresh] = vad( ft, noift, ltadj, hang )
+function [vafr, sdfr, ddfr, sdthresh, ddthresh] = vad( ft, noift, ltadj, hang )
 % voice activity detector
 %
-% [va, sd, dd, sdthresh, ddthresh] = VAD( ft, noift, ltadj, hang )
+% [vafr, sdfr, ddfr, sdthresh, ddthresh] = VAD( ft, noift, ltadj, hang )
 %
 % INPUT
-% va : voice activity (column logical)
 % ft : signal frames fourier transform (matrix numeric)
 % noift : noise frames fourier transform (matrix numeric)
 % ltadj : long-term adjacency (scalar numeric)
 % hang : activity hangover (scalar numeric)
 %
 % OUTPUT
-% sd : static long-term spectral distance (column numeric)
-% dd : dynamic long-term spectral distance (column numeric)
+% vafr : voice activity (row numeric)
+% sdfr : static long-term spectral distance (row numeric)
+% ddfr : dynamic long-term spectral distance (row numeric)
 % sdthresh : static distance threshold (scalar numeric)
 % ddthresh : dynamic distance threshold (scalar numeric)
 %
@@ -23,11 +23,11 @@ function [va, sd, dd, sdthresh, ddthresh] = vad( ft, noift, ltadj, hang )
 % (2005) Wu, Ren, Liu, Zhang : A Robust, Real-Time Voice Activity Detection Algorithm for Embedded Mobile Devices
 
 		% safeguard
-	if nargin < 1 || ~ismatrix( ft ) || ~isnumeric( ft ) || any( size( ft ) < 1 )
+	if nargin < 1 || ~ismatrix( ft ) || ~isnumeric( ft ) || any( size( ft ) == 0 )
 		error( 'invalid argument: ft' );
 	end
 
-	if nargin < 2 || ~ismatrix( noift ) || ~ismatrix( noift ) || any( size( noift ) < 1 ) || size( noift, 1 ) ~= size( ft, 1 )
+	if nargin < 2 || ~ismatrix( noift ) || ~ismatrix( noift ) || any( size( noift ) == 0 ) || size( noift, 1 ) ~= size( ft, 1 )
 		error( 'invalid argument: noift' );
 	end
 
@@ -35,64 +35,62 @@ function [va, sd, dd, sdthresh, ddthresh] = vad( ft, noift, ltadj, hang )
 		error( 'invaid argument: ltadj' );
 	end
 
-	if nargin < 4 || ~isscalar( hang ) || ~isnumeric( hang )
+	if nargin < 4 || ~isscalar( hang ) || ~isnumeric( hang ) || hang < 0
 		error( 'invalid argument: hang' );
 	end
 
-		% set one-sided power spectra
-	nfreqs = ceil( (size( ft, 1 ) + 1) / 2 );
-
-	ftpow = abs( ft(1:nfreqs, :) ).^2;
-	noipow = abs( noift(1:nfreqs, :) ).^2;
+		% transform to power spectra
+	ftpow = ft .* conj( ft );
+	noipow = noift .* conj( noift );
 
 	noipowmu = mean( noipow, 2 ); % average noise
 
 		% proceed signal frames
 	nfrs = size( ft, 2 );
 
-	sd = NaN( nfrs, 1 ); % pre-allocation
-	dd = NaN( nfrs, 1 );
+	sdfr = NaN( 1, nfrs ); % pre-allocation
+	ddfr = NaN( 1, nfrs );
 
 	for i = 1+ltadj:nfrs-ltadj
 
 			% set spectral features
 		ltpow = max( ftpow(:, i-ltadj:i+ltadj), [], 2 ); % long-term envelope
 
-		sd(i) = mean( (ltpow - noipowmu).^2 ); % static distance
+		sdfr(i) = mean( (ltpow - noipowmu).^2 ); % static distance
 
-		tmp = zeros( nfreqs, 1 ); % dynamic distance
+		tmp = zeros( size( ft, 1 ), 1 ); % dynamic distance
 		for j = 1:ltadj
 			tmp = tmp + ftpow(:, i+j-1) - ftpow(:, i-j);
 		end
-		dd(i) = mean( (tmp / ltadj).^2 );
+		ddfr(i) = mean( (tmp / ltadj).^2 );
 
 	end
 
 		% set feature thresholds and convert to log-scale
-	sdmin = min( sd );
-	sdmax = max( sd );
+	sdmin = min( sdfr );
+	sdmax = max( sdfr );
 	lothresh = sdmin * (1 + 2*log10( sdmax/sdmin ));
-	hithresh = lothresh + 0.25 * (mean( sd(sd >= lothresh) ) - lothresh);
+	hithresh = lothresh + 0.25 * (mean( sdfr(sdfr >= lothresh) ) - lothresh);
 	sdthresh = log( lothresh * hithresh ) / 2;
 
-	ddmin = min( dd );
-	ddmax = max( dd );
+	ddmin = min( ddfr );
+	ddmax = max( ddfr );
 	lothresh = ddmin * (1 + 2*log10( ddmax/ddmin ));
-	hithresh = lothresh + 0.25 * (mean( dd(dd >= lothresh) ) - lothresh);
+	hithresh = lothresh + 0.25 * (mean( ddfr(ddfr >= lothresh) ) - lothresh);
 	ddthresh = log( lothresh * hithresh ) / 2;
 
-	sd = log( sd ); % scale conversion
-	dd = log( dd );
+	sdfr = log( sdfr ); % scale conversion
+	ddfr = log( ddfr );
 
 		% set voice activity
-	vapre = sd >= sdthresh & dd >= ddthresh; % thresholding
-	va = vapre;
+	vapre = double( sdfr >= sdthresh & ddfr >= ddthresh ); % thresholding
+	vafr = vapre;
 
 	for i = 1:nfrs-1 % apply hangover
 		if vapre(i) && ~vapre(i+1)
 			hangstart = i + 1;
 			hangstop = min( nfrs, i + hang );
-			va(hangstart:hangstop) = true;
+			vafr(hangstart:hangstop) = 1;
 		end
 	end
 

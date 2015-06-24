@@ -31,7 +31,7 @@ function activity( run, cfg )
 		resp.range = [NaN, NaN];
 
 			% set local noise and response signal
-		noir = dsp.sec2smp( [trial.cue, trial.dist], run.audiorate ) + [1, 0]; % noise range
+		noir = dsp.sec2smp( [trial.range(1), trial.dist], run.audiorate ) + [1, 0]; % noise range
 		if any( isnan( noir ) ) || any( noir < 1 ) || any( noir > run.audiosize(1) )
 			logger.progress( i, ntrials );
 			continue;
@@ -60,21 +60,26 @@ function activity( run, cfg )
 		[noift, noifreqs] = dsp.fft( noifr, run.audiorate ); % fourier transforms
 		[respft, respfreqs] = dsp.fft( respfr, run.audiorate );
 
+		[noift, noifreqs] = dsp.band( noift, noifreqs, cfg.vad_freqband(1), cfg.vad_freqband(2), true ); % one-sided subband
+		[respft, respfreqs] = dsp.band( respft, respfreqs, cfg.vad_freqband(1), cfg.vad_freqband(2), true );
+
 			% get voice activity
-		[va, ~, ~, ~, ~] = k15.vad( respft, noift, cfg.vad_adjacency, cfg.vad_hangover );
+		[respvafr, ~, ~, ~, ~] = k15.vad( respft, noift, cfg.vad_adjacency, cfg.vad_hangover );
+
+		respva = round( dsp.unframe( respvafr, frlen, cfg.vad_froverlap ) ); % unframing
 
 			% set response to first activity
-		vaswaps = diff( cat( 1, false, va ) );
+		vadiffs = diff( cat( 2, 0, respva ) );
 
-		vastart = find( vaswaps == 1, 1 );
+		vastart = find( vadiffs == 1, 1 );
 		if ~isempty( vastart )
-			resp.range(1) = trial.range(1) + dsp.fr2sec( vastart, frlen, cfg.vad_froverlap, run.audiorate );
+			resp.range(1) = trial.range(1) + dsp.smp2sec( vastart - 1, run.audiorate );
 
-			vastop = find( vaswaps == -1, 1 ) - 1;
+			vastop = find( vadiffs == -1, 1 ) - 1;
 			if ~isempty( vastop )
-				resp.range(2) = trial.range(1) + dsp.fr2sec( vastop, frlen, cfg.vad_froverlap, run.audiorate );
+				resp.range(2) = trial.range(1) + dsp.smp2sec( vastop - 1, run.audiorate );
 			else
-				resp.range(2) = trial.range(2); % fallback: stop with trial end
+				resp.range(2) = trial.range(2); % fallback to end of trial
 			end
 		end
 

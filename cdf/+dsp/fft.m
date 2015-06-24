@@ -36,7 +36,7 @@ function [ft, freqs] = fft( fr, rate )
 
 		% fourier transform
 	ft = fftshift( fft( fftshift( fr ) ) ) / ncoeffs;
-	freqs = rate/2 * linspace( -1, 1 - 2/ncoeffs, ncoeffs );
+	freqs = transpose( rate/2 * linspace( -1, 1 - 2/ncoeffs, ncoeffs ) );
 
 end
 
