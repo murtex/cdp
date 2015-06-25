@@ -27,59 +27,62 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 	logger = xis.hLogger.instance();
 	logger.tab( 'sync timings...' );
 
-		% estimate cue/distractor noise
-	noimu = NaN;
-	noisigma = NaN;
-
+		% pre-estimate cue/distractor noise
 	ntrials = numel( run.trials );
-	for i = 1:ntrials
-		trial = run.trials(i);
-
-			% set search range
-		sr = dsp.sec2smp( trial.cue + cfg.sync_range, run.audiorate ) + [1, 0];
-		if any( isnan( sr ) ) || any( sr < 1 ) || any( sr > run.audiosize(1) ) || isempty( sr(1):sr(2) )
-			continue;
-		end
-
-			% set statistics
-		noimu = mean( run.audiodata(sr(1):sr(2), 2) );
-		noisigma = std( run.audiodata(sr(1):sr(2), 2), 1 );
-
-		break;
-
+	if ntrials == 0
+		error( 'invalid value: ntrials' );
 	end
 
-	if isnan( noimu ) || isnan( noisigma )
-		error( 'invalid value: noimu | noisigma' );
+	noir = [1, dsp.sec2smp( run.trials(1).dist, run.audiorate )]; % initial noise range
+	if any( isnan( noir ) ) || any( noir < 1 ) || any( noir > run.audiosize(1) )
+		error( 'invalid value: noir' );
 	end
 
-		% normalize and smooth cue/distractor data (mahalanobis distance to noise)
-	cdts = (run.audiodata(:, 2) - noimu) / noisigma;
-	cdtslen = numel( cdts );
+	noits = run.audiodata(noir(1):noir(2), 2);
+	noimu = mean( noits );
+	noisigma = std( noits, 1 );
+
+		% track sync start (first activity/tone distractor)
+	sync0 = 0;
 
 	smooth = dsp.sec2smp( cfg.sync_smooth, run.audiorate );
-	cdts = cdts / smooth;
-	
-		% track sync start (first tone/activity)
-	sync0 = NaN;
+	lsmooth = ceil( (smooth-1) / 2 );
+	rsmooth = floor( (smooth-1) / 2 );
+	if smooth < 1
+		error( 'invalid value: smooth' );
+	end
 
-	for i = 1:cdtslen
-		cdr = i:min( cdtslen, i + smooth );
-		if sum( abs( cdts(cdr) ) ) >= cfg.sync_thresh
+	cdts = abs( run.audiodata(:, 2) - noimu ) / noisigma / smooth; % standardization
+	cdtslen = numel( cdts );
+
+	for i = 1+lsmooth:cdtslen-rsmooth
+		cdr = i-lsmooth:i+rsmooth;
+		cdtsfr = sum( cdts(cdr) );
+
+		if cdtsfr >= 3*cfg.sync_thresh % enlarged threshold
 			sync0 = i - 1;
 			break;
 		end
 	end
 
-	if isnan( sync0 )
-		error( 'invalid value: sync0' );
+		% estimate cue/distractor noise
+	noir = sync0 + dsp.sec2smp( run.trials(1).cue + cfg.sync_range, run.audiorate ) + [1, 0]; % estimated noise range
+	if any( isnan( noir ) ) || any( noir < 1 ) || any( noir > run.audiosize(1) )
+		error( 'invalid value: noir' );
 	end
 
-		% track sync markers
+	noits = run.audiodata(noir(1):noir(2), 2);
+	noimu = mean( noits);
+	noisigma = std( noits, 1 );
+
+		% track trial sync markers
 	synclast = 0;
 
 	synchints = zeros( 1, ntrials );
 	syncs = NaN( 1, ntrials );
+
+	cdts = (run.audiodata(:, 2) - noimu) / noisigma / smooth; % standardization
+	cdtslen = numel( cdts );
 
 	logger.progress()
 	for i = 1:ntrials
@@ -99,12 +102,12 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 		sr(sr > run.audiosize(1)) = run.audiosize(1);
 
 			% track marker
-		sr = sr(1):sr(2);
-		for j = sr
-			cdr = j:min( sr(end), j + smooth );
-			tmp = cdts(cdr);
-			tmp = sum( abs( tmp - mean( tmp ) ) ); % center snippet (highpass)
-			if tmp >= cfg.sync_thresh
+		for j = sr(1)+lsmooth:sr(2)-rsmooth
+			cdr = j-lsmooth:j+rsmooth;
+			cdtsfr = cdts(cdr);
+			cdtsfr = sum( abs( cdtsfr - mean( cdtsfr ) ) ); % remove frame dc (highpass)
+
+			if cdtsfr >= cfg.sync_thresh
 				expected = sync0 + dsp.sec2smp( trial.cue, run.audiorate ) + 1;
 				synclast = j - 1 - expected;
 				syncs(i) = synclast;
@@ -112,7 +115,7 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 			end
 		end
 
-			% lost sync
+			% catch lost sync
 		if isnan( syncs(i) )
 			logger.untab( 'LOST SYNC!' );
 			if i > 1

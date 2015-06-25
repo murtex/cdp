@@ -66,20 +66,27 @@ function trial_sync( run, cfg, id, sync0, synchint, sync, plotfile )
 		% plot
 	fig = style.figure();
 
+	subplot( 2, 1, 1 ); % vicinity
 	title( ...
 		sprintf( 'sync start: %.1fms, sync hint: %.1fms, sync offset: %.1fms', ...
 		1000 * sync0, 1000 * synchint, 1000 * sync ) );
-
 	xlabel( 'time in milliseconds (expected: t=0)' );
 	ylabel( 'distractor channel' );
-
 	xlim( xl );
 	ylim( yl );
-
-	plot( 1000 * sync * [1, 1], yl, ... % sync ofset
+	plot( 1000 * sync * [1, 1], yl, ...
 		'Color', style.color( 'warm', 0 ) );
+	plot( xs, cdts, ...
+		'Color', style.color( 'cold', +1 ) );
 
-	plot( xs, cdts, ... % signal
+	subplot( 2, 1, 2 ); % zoom
+	xlabel( 'time in milliseconds' );
+	ylabel( 'distractor channel' );
+	xlim( 1000 * (sync + 5*cfg.sync_smooth * [-1, 1]) );
+	ylim( yl );
+	plot( 1000 * sync * [1, 1], yl, ...
+		'Color', style.color( 'warm', 0 ) );
+	plot( xs, cdts, ...
 		'Color', style.color( 'cold', +1 ) );
 
 		% print
