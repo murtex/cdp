@@ -95,7 +95,7 @@ function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
 		trialids = 1:numel( run.trials ); % valid trials
 		invalids = [];
 		for j = trialids
-			if isnan( run.trials(j).cue )
+			if isnan( run.trials(j).cue ) || isnan( syncs(j) )
 				invalids(end+1) = j;
 			end
 		end
