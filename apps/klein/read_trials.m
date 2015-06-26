@@ -87,7 +87,7 @@ function read_trials( run, trialfile )
 		trial.cue = max( fdata{9}(i), fdata{10}(i) ); % cue/distractor fields have swapped during experiments
 		trial.dist = trial.cue + trial.soa;
 
-		trial.range(1) = min( fdata{9}(i), fdata{10}(i) ); % cue/distractor fields have swapped during experiments
+		trial.range(1) = trial.cue;
 		if i < ntrials
 			trial.range(2) = run.trials(i+1).range(1);
 		else
