@@ -55,9 +55,8 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 	cdts = abs( run.audiodata(:, 2) - noimu ) / noisigma / smooth; % standardization
 	cdtslen = numel( cdts );
 
-	for i = 1+lsmooth:cdtslen-rsmooth
-		cdr = i-lsmooth:i+rsmooth;
-		cdtsfr = sum( cdts(cdr) );
+	for i = 1:cdtslen-smooth
+		cdtsfr = sum( cdts(i:i+smooth-1) );
 
 		if cdtsfr >= 3*cfg.sync_thresh % enlarged threshold
 			sync0 = i - 1;
@@ -103,8 +102,7 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 
 			% track marker
 		for j = sr(1)+lsmooth:sr(2)-rsmooth
-			cdr = j-lsmooth:j+rsmooth;
-			cdtsfr = cdts(cdr);
+			cdtsfr = cdts(j-lsmooth:j+rsmooth);
 			cdtsfr = sum( abs( cdtsfr - mean( cdtsfr ) ) ); % remove frame dc (highpass)
 
 			if cdtsfr >= cfg.sync_thresh
