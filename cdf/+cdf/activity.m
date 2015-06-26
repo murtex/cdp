@@ -31,7 +31,7 @@ function activity( run, cfg )
 		resp.range = [NaN, NaN];
 
 			% set local noise and response signal
-		noir = dsp.sec2smp( [trial.range(1), trial.dist], run.audiorate ) + [1, 0]; % noise range
+		noir = dsp.sec2smp( [trial.cue, trial.dist], run.audiorate ) + [1, 0]; % noise range
 		if any( isnan( noir ) ) || any( noir < 1 ) || any( noir > run.audiosize(1) )
 			logger.progress( i, ntrials );
 			continue;

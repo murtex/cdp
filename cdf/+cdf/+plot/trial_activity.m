@@ -34,7 +34,7 @@ function trial_activity( run, cfg, id, plotfile )
 		% prepare data
 	trial = run.trials(id);
 
-	noir = dsp.sec2smp( [trial.range(1), trial.dist], run.audiorate ) + [1, 0]; % signal ranges
+	noir = dsp.sec2smp( [trial.cue, trial.dist], run.audiorate ) + [1, 0]; % signal ranges
 	respr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0];
 
 	if any( isnan( noir ) ) || any( isnan( respr ) )
