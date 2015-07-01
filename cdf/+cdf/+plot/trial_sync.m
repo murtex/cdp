@@ -61,7 +61,7 @@ function trial_sync( run, cfg, id, sync0, synchint, sync, plotfile )
 
 	xs = 1000 * (dsp.smp2sec( cdr - 1, run.audiorate ) - sync0 - trial.cue); % axes scaling
 	xl = [min( xs ), max( xs )];
-	yl = max( abs( cdts ) ) * style.width( 1/2 ) * [-1, 1];
+	yl = max( abs( cdts ) ) * style.scale( 1/2 ) * [-1, 1];
 
 		% plot
 	fig = style.figure();

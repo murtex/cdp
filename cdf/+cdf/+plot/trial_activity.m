@@ -33,6 +33,7 @@ function trial_activity( run, cfg, id, plotfile )
 
 		% prepare data
 	trial = run.trials(id);
+	resp = run.resps_det(id);
 
 	noir = dsp.sec2smp( [trial.cue, trial.dist], run.audiorate ) + [1, 0]; % signal ranges
 	respr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0];
@@ -53,7 +54,7 @@ function trial_activity( run, cfg, id, plotfile )
 	[noift, noifreqs] = dsp.band( noift, noifreqs, cfg.vad_freqband(1), cfg.vad_freqband(2), true ); % one-sided subband
 	[respft, respfreqs] = dsp.band( respft, respfreqs, cfg.vad_freqband(1), cfg.vad_freqband(2), true );
 
-	[respvafr, respsdfr, respddfr, respsdthresh, respddthresh] = k15.vad( ... % activity
+	[respvafr, respfeatfr, respthreshs] = k15.vad( ... % activity
 		respft, noift, cfg.vad_adjacency, cfg.vad_hangover );
 
 	respva = round( dsp.unframe( respvafr, frlen, cfg.vad_froverlap ) ); % unframing
@@ -62,50 +63,80 @@ function trial_activity( run, cfg, id, plotfile )
 	xsufr = 1000 * dsp.smp2sec( 0:numel( respva )-1, run.audiorate );
 	xsfr = 1000 * dsp.fr2sec( 0:size( respft, 2 )-1, frlen, cfg.vad_froverlap, run.audiorate );
 	xl = [min( xs ), max( xs )];
-	yl = max( abs( respts ) ) * style.width( 1/2 ) * [-1, 1];
+	yl = max( abs( respts ) ) * style.scale( 1/2 ) * [-1, 1];
 
 		% plot
 	fig = style.figure();
 
-	subplot( 4, 2, 1, 'XTickLabel', {} ); % cue/distractor signal
+	subplot( 20, 2, [1, 9], 'XTickLabel', {}, 'YTickLabel', {} ); % cue/distractor
 	ylabel( 'cue/distractor' );
 	xlim( xl );
-	ylim( max( abs( cdts ) ) * style.width( 1/2 ) * [-1, 1] );
+	ylim( max( abs( cdts ) ) * style.scale( 1/2 ) * [-1, 1] );
 	plot( xs, cdts, ...
 		'Color', style.color( 'cold', -1 ) );
 
-	subplot( 4, 2, 3, 'XTickLabel', {} ); % response signal
+	subplot( 20, 2, [11, 19], 'XTickLabel', {}, 'YTickLabel', {} ); % response
 	ylabel( 'response' );
 	xlim( xl );
 	ylim( yl );
-	plot( xsufr, respva * 0.5 * yl(2), ...
+	stairs( xsufr, respva * style.scale( -1 ) * yl(2), ...
 		'Color', style.color( 'warm', 0 ) );
+	if ~any( isnan( resp.range ) )
+		rectangle( 'Position', [ ...
+			1000 * (resp.range(1) - trial.range(1)), style.scale( -1 ) * yl(1), ...
+			1000 * diff( resp.range ), abs( style.scale( -1 ) * yl(1) )], ...
+			'EdgeColor', style.color( 'warm', 0 ), 'FaceColor', style.color( 'warm', +2 ) );
+	end
 	plot( xs, respts, ...
 		'Color', style.color( 'cold', -1 ) );
 
-	subplot( 4, 2, [5, 7] ); % spectrogram
+	subplot( 20, 2, [21, 39] ); % spectrogram
 	xlabel( 'trial-time in milliseconds' );
-	ylabel( 'frequency in hertz' );
+	ylabel( 'frequency in kilohertz' );
 	xlim( xl );
 	ylim( [min( respfreqs ), max( respfreqs )] );
 	colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) );
-	imagesc( xsfr, respfreqs, log( respft .* conj( respft ) ) );
+	imagesc( xsfr, respfreqs/1000, log( respft .* conj( respft ) + eps ) );
 
-	subplot( 4, 2, [2, 4], 'XTickLabel', {} ); % static distance
-	ylabel( 'static spectral distance' );
+	subplot( 20, 2, [2, 8], 'XTickLabel', {}, 'YTickLabel', {} ); % static distance
+	ylabel( 'static' );
 	xlim( xl );
-	plot( xl, respsdthresh * [1, 1], ...
+	plot( xl, respthreshs(1) * [1, 1], ...
 		'Color', style.color( 'warm', 0 ) );
-	plot( xsfr, respsdfr, ...
+	plot( xsfr, respfeatfr(1, :), ...
 		'Color', style.color( 'cold', -1 ) );
 
-	subplot( 4, 2, [6, 8] ); % dynamic distance
-	xlabel( 'trial-time in milliseconds' );
-	ylabel( 'dynamic spectral distance' );
+	subplot( 20, 2, [10, 16], 'XTickLabel', {}, 'YTickLabel', {} ); % flatness
+	ylabel( 'flatness' );
 	xlim( xl );
-	plot( xl, respddthresh * [1, 1], ...
+	plot( xl, respthreshs(2) * [1, 1], ...
 		'Color', style.color( 'warm', 0 ) );
-	plot( xsfr, respddfr, ...
+	plot( xsfr, respfeatfr(2, :), ...
+		'Color', style.color( 'cold', -1 ) );
+
+	subplot( 20, 2, [18, 24], 'XTickLabel', {}, 'YTickLabel', {} ); % dynamic distance 1
+	ylabel( 'dynamic 1' );
+	xlim( xl );
+	plot( xl, respthreshs(3) * [1, 1], ...
+		'Color', style.color( 'warm', 0 ) );
+	plot( xsfr, respfeatfr(3, :), ...
+		'Color', style.color( 'cold', -1 ) );
+
+	subplot( 20, 2, [26, 32], 'XTickLabel', {}, 'YTickLabel', {} ); % dynamic distance 2
+	ylabel( 'dynamic 2' );
+	xlim( xl );
+	plot( xl, respthreshs(4) * [1, 1], ...
+		'Color', style.color( 'warm', 0 ) );
+	plot( xsfr, respfeatfr(4, :), ...
+		'Color', style.color( 'cold', -1 ) );
+
+	subplot( 20, 2, [34, 40], 'YTickLabel', {} ); % weighted sum
+	xlabel( 'trial-time in milliseconds' );
+	ylabel( 'weighted' );
+	xlim( xl );
+	plot( xl, respthreshs(5) * [1, 1], ...
+		'Color', style.color( 'warm', 0 ) );
+	plot( xsfr, respfeatfr(5, :), ...
 		'Color', style.color( 'cold', -1 ) );
 
 		% print
