@@ -36,13 +36,13 @@ classdef (Sealed = true) hStyle < handle
 			fig = figure( ...
 				'Visible', 'off', ...
 				'InvertHardCopy', 'off', ...
-				'Color', this.color( 'grey', this.width( -1/3 ) ), ...
+				'Color', this.color( 'grey', this.scale( -1/3 ) ), ...
 				'defaultAxesFontSize', 8, ...
 				'defaultAxesTitleFontSizeMultiplier', 1, 'defaultAxesLabelFontSizeMultiplier', 1, ...
 				'defaultAxesNextPlot', 'add', ...
 				'defaultAxesBox', 'on', 'defaultAxesLayer', 'top', ...
 				'defaultAxesXGrid', 'on', 'defaultAxesYGrid', 'on', ...
-				'defaultAxesGridColor', this.color( 'grey', -2 ), ...
+				'defaultAxesGridColor', this.color( 'neutral', -2 ), ...
 				varargin{:} );
 
 			warning( ws ); % (re-)enable warnings
@@ -228,29 +228,29 @@ classdef (Sealed = true) hStyle < handle
 
 		end
 
-		function w = width( this, shade )
-		% get width
+		function s = scale( this, rank )
+		% get scale factor
 		%
-		% w = width( this, shade )
+		% s = SCALE( this, rank )
 		%
 		% INPUT
 		% this : style (scalar object)
-		% shade : width shade (scalar numeric)
+		% rank : scale rank (scalar numeric)
 		%
 		% OUTPUT
-		% width : width in points (scalar numeric)
+		% scale : scale factor (scalar numeric)
 
 				% safeguard
 			if ~isscalar( this )
 				error( 'invalid argument: this' );
 			end
 
-			if nargin < 2 || ~isscalar( shade ) || ~isnumeric( shade )
-				error( 'invalid argument: shade' );
+			if nargin < 2 || ~isscalar( rank ) || ~isnumeric( rank )
+				error( 'invalid argument: rank' );
 			end
 
-				% set shaded width
-			w = 2^(shade * 1/2);
+				% set rankd scale
+			s = 2^(rank * 1/2);
 
 		end
 
