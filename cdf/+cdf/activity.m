@@ -64,23 +64,19 @@ function activity( run, cfg )
 		[respft, respfreqs] = dsp.band( respft, respfreqs, cfg.vad_freqband(1), cfg.vad_freqband(2), true );
 
 			% get voice activity
-		[respvafr, ~, ~, ~, ~] = k15.vad( respft, noift, cfg.vad_adjacency, cfg.vad_hangover );
+		[respvafr, ~, ~] = k15.vad( respft, noift, cfg.vad_adjacency, cfg.vad_hangover );
 
 		respva = round( dsp.unframe( respvafr, frlen, cfg.vad_froverlap ) ); % unframing
 
-			% set response to first activity, TODO: skip first activity in case
-		vadiffs = diff( cat( 2, 0, respva ) );
+			% set response to longest activity, TODO: a second (to be rejected) response might be longer!
+		vadiffs = diff( cat( 2, 0, respva, 0 ) );
+		vastarts = find( vadiffs == 1 );
+		vastops = find( vadiffs == -1 ) - 1;
+		[~, vai] = max( vastops - vastarts );
 
-		vastart = find( vadiffs == 1, 1 );
-		if ~isempty( vastart )
-			resp.range(1) = trial.range(1) + dsp.smp2sec( vastart - 1, run.audiorate );
-
-			vastop = find( vadiffs == -1, 1 ) - 1;
-			if ~isempty( vastop )
-				resp.range(2) = trial.range(1) + dsp.smp2sec( vastop - 1, run.audiorate );
-			else
-				resp.range(2) = trial.range(2); % fallback to end of trial
-			end
+		if ~isempty( vai )
+			resp.range(1) = trial.range(1) + dsp.smp2sec( vastarts(vai) - 1, run.audiorate );
+			resp.range(2) = trial.range(1) + dsp.smp2sec( vastops(vai) - 1, run.audiorate );
 		end
 
 		logger.progress( i, ntrials );
