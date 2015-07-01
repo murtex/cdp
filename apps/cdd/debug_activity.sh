@@ -27,6 +27,7 @@ matlab -nosplash -nodesktop -r "debug_activity( $INDIR, $OUTDIR, 40, $NTRIALS, $
 
 	# DEBUG
 #IDS="[15, 20]"
+#IDS=8
 #matlab -nosplash -nodesktop -r "debug_activity( $INDIR, $OUTDIR, $IDS, $NTRIALS, $SEED ); exit();" &
 
 wait
