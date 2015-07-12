@@ -94,7 +94,7 @@ function trial_activity( run, cfg, id, plotfile )
 	xlabel( 'trial-time in milliseconds' );
 	ylabel( 'frequency in kilohertz' );
 	xlim( xl );
-	ylim( [min( respfreqs ), max( respfreqs )] );
+	ylim( [min( respfreqs/1000 ), max( respfreqs/1000 )] );
 	colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) );
 	imagesc( xsfr, respfreqs/1000, log( respft .* conj( respft ) + eps ) );
 
