@@ -19,6 +19,13 @@ classdef (Sealed = true) hConfig < handle
 		vad_adjacency = 6; % long-term adjacency (scalar numeric)
 		vad_hangover = 6; % activity hangover (scalar numeric)
 
+			% labeling
+		lab_frlength = 0.025; % short-time length (scalar numeric)
+		lab_froverlap = 0.5; % short-time overlap (scalar numeric)
+		lab_frwindow = @hann; % short-time window function (scalar object)
+
+		lab_freqband = [0, 2000]; % frequency band (row numeric)
+
 	end
 
 end
