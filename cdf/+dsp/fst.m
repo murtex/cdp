@@ -91,7 +91,7 @@ function [st, freqs] = fst( ts, rate, lofreq, hifreq, nfreqs )
 		if ftfreqi == 1
 			st(i, :) = mean( ts );
 		else
-			st(i, :) = ifft( fts( ftfreqi:ftfreqi+tslen-1 ) .* gw( tslen, freqs(i), FACTOR ) );
+			st(i, :) = ifft( fts(ftfreqi:ftfreqi+tslen-1) .* gw( tslen, freqs(i), FACTOR ) );
 		end
 
 	end
