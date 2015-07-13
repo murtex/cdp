@@ -49,14 +49,16 @@ function label( run, cfg )
 			case 'buttondown'
 				switch get( fig, 'SelectionType' )
 
-					case 'normal' % set response range start
+					case 'normal' % range start
 						cp = get( src, 'CurrentPoint' );
 						resp.range(1) = trial.range(1) + cp(1, 1) / 1000;
+						recompute = true;
 						update();
 
-					case 'alt' % set response range stop
+					case 'alt' % range stop
 						cp = get( src, 'CurrentPoint' );
 						resp.range(2) = trial.range(1) + cp(1, 1) / 1000;
+						recompute = true;
 						update();
 
 				end
@@ -74,12 +76,35 @@ function label( run, cfg )
 						if id < 1
 							id = ntrials;
 						end
+						recompute = true;
 						update();
 					case 'rightarrow'
 						id = id + 1;
 						if id > ntrials
 							id = 1;
 						end
+						recompute = true;
+						update();
+					case 'pageup'
+						id = id - 10;
+						if id < 1
+							id = ntrials;
+						end
+						recompute = true;
+						update();
+					case 'pagedown'
+						id = id + 10;
+						if id > ntrials
+							id = 1;
+						end
+						recompute = true;
+						update();
+					case 'space'
+						id = id + 1;
+						if id > ntrials
+							id = 1;
+						end
+						recompute = true;
 						update();
 
 					case 'downarrow' % zooming
@@ -89,42 +114,65 @@ function label( run, cfg )
 						zoom = false;
 						update();
 
-					case 'backspace' % mode change
-						mode = 'range';
-					case 'b'
-						mode = 'bo';
-					case '0'
-						mode = 'f0';
-					case '1'
-						mode = 'f1';
-					case '2'
-						mode = 'f2';
-					case '3'
-						mode = 'f3';
-					case 'r';
-						mode = 'vr';
+					case 'add' % contrast
+						contrast = contrast + 0.5;
+						update();
+					case 'subtract'
+						contrast = contrast - 0.5;
+						if contrast < 1
+							contrast = 1;
+						end
+						update();
 
-					case 'space' % playback
+					case 'return' % playback
 						sound( respts, run.audiorate );
 
 					case 'backspace' % reset data
-						switch mode
-							case 'range'
-								resp.range = [NaN, NaN];
-							case 'bo'
-								resp.bo = NaN;
-							case 'f0'
-								resp.f0 = [NaN, NaN];
-							case 'f1'
-								resp.f1 = [NaN, NaN];
-							case 'f2'
-								resp.f2 = [NaN, NaN];
-							case 'f3'
-								resp.f3 = [NaN, NaN];
-							case 'vr'
-								resp.vr = NaN;
-						end
+						resp.range = [NaN, NaN];
+						resp.bo = NaN;
+						resp.f0 = [NaN, NaN];
+						resp.f1 = [NaN, NaN];
+						resp.f2 = [NaN, NaN];
+						resp.f3 = [NaN, NaN];
+						resp.vr = NaN;
+						recompute = true;
 						update();
+
+					case 'b' % landmarks
+						if zoom
+							[x, ~] = ginput( 1 );
+							if ~isempty( x )
+								resp.bo = trial.range(1) + x / 1000;
+								update();
+							end
+						end
+					case '0'
+						if zoom
+							[x, y] = ginput( 1 ); % TODO
+						end
+					case '1'
+						if zoom
+							[x, y] = ginput( 1 ); % TODO
+						end
+					case '2'
+						if zoom
+							[x, y] = ginput( 1 ); % TODO
+						end
+					case '3'
+						if zoom
+							[x, y] = ginput( 1 ); % TODO
+						end
+					case 'r'
+						if zoom
+							[x, ~] = ginput( 1 );
+							if ~isempty( x )
+								resp.vr = trial.range(1) + x / 1000;
+								update();
+							end
+						end
+
+					%otherwise % DEBUG
+						%event.Key
 
 				end
 
@@ -133,9 +181,11 @@ function label( run, cfg )
 
 		% interaction loop
 	done = false;
+
 	zoom = false;
 	recompute = true;
-	mode = 'range';
+
+	contrast = 3;
 
 	ntrials = numel( run.trials );
 	id = 1;
@@ -163,6 +213,7 @@ function label( run, cfg )
 
 		if zoom && recompute
 			[respst, respfreqs] = dsp.fst( respts, run.audiorate, cfg.lab_freqband(1), cfg.lab_freqband(2), cfg.lab_nfreqs );
+			recompute = false;
 		end
 
 		xs = 1000 * (dsp.smp2sec( respr(1):respr(2), run.audiorate ) - trial.range(1)); % axes scaling
@@ -182,22 +233,43 @@ function label( run, cfg )
 		yl = max( abs( respts ) ) * style.scale( 1/2 ) * [-1, 1];
 		ylim( yl );
 
-		if ~any( isnan( resp.range ) ) && diff( resp.range ) > 0 % response range
-			h = rectangle( 'Position', [ ...
+		if ~zoom && ~any( isnan( resp.range ) ) && diff( resp.range ) > 0 % response range
+			rectangle( 'Position', [ ...
 				1000 * (resp.range(1) - trial.range(1)), style.scale( -1 ) * yl(1), ...
 				1000 * diff( resp.range ), abs( style.scale( -1 ) * yl(1) )], ...
 				'EdgeColor', style.color( 'warm', +2 ), 'FaceColor', style.color( 'warm', +2 ), ...
 				'HitTest', 'off' );
 		end
-		if ~isnan( resp.range(1) )
+		if ~zoom && ~isnan( resp.range(1) )
 			stem( 1000 * (resp.range(1) - trial.range(1)), style.scale( -1 ) * yl(1), ...
 				'Color', style.color( 'warm', 0 ), ...
 				'HitTest', 'off' );
 		end
-		if ~isnan( resp.range(2) )
+		if ~zoom && ~isnan( resp.range(2) )
 			stem( 1000 * (resp.range(2) - trial.range(1)), style.scale( -1 ) * yl(1), ...
 				'Color', style.color( 'warm', 0 ), ...
 				'HitTest', 'off' );
+		end
+
+		if ~isnan( resp.bo ) % landmarks
+			stem( 1000 * (resp.bo - trial.range(1)), style.scale( -1 ) * yl(2), ...
+				'Color', style.color( 'warm', 0 ), ...
+				'HitTest', 'off' );
+			if zoom
+				stem( 1000 * (resp.bo - trial.range(1)), style.scale( -1 ) * yl(1), ...
+					'Color', style.color( 'warm', 0 ), ...
+					'HitTest', 'off' );
+			end
+		end
+		if ~isnan( resp.vr )
+			stem( 1000 * (resp.vr - trial.range(1)), style.scale( -1 ) * yl(2), ...
+				'Color', style.color( 'warm', 0 ), ...
+				'HitTest', 'off' );
+			if zoom
+				stem( 1000 * (resp.vr - trial.range(1)), style.scale( -1 ) * yl(1), ...
+					'Color', style.color( 'warm', 0 ), ...
+					'HitTest', 'off' );
+			end
 		end
 
 		stairs( xs, respts, ... % signal
@@ -218,7 +290,8 @@ function label( run, cfg )
 			ylim( [min( respfreqs ), max( respfreqs )] );
 
 			colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) );
-			imagesc( xs, respfreqs, log( (respst .* conj( respst )).^3 + eps ) );
+			imagesc( xs, respfreqs, log( (respst .* conj( respst )).^contrast + eps ), ...
+				'HitTest', 'off' );
 		end
 
 			% dispatch interaction events
