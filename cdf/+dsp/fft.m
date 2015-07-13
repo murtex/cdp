@@ -24,11 +24,11 @@ function [ft, freqs] = fft( fr, rate )
 	end
 
 		% zero-padding
-	nfrs = size( fr, 1 );
-	ncoeffs = 2^nextpow2( nfrs );
+	tslen = size( fr, 1 );
+	ncoeffs = 2^nextpow2( tslen );
 	
-	zs = zeros( ceil( (ncoeffs-nfrs)/2 ), size( fr, 2 ) );
-	if mod( nfrs, 2 ) == 0
+	zs = zeros( ceil( (ncoeffs-tslen)/2 ), size( fr, 2 ) );
+	if mod( tslen, 2 ) == 0
 		fr = cat( 1, zs, fr, zs );
 	else
 		fr = cat( 1, zs, fr, zs(1:end-1, :) );
