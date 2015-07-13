@@ -22,7 +22,7 @@ function label( run, cfg )
 	style = xis.hStyle.instance();
 
 		% create interactive plot
-	fig = style.figure(	'Visible', 'on' );
+	fig = style.figure( 'Visible', 'on' );
 
 	set( fig, 'CloseRequestFcn', {@dispatch, 'close'} );
 	set( fig, 'WindowKeyPressFcn', {@dispatch, 'keypress'} );
