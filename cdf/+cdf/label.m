@@ -148,19 +148,35 @@ function label( run, cfg )
 						end
 					case '0'
 						if zoom
-							[x, y] = ginput( 1 ); % TODO
+							[x, y] = ginput( 1 );
+							if ~isempty( x ) && ~isempty( y )
+								resp.f0 = [trial.range(1) + x / 1000, y];
+								update();
+							end
 						end
 					case '1'
 						if zoom
-							[x, y] = ginput( 1 ); % TODO
+							[x, y] = ginput( 1 );
+							if ~isempty( x ) && ~isempty( y )
+								resp.f1 = [trial.range(1) + x / 1000, y];
+								update();
+							end
 						end
 					case '2'
 						if zoom
-							[x, y] = ginput( 1 ); % TODO
+							[x, y] = ginput( 1 );
+							if ~isempty( x ) && ~isempty( y )
+								resp.f2 = [trial.range(1) + x / 1000, y];
+								update();
+							end
 						end
 					case '3'
 						if zoom
-							[x, y] = ginput( 1 ); % TODO
+							[x, y] = ginput( 1 );
+							if ~isempty( x ) && ~isempty( y )
+								resp.f3 = [trial.range(1) + x / 1000, y];
+								update();
+							end
 						end
 					case 'r'
 						if zoom
@@ -289,9 +305,31 @@ function label( run, cfg )
 			xlim( xl );
 			ylim( [min( respfreqs ), max( respfreqs )] );
 
-			colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) );
+			colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) ); % spectrogram
 			imagesc( xs, respfreqs, log( (respst .* conj( respst )).^contrast + eps ), ...
 				'HitTest', 'off' );
+
+			if ~any( isnan( resp.f0 ) )
+				scatter( 1000 * (resp.f0(1) - trial.range(1)), resp.f0(2), ...
+					'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', 'none', ...
+					'HitTest', 'off' );
+			end
+			if ~any( isnan( resp.f1 ) )
+				scatter( 1000 * (resp.f1(1) - trial.range(1)), resp.f1(2), ...
+					'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', 'none', ...
+					'HitTest', 'off' );
+			end
+			if ~any( isnan( resp.f2 ) )
+				scatter( 1000 * (resp.f2(1) - trial.range(1)), resp.f2(2), ...
+					'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', 'none', ...
+					'HitTest', 'off' );
+			end
+			if ~any( isnan( resp.f3 ) )
+				scatter( 1000 * (resp.f3(1) - trial.range(1)), resp.f3(2), ...
+					'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', 'none', ...
+					'HitTest', 'off' );
+			end
+
 		end
 
 			% dispatch interaction events
