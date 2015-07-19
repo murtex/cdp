@@ -34,6 +34,10 @@ function sync( run, sync0, syncs, plotfile )
 		% plot
 	fig = style.figure();
 
+	if any( isnan( syncs ) ) % lost syncs
+		set( fig, 'Color', style.color( 'warm', +2 ) );
+	end
+
 	title( ...
 		sprintf( 'sync start: %.1fms, sync markers: %d/%d', ...
 		1000 * sync0, ...
@@ -46,7 +50,7 @@ function sync( run, sync0, syncs, plotfile )
 
 	scatter( [run.trials.cue], 1000 * syncs, ...
 		'Marker', '+', ...
-		'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', style.color( 'warm', 0 ) );
+		'MarkerEdgeColor', style.color( 'cold', 0 ), 'MarkerFaceColor', style.color( 'cold', 0 ) );
 
 		% print
 	style.print( plotfile );
