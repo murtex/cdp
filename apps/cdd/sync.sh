@@ -4,7 +4,7 @@
 INDIR="'../../data/cdd/convert/'"
 OUTDIR="'../../data/cdd/sync/'"
 
-	# prepare directories
+	# reset output directory
 rm -rf $OUTDIR
 
 	# spread workload

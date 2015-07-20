@@ -4,7 +4,7 @@
 INDIR="'../../data/klein-dev/convert/'"
 OUTDIR="'../../data/klein-dev/sync/'"
 
-	# prepare directories
+	# reset output directory
 rm -rf $OUTDIR
 
 	# spread workload

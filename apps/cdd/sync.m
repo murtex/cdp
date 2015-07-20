@@ -30,12 +30,6 @@ function sync( indir, outdir, ids )
 		mkdir( outdir );
 	end
 
-	plotdir = fullfile( outdir, 'plot/' );
-	if exist( plotdir, 'dir' ) == 7
-		rmdir( plotdir, 's' );
-	end
-	mkdir( plotdir );
-
 		% initialize framework
 	addpath( '../../cdf/' );
 
@@ -63,7 +57,7 @@ function sync( indir, outdir, ids )
 			% sync timings and plot offsets
 		[sync0, synchints, syncs] = cdf.sync( run, cfg );
 
-		cdf.plot.sync( run, sync0, syncs, fullfile( plotdir, sprintf( 'run_%d_sync.png', i ) ) );
+		cdf.plot.sync( run, sync0, syncs, fullfile( outdir, sprintf( 'run_%d_sync.png', i ) ) );
 
 			% write output data
 		run.audiodata = []; % do not write redundant audio data

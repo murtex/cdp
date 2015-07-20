@@ -6,7 +6,7 @@ OUTDIR="'../../data/cdd/convert/'"
 
 IDS="0:40"
 
-	# prepare directories
+	# reset output directory
 rm -rf $OUTDIR
 
 	# spread workload

@@ -6,7 +6,7 @@ OUTDIR="'../../data/klein-dev/convert/'"
 
 IDS="1:47"
 
-	# prepare directories
+	# reset output directory
 rm -rf $OUTDIR
 
 	# spread workload
