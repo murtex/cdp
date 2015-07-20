@@ -28,8 +28,7 @@ sleep 3
 matlab -nosplash -nodesktop -r "debug_activity( $INDIR, $OUTDIR, 46:47, $NTRIALS, $SEED ); exit();" &
 
 	# DEBUG
-#IDS="[5, 7, 11, 20, 21, 41]"
-#IDS=5
+#IDS=37
 #matlab -nosplash -nodesktop -r "debug_activity( $INDIR, $OUTDIR, $IDS, $NTRIALS, $SEED ); exit();" &
 
 wait
