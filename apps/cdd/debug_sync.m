@@ -1,12 +1,12 @@
-function debug_sync( cdfindir, syncindir, plotdir, ids, ntrials, seed )
+function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
 % debug syncing
 % 
-% DEBUG_SYNC( cdfindir, syncindir, plotdir, ids, ntrials, seed )
+% DEBUG_SYNC( cdfindir, syncindir, outdir, ids, ntrials, seed )
 %
 % INPUT
 % cdfindir : cdf input directory (row char)
 % syncindir : sync input directory (row char)
-% plotdir : plot directory (row char)
+% outdir : plot directory (row char)
 % ids : subject identifiers (row numeric)
 % ntrials : number of trials (scalar numeric)
 % seed : randomization seed (scalar numeric)
@@ -20,8 +20,8 @@ function debug_sync( cdfindir, syncindir, plotdir, ids, ntrials, seed )
 		error( 'invalid argument: syncindir' );
 	end
 
-	if nargin < 3 || ~isrow( plotdir ) || ~ischar( plotdir )
-		error( 'invalid argument: plotdir' );
+	if nargin < 3 || ~isrow( outdir ) || ~ischar( outdir )
+		error( 'invalid argument: outdir' );
 	end
 
 	if nargin < 4 || ~isrow( ids ) || ~isnumeric( ids )
@@ -45,15 +45,14 @@ function debug_sync( cdfindir, syncindir, plotdir, ids, ntrials, seed )
 		error( 'invalid argument: syncindir' );
 	end
 
-	if exist( plotdir, 'dir' ) == 7
-		rmdir( plotdir, 's' );
+	if exist( outdir, 'dir' ) ~= 7
+		mkdir( outdir );
 	end
-	mkdir( plotdir );
 
 		% initialize framework
 	addpath( '../../cdf/' );
 
-	logger = xis.hLogger.instance( fullfile( plotdir, sprintf( 'debug_sync_%d-%d.log', min( ids ), max( ids ) ) ) );
+	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'debug_sync_%d-%d.log', min( ids ), max( ids ) ) ) );
 	logger.tab( 'debug syncing...' );
 
 	cfg = cdf.hConfig(); % use defaults
@@ -80,10 +79,10 @@ function debug_sync( cdfindir, syncindir, plotdir, ids, ntrials, seed )
 		read_audio( run, run.audiofile, true );
 
 			% plot sync offsets
-		cdf.plot.sync( run, sync0, syncs, fullfile( plotdir, sprintf( 'run_%d_sync.png', i ) ) );
+		cdf.plot.sync( run, sync0, syncs, fullfile( outdir, sprintf( 'run_%d_sync.png', i ) ) );
 
 			% prepare trial plot directory
-		plotdir = fullfile( plotdir, sprintf( 'run_%d', i ) );
+		plotdir = fullfile( outdir, sprintf( 'run_%d', i ) );
 		if exist( plotdir, 'dir' ) == 7
 			rmdir( plotdir, 's' );
 		end
