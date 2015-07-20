@@ -45,10 +45,9 @@ function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
 		error( 'invalid argument: syncindir' );
 	end
 
-	if exist( outdir, 'dir' ) == 7
-		rmdir( outdir, 's' );
+	if exist( outdir, 'dir' ) ~= 7
+		mkdir( outdir );
 	end
-	mkdir( outdir );
 
 		% initialize framework
 	addpath( '../../cdf/' );
@@ -82,12 +81,12 @@ function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
 			% plot sync offsets
 		cdf.plot.sync( run, sync0, syncs, fullfile( outdir, sprintf( 'run_%d_sync.png', i ) ) );
 
-			% prepare trial directory
-		trialdir = fullfile( outdir, sprintf( 'run_%d', i ) );
-		if exist( trialdir, 'dir' ) == 7
-			rmdir( trialdir, 's' );
+			% reset specific directory
+		specdir = fullfile( outdir, sprintf( 'run_%d', i ) );
+		if exist( specdir, 'dir' ) == 7
+			rmdir( specdir, 's' );
 		end
-		mkdir( trialdir );
+		mkdir( specdir );
 
 			% sample random trials
 		rs = rng(); % push randomness
@@ -111,7 +110,7 @@ function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
 			% plot trials
 		for j = trialids
 			cdf.plot.trial_sync( run, cfg, j, sync0, synchints(j), syncs(j), ...
-				fullfile( trialdir, sprintf( 'run_%d_trial_%d_sync.png', i, j ) ) );
+				fullfile( specdir, sprintf( 'run_%d_trial_%d_sync.png', i, j ) ) );
 		end
 
 			% clean up

@@ -4,8 +4,12 @@
 CDFINDIR="'../../data/cdd/convert/'"
 SYNCINDIR="'../../data/cdd/sync/'"
 OUTDIR="'../../data/cdd/debug-sync/'"
+
 NTRIALS=20
 SEED=1
+
+	# reset output directory
+rm -rf $OUTDIR
 
 	# spread workload
 matlab -nosplash -nodesktop -r "debug_sync( $CDFINDIR, $SYNCINDIR, $OUTDIR, 0:4, $NTRIALS, $SEED ); exit();" &
