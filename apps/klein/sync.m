@@ -31,9 +31,10 @@ function sync( indir, outdir, ids )
 	end
 
 	plotdir = fullfile( outdir, 'plot/' );
-	if exist( plotdir, 'dir' ) ~= 7
-		mkdir( plotdir );
+	if exist( plotdir ) == 7
+		rmdir( plotdir, 's' );
 	end
+	mkdir( plotdir );
 
 		% initialize framework
 	addpath( '../../cdf/' );
