@@ -1,7 +1,7 @@
 #!/bin/sh
 
 	# script arguments
-INDIR="'../../data/cdd/label/'"
+INDIR="'../../data/cdd/activity/'"
 OUTDIR="'../../data/cdd/label/'"
 
 	# workload
