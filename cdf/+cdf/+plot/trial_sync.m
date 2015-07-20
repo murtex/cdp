@@ -77,7 +77,7 @@ function trial_sync( run, cfg, id, sync0, synchint, sync, plotfile )
 	plot( 1000 * sync * [1, 1], yl, ...
 		'Color', style.color( 'warm', 0 ) );
 	plot( xs, cdts, ...
-		'Color', style.color( 'cold', +1 ) );
+		'Color', style.color( 'cold', 0 ) );
 
 	subplot( 2, 1, 2 ); % zoom
 	xlabel( 'time in milliseconds' );
@@ -87,7 +87,7 @@ function trial_sync( run, cfg, id, sync0, synchint, sync, plotfile )
 	plot( 1000 * sync * [1, 1], yl, ...
 		'Color', style.color( 'warm', 0 ) );
 	plot( xs, cdts, ...
-		'Color', style.color( 'cold', +1 ) );
+		'Color', style.color( 'cold', 0 ) );
 
 		% print
 	style.print( plotfile );

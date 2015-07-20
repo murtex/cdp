@@ -94,7 +94,7 @@ function activity( run, cfg, plotfile )
 	ylabel( 'rate' );
 	xlim( maxdelta * [-1, 1] );
 	bar( dstartpos, dstartns / ndstarts, ...
-		'BarWidth', 1, 'FaceColor', style.color( 'cold', +1 ), 'EdgeColor', 'none' );
+		'BarWidth', 1, 'FaceColor', style.color( 'cold', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, 2 );
 	xlabel( 'abs(delta) in milliseconds' );
@@ -102,7 +102,7 @@ function activity( run, cfg, plotfile )
 	xlim( [0, maxdelta] );
 	ylim( [0, 1] );
 	bar( absdstartpos, cumsum( absdstartns ) / ndstarts, ...
-		'BarWidth', 1, 'FaceColor', style.color( 'cold', +1 ), 'EdgeColor', 'none' );
+		'BarWidth', 1, 'FaceColor', style.color( 'cold', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, 3 ); % detection stops
 	title( ...
@@ -112,7 +112,7 @@ function activity( run, cfg, plotfile )
 	ylabel( 'rate' );
 	xlim( maxdelta * [-1, 1] );
 	bar( dstoppos, dstopns / ndstops, ...
-		'BarWidth', 1, 'FaceColor', style.color( 'cold', +1 ), 'EdgeColor', 'none' );
+		'BarWidth', 1, 'FaceColor', style.color( 'cold', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, 4 );
 	xlabel( 'abs(delta) in milliseconds' );
@@ -120,7 +120,7 @@ function activity( run, cfg, plotfile )
 	xlim( [0, maxdelta] );
 	ylim( [0, 1] );
 	bar( absdstoppos, cumsum( absdstopns ) / ndstops, ...
-		'BarWidth', 1, 'FaceColor', style.color( 'cold', +1 ), 'EdgeColor', 'none' );
+		'BarWidth', 1, 'FaceColor', style.color( 'cold', 0 ), 'EdgeColor', 'none' );
 
 	subplot( 3, 2, [5, 6] ); % detection overlaps
 	title( ...
@@ -130,7 +130,7 @@ function activity( run, cfg, plotfile )
 	ylabel( 'rate' );
 	xlim( [0, maxoverlap] );
 	bar( overlappos, overlapns / noverlaps, ...
-		'BarWidth', 1, 'FaceColor', style.color( 'cold', +1 ), 'EdgeColor', 'none' );
+		'BarWidth', 1, 'FaceColor', style.color( 'cold', 0 ), 'EdgeColor', 'none' );
 
 		% print
 	style.print( plotfile );
