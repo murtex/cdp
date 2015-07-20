@@ -4,6 +4,9 @@
 INDIR="'../../data/klein-dev/convert/'"
 OUTDIR="'../../data/klein-dev/sync/'"
 
+	# prepare directories
+rm -rf $OUTDIR
+
 	# spread workload
 matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 1:5 ); exit();" &
 sleep 3

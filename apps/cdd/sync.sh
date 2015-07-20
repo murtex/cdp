@@ -4,6 +4,9 @@
 INDIR="'../../data/cdd/convert/'"
 OUTDIR="'../../data/cdd/sync/'"
 
+	# prepare directories
+rm -rf $OUTDIR
+
 	# spread workload
 matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 0:4 ); exit();" &
 sleep 3
