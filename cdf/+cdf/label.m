@@ -51,13 +51,13 @@ function label( run, cfg )
 
 					case 'normal' % range start
 						cp = get( src, 'CurrentPoint' );
-						resp.range(1) = trial.range(1) + cp(1, 1) / 1000;
+						resp_lab.range(1) = trial.range(1) + cp(1, 1) / 1000;
 						recompute = true;
 						update();
 
 					case 'alt' % range stop
 						cp = get( src, 'CurrentPoint' );
-						resp.range(2) = trial.range(1) + cp(1, 1) / 1000;
+						resp_lab.range(2) = trial.range(1) + cp(1, 1) / 1000;
 						recompute = true;
 						update();
 
@@ -128,13 +128,14 @@ function label( run, cfg )
 						sound( respts, run.audiorate );
 
 					case 'backspace' % reset data
-						resp.range = [NaN, NaN];
-						resp.bo = NaN;
-						resp.f0 = [NaN, NaN];
-						resp.f1 = [NaN, NaN];
-						resp.f2 = [NaN, NaN];
-						resp.f3 = [NaN, NaN];
-						resp.vr = NaN;
+						resp_lab.range = [NaN, NaN];
+						resp_lab.bo = NaN;
+						resp_lab.vo = NaN;
+						resp_lab.vr = NaN;
+						resp_lab.f0 = [NaN, NaN];
+						resp_lab.f1 = [NaN, NaN];
+						resp_lab.f2 = [NaN, NaN];
+						resp_lab.f3 = [NaN, NaN];
 						recompute = true;
 						update();
 
@@ -142,39 +143,15 @@ function label( run, cfg )
 						if zoom
 							[x, ~] = ginput( 1 );
 							if ~isempty( x )
-								resp.bo = trial.range(1) + x / 1000;
+								resp_lab.bo = trial.range(1) + x / 1000;
 								update();
 							end
 						end
-					case '0'
+					case 'v'
 						if zoom
-							[x, y] = ginput( 1 );
-							if ~isempty( x ) && ~isempty( y )
-								resp.f0 = [trial.range(1) + x / 1000, y];
-								update();
-							end
-						end
-					case '1'
-						if zoom
-							[x, y] = ginput( 1 );
-							if ~isempty( x ) && ~isempty( y )
-								resp.f1 = [trial.range(1) + x / 1000, y];
-								update();
-							end
-						end
-					case '2'
-						if zoom
-							[x, y] = ginput( 1 );
-							if ~isempty( x ) && ~isempty( y )
-								resp.f2 = [trial.range(1) + x / 1000, y];
-								update();
-							end
-						end
-					case '3'
-						if zoom
-							[x, y] = ginput( 1 );
-							if ~isempty( x ) && ~isempty( y )
-								resp.f3 = [trial.range(1) + x / 1000, y];
+							[x, ~] = ginput( 1 );
+							if ~isempty( x )
+								resp_lab.vo = trial.range(1) + x / 1000;
 								update();
 							end
 						end
@@ -182,7 +159,7 @@ function label( run, cfg )
 						if zoom
 							[x, ~] = ginput( 1 );
 							if ~isempty( x )
-								resp.vr = trial.range(1) + x / 1000;
+								resp_lab.vr = trial.range(1) + x / 1000;
 								update();
 							end
 						end
@@ -210,10 +187,28 @@ function label( run, cfg )
 
 			% prepare data
 		trial = run.trials(id);
-		resp = run.resps_lab(id);
+
+		resp_det = run.resps_det(id);
+		resp_lab = run.resps_lab(id);
+
+		if isnan( resp_lab.range(1) ) && ~isnan( resp_det.range(1) ) % detection hints
+			resp_lab.range(1) = resp_det.range(1);
+		end
+		if isnan( resp_lab.range(2) ) && ~isnan( resp_det.range(2) )
+			resp_lab.range(2) = resp_det.range(2);
+		end
+		if isnan( resp_lab.bo ) && ~isnan( resp_det.bo )
+			resp_lab.bo = resp_det.bo;
+		end
+		if isnan( resp_lab.vo ) && ~isnan( resp_det.vo )
+			resp_lab.vo = resp_det.vo;
+		end
+		if isnan( resp_lab.vr ) && ~isnan( resp_det.vr )
+			resp_lab.vr = resp_det.vr;
+		end
 
 		if zoom % signal range
-			respr = dsp.sec2smp( resp.range, run.audiorate ) + [1, 0];
+			respr = dsp.sec2smp( resp_lab.range, run.audiorate ) + [1, 0];
 			if any( isnan( respr ) )
 				zoom = false;
 			end
@@ -249,40 +244,50 @@ function label( run, cfg )
 		yl = max( abs( respts ) ) * style.scale( 1/2 ) * [-1, 1];
 		ylim( yl );
 
-		if ~zoom && ~any( isnan( resp.range ) ) && diff( resp.range ) > 0 % response range
+		if ~zoom && ~any( isnan( resp_lab.range ) ) && diff( resp_lab.range ) > 0 % response range
 			rectangle( 'Position', [ ...
-				1000 * (resp.range(1) - trial.range(1)), style.scale( -1 ) * yl(1), ...
-				1000 * diff( resp.range ), abs( style.scale( -1 ) * yl(1) )], ...
+				1000 * (resp_lab.range(1) - trial.range(1)), style.scale( -1 ) * yl(1), ...
+				1000 * diff( resp_lab.range ), abs( style.scale( -1 ) * yl(1) )], ...
 				'EdgeColor', style.color( 'warm', +2 ), 'FaceColor', style.color( 'warm', +2 ), ...
 				'HitTest', 'off' );
 		end
-		if ~zoom && ~isnan( resp.range(1) )
-			stem( 1000 * (resp.range(1) - trial.range(1)), style.scale( -1 ) * yl(1), ...
+		if ~zoom && ~isnan( resp_lab.range(1) )
+			stem( 1000 * (resp_lab.range(1) - trial.range(1)), style.scale( -1 ) * yl(1), ...
 				'Color', style.color( 'warm', 0 ), ...
 				'HitTest', 'off' );
 		end
-		if ~zoom && ~isnan( resp.range(2) )
-			stem( 1000 * (resp.range(2) - trial.range(1)), style.scale( -1 ) * yl(1), ...
+		if ~zoom && ~isnan( resp_lab.range(2) )
+			stem( 1000 * (resp_lab.range(2) - trial.range(1)), style.scale( -1 ) * yl(1), ...
 				'Color', style.color( 'warm', 0 ), ...
 				'HitTest', 'off' );
 		end
 
-		if ~isnan( resp.bo ) % landmarks
-			stem( 1000 * (resp.bo - trial.range(1)), style.scale( -1 ) * yl(2), ...
+		if ~isnan( resp_lab.bo ) % landmarks
+			stem( 1000 * (resp_lab.bo - trial.range(1)), style.scale( -1 ) * yl(2), ...
 				'Color', style.color( 'warm', 0 ), ...
 				'HitTest', 'off' );
 			if zoom
-				stem( 1000 * (resp.bo - trial.range(1)), style.scale( -1 ) * yl(1), ...
+				stem( 1000 * (resp_lab.bo - trial.range(1)), style.scale( -1 ) * yl(1), ...
 					'Color', style.color( 'warm', 0 ), ...
 					'HitTest', 'off' );
 			end
 		end
-		if ~isnan( resp.vr )
-			stem( 1000 * (resp.vr - trial.range(1)), style.scale( -1 ) * yl(2), ...
+		if ~isnan( resp_lab.vo )
+			stem( 1000 * (resp_lab.vo - trial.range(1)), style.scale( -1 ) * yl(2), ...
 				'Color', style.color( 'warm', 0 ), ...
 				'HitTest', 'off' );
 			if zoom
-				stem( 1000 * (resp.vr - trial.range(1)), style.scale( -1 ) * yl(1), ...
+				stem( 1000 * (resp_lab.vo - trial.range(1)), style.scale( -1 ) * yl(1), ...
+					'Color', style.color( 'warm', 0 ), ...
+					'HitTest', 'off' );
+			end
+		end
+		if ~isnan( resp_lab.vr )
+			stem( 1000 * (resp_lab.vr - trial.range(1)), style.scale( -1 ) * yl(2), ...
+				'Color', style.color( 'warm', 0 ), ...
+				'HitTest', 'off' );
+			if zoom
+				stem( 1000 * (resp_lab.vr - trial.range(1)), style.scale( -1 ) * yl(1), ...
 					'Color', style.color( 'warm', 0 ), ...
 					'HitTest', 'off' );
 			end
@@ -309,23 +314,23 @@ function label( run, cfg )
 			imagesc( xs, respfreqs, log( (respst .* conj( respst )).^contrast + eps ), ...
 				'HitTest', 'off' );
 
-			if ~any( isnan( resp.f0 ) )
-				scatter( 1000 * (resp.f0(1) - trial.range(1)), resp.f0(2), ...
+			if ~any( isnan( resp_lab.f0 ) )
+				scatter( 1000 * (resp_lab.f0(1) - trial.range(1)), resp_lab.f0(2), ...
 					'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', 'none', ...
 					'HitTest', 'off' );
 			end
-			if ~any( isnan( resp.f1 ) )
-				scatter( 1000 * (resp.f1(1) - trial.range(1)), resp.f1(2), ...
+			if ~any( isnan( resp_lab.f1 ) )
+				scatter( 1000 * (resp_lab.f1(1) - trial.range(1)), resp_lab.f1(2), ...
 					'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', 'none', ...
 					'HitTest', 'off' );
 			end
-			if ~any( isnan( resp.f2 ) )
-				scatter( 1000 * (resp.f2(1) - trial.range(1)), resp.f2(2), ...
+			if ~any( isnan( resp_lab.f2 ) )
+				scatter( 1000 * (resp_lab.f2(1) - trial.range(1)), resp_lab.f2(2), ...
 					'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', 'none', ...
 					'HitTest', 'off' );
 			end
-			if ~any( isnan( resp.f3 ) )
-				scatter( 1000 * (resp.f3(1) - trial.range(1)), resp.f3(2), ...
+			if ~any( isnan( resp_lab.f3 ) )
+				scatter( 1000 * (resp_lab.f3(1) - trial.range(1)), resp_lab.f3(2), ...
 					'MarkerEdgeColor', style.color( 'warm', 0 ), 'MarkerFaceColor', 'none', ...
 					'HitTest', 'off' );
 			end
