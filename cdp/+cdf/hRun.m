@@ -6,6 +6,9 @@ classdef hRun < matlab.mixin.Copyable
 
 		id = NaN; % subject identifier (scalar numeric)
 
+		sex = ''; % subject sex (row char)
+		age = NaN; % subject age (scalar numeric)
+
 		audiofile = ''; % audio filename (row char)
 		audiodata = []; % audio data (matrix numeric)
 		audiolen = NaN; % audio length (scalar numeric)
