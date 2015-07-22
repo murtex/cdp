@@ -2,7 +2,7 @@
 
 	# data directories
 INDIR='../../data/klein/classify-lab/'
-OUTDIR='../../data/klein/debug-worst/'
+OUTDIR='../../data/klein/debug-ka/'
 
 	# spread workload
 #matlab -nosplash -nodesktop -r "debug( '$INDIR', '$OUTDIR', 1:5 ); exit();" &
@@ -26,7 +26,7 @@ OUTDIR='../../data/klein/debug-worst/'
 #matlab -nosplash -nodesktop -r "debug( '$INDIR', '$OUTDIR', 46:47 ); exit();" &
 
 	# DEBUG
-IDS='[]'
+IDS='[38, 42, 45, 46]'
 matlab -nosplash -nodesktop -r "debug( '$INDIR', '$OUTDIR', $IDS ); exit();" &
 
 wait

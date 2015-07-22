@@ -59,12 +59,24 @@ function debug( indir, outdir, ids )
 		end
 		mkdir( plotdir );
 
-		trials = [run.trials.detected];
-		lens = diff( cat( 1, trials.range ), 1, 2 );
-		trials = run.trials(~isnan( lens ));
-		trials = randsample( trials, min( numel( trials ), 20 ) ); % 20 trials
+		itrials = []; % choose correctly classified trials
+		for j = 1:numel( run.trials )
+			if strcmp( run.trials(j).labeled.label, 'ka' ) && strcmp( run.trials(j).detected.label, 'ka' ) ...
+					&& ~any( isnan( run.trials(j).range ) )
+				itrials(end+1) = j;
+			end
+		end
+		if numel( itrials ) > 1
+			itrials = randsample( itrials, min( numel( itrials ), 20 ) );
+		end
+		trials = run.trials(itrials);
 
-		n = numel( trials );
+		%trials = [run.trials.detected]; % choose random trials
+		%lens = diff( cat( 1, trials.range ), 1, 2 );
+		%trials = run.trials(~isnan( lens ));
+		%trials = randsample( trials, min( numel( trials ), 20 ) ); % 20 trials
+
+		n = numel( trials ); % plot
 		for j = 1:n
 			cdf.plot.trial_range( run, cfg, trials(j), [...
 				min( trials(j).detected.range(1), trials(j).labeled.range(1) ), ...
@@ -73,6 +85,11 @@ function debug( indir, outdir, ids )
 				fullfile( plotdir, sprintf( 'trial_%d.png', trials(j).id ) ) );
 		end
 
+		for j = 1:n % write audio
+			wavwrite( run.audiodata(trials(j).range(1):trials(j).range(2), 1), run.audiorate, ...
+				fullfile( plotdir, sprintf( 'trial_%d.wav', trials(j).id ) ) );
+		end
+		
 			% cleanup
 		delete( run );
 
