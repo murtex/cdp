@@ -7,10 +7,10 @@
 #./landmark.sh
 
 	# label classification (~25min)
-#./features.sh
-#./train.sh
-#./classify.sh
+./features.sh
+./train.sh
+./classify.sh
 
 	# debugging
-./debug.sh
+#./debug.sh
 
