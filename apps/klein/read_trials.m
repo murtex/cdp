@@ -75,6 +75,8 @@ function read_trials( run, logfile )
 
 		% setup run and trials
 	run.id = fdata{1}(1);
+	run.sex = fdata{3}{1};
+	run.age = fdata{2}(1);
 
 	run.trials(n) = cdf.hTrial(); % pre-allocation
 
