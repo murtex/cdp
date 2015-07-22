@@ -150,7 +150,7 @@ function trial_range( run, cfg, trial, range, rzp, plotfile )
 	ylim( [freqs(1), freqs(end)] );
 
 	colormap( style.gradient( 64, [1, 1, 1], style.color( 'neutral', -0.5 ) ) ); % spectrogram
-	imagesc( sta.smp2msec( 0:size( respft, 1 )-1, run.audiorate ), freqs, log( respft' ) );
+	imagesc( sta.smp2msec( 0:size( respft, 1 )-1, run.audiorate ), freqs, log( respft' + eps ) );
 
 	plot( ... % landmarks
 		sta.smp2msec( [trial.labeled.bo, trial.labeled.vo, trial.labeled.vr]-rzp, run.audiorate ), ...
