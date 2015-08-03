@@ -1,7 +1,7 @@
 #!/bin/sh
 
 	# script arguments
-INDIR="'../../data/klein-dev/sync/'"
+INDIR="'../../data/klein-dev/label/'"
 OUTDIR="'../../data/klein-dev/label/'"
 
 	# workload
