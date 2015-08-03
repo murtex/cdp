@@ -36,7 +36,10 @@ function label( indir, outdir, ids )
 	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'label_%d-%d.log', min( ids ), max( ids ) ) ) );
 	logger.tab( 'label data...' );
 
-	cfg = cdf.hConfig(); % use defaults
+	cfg = cdf.hConfig(); % formant config
+
+	cfg.lab_freqband = [0, 2000];
+	cfg.lab_nfreqs = 200;
 
 		% proceed subject identifiers
 	for i = ids

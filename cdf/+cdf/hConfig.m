@@ -20,8 +20,8 @@ classdef (Sealed = true) hConfig < handle
 		vad_hangover = 6; % activity hangover (scalar numeric)
 
 			% labeling
-		lab_freqband = [0, 4000]; % frequency band (row numeric)
-		lab_nfreqs = 100; % frequency resolution (scalar numeric)
+		lab_freqband = [0, 2000]; % frequency band (row numeric)
+		lab_nfreqs = 200; % frequency resolution (scalar numeric)
 
 	end
 
