@@ -51,6 +51,11 @@ function read_labels( run, labelfile )
 		resp.range(1) = trial.cue + fdata{i, 8};
 		resp.range(2) = resp.range(1) + fdata{i, 9} + fdata{i, 10};
 
+			% landmarks
+		resp.bo = resp.range(1);
+		resp.vo = resp.range(1) + fdata{i, 9};
+		resp.vr = resp.range(2);
+
 	end
 
 	logger.untab();
