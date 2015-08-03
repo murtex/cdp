@@ -282,11 +282,11 @@ classdef (Sealed = true) hStyle < handle
 
 			g1 = skewness( data ); % doane's formula
 			sigmag1 = sqrt( 6*(n-2) / ((n+1)*(n+3)) );
-			ks(end+1) = 1 + log2( n ) + log2( 1 + abs( g1 )/sigmag1 );
+			ks(end+1) = round( 1 + log2( n ) + log2( 1 + abs( g1 )/sigmag1 ) );
 
-			ks(end+1) = 3.5 * std( data ) / (n^(1/3)); % scott's normal reference rule
+			ks(end+1) = round( 3.5 * std( data ) / (n^(1/3)) ); % scott's normal reference rule
 
-			ks(end+1) = 2 * iqr( data ) / (n^(1/3)); % freedman-diaconis rule
+			ks(end+1) = round( 2 * iqr( data ) / (n^(1/3)) ); % freedman-diaconis rule
 
 				% choose maximum number of bins
 			k = max( ks );
