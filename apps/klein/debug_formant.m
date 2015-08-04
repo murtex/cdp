@@ -98,8 +98,8 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 		global_f1freqs = cat( 1, global_f1freqs, f1freqs );
 
 			% bin statistics
-		nbinxs = style.bins( f0onsets );
-		nbinys = style.bins( f1freqs );
+		nbinxs = 20; % style.bins( f0onsets );
+		nbinys = 20; % style.bins( f1freqs );
 		bins = transpose( hist3( [f0onsets, f1freqs], [nbinxs, nbinys] ) );
 
 		bins = bins / max( bins(:) );
@@ -130,6 +130,34 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 
 		logger.untab();
 	end
+
+		% bin global statistics
+	nbinxs = 20; % style.bins( global_f0onsets );
+	nbinys = 20; % style.bins( global_f1freqs );
+	bins = transpose( hist3( [global_f0onsets, global_f1freqs], [nbinxs, nbinys] ) );
+
+	bins = bins / max( bins(:) );
+	binxs = linspace( min( global_f0onsets ), max( global_f0onsets ), size( bins, 2 ) );
+	binys = linspace( min( global_f1freqs ), max( global_f1freqs ), size( bins, 1 ) );
+
+		% plot global statistics
+	fig = style.figure();
+
+	title( sprintf( 'formant-onsets (trials: %d/%s)', numel( global_f0onsets ), 'TODO' ) );
+	xlabel( 'f0-onset (relative deviation from median)' );
+	ylabel( 'f1-frequency (relative deviation from median)' );
+	xlim( [min( binxs ), max( binxs )] );
+	ylim( [min( binys ), max( binys )] );
+
+	colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', 0 ) ) );
+	imagesc( binxs, binys, bins );
+
+	hc = colorbar();
+	ylabel( hc, 'rate' );
+
+	style.print( fullfile( outdir, 'global_formant.png' ) );
+
+	delete( fig );
 
 		% done
 	logger.untab( 'done' );
