@@ -28,7 +28,7 @@ SEED=1
 #matlab -nosplash -nodesktop -r "debug_formant( $INDIR, $OUTDIR, 46:47, $NTRIALS, $SEED ); exit();" &
 
 	# DEBUG
-IDS="[13, 46]"
+IDS="[13, 42, 46]"
 matlab -nosplash -nodesktop -r "debug_formant( $INDIR, $OUTDIR, $IDS, $NTRIALS, $SEED ); exit();" &
 
 wait

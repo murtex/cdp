@@ -54,6 +54,8 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 	cfg.lab_nfreqs = 200;
 
 		% proceed subject identifiers
+	global_ntrials = 0;
+
 	global_f0onsets = []; % pre-allocation
 	global_f1freqs = [];
 
@@ -74,19 +76,26 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 		read_audio( run, run.audiofile, false );
 
 			% gather formant statistics
+		trials = [run.trials];
 		resps = [run.resps_lab];
+
+		dels = [];
+		for j = 1:numel( resps )
+			if ~strcmp( trials(j).cuelabel, 'ta' )
+				dels(end+1) = j;
+			end
+		end
+		resps(dels) = [];
 
 		bos = transpose( [resps.bo] );
 		f0s = cat( 1, resps.f0 );
 		f1s = cat( 1, resps.f1 );
 
 		f0onsets = f0s(:, 1) - bos;
-		f0freqs = f0s(:, 2);
 		f1freqs = f1s(:, 2);
 
-		nans = isnan( f0onsets ) | isnan( f0freqs ) | isnan( f1freqs ); % remove nans
+		nans = isnan( f0onsets ) | isnan( f1freqs ); % remove nans
 		f0onsets(nans) = [];
-		f0freqs(nans) = [];
 		f1freqs(nans) = [];
 
 		f0onsetmean = median( f0onsets ); % normalization
@@ -94,12 +103,13 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 		f1freqmean = median( f1freqs );
 		f1freqs = (f1freqs - f1freqmean) / f1freqmean;
 
-		global_f0onsets = cat( 1, global_f0onsets, f0onsets ); % update globals
+		global_ntrials = global_ntrials + numel( resps ); % update globals
+		global_f0onsets = cat( 1, global_f0onsets, f0onsets );
 		global_f1freqs = cat( 1, global_f1freqs, f1freqs );
 
 			% bin statistics
-		nbinxs = 20; % style.bins( f0onsets );
-		nbinys = 20; % style.bins( f1freqs );
+		nbinxs = 15; % style.bins( f0onsets );
+		nbinys = 15; % style.bins( f1freqs );
 		bins = transpose( hist3( [f0onsets, f1freqs], [nbinxs, nbinys] ) );
 
 		bins = bins / max( bins(:) );
@@ -110,8 +120,8 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 		fig = style.figure();
 
 		title( sprintf( 'formant-onsets (trials: %d/%d)', numel( f0onsets ), numel( resps ) ) );
-		xlabel( 'f0-onset (relative deviation)' );
-		ylabel( 'f1-frequency (relative deviation)' );
+		xlabel( 'f0-onset time (relative deviation)' );
+		ylabel( 'f1-onset frequency (relative deviation)' );
 		xlim( [min( binxs ), max( binxs )] );
 		ylim( [min( binys ), max( binys )] );
 
@@ -121,7 +131,7 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 		hc = colorbar();
 		ylabel( hc, 'rate' );
 
-		style.print( fullfile( outdir, sprintf( 'run_%d_formant.png', i ) ) );
+		style.print( fullfile( outdir, sprintf( 'run_%d_formant_ta.png', i ) ) );
 
 		delete( fig );
 
@@ -132,8 +142,8 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 	end
 
 		% bin global statistics
-	nbinxs = 20; % style.bins( global_f0onsets );
-	nbinys = 20; % style.bins( global_f1freqs );
+	nbinxs = 15; % style.bins( global_f0onsets );
+	nbinys = 15; % style.bins( global_f1freqs );
 	bins = transpose( hist3( [global_f0onsets, global_f1freqs], [nbinxs, nbinys] ) );
 
 	bins = bins / max( bins(:) );
@@ -143,9 +153,9 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 		% plot global statistics
 	fig = style.figure();
 
-	title( sprintf( 'formant-onsets (trials: %d/%s)', numel( global_f0onsets ), 'TODO' ) );
-	xlabel( 'f0-onset (relative deviation from median)' );
-	ylabel( 'f1-frequency (relative deviation from median)' );
+	title( sprintf( 'formant-onsets (trials: %d/%d)', numel( global_f0onsets ), global_ntrials ) );
+	xlabel( 'f0-onset time (relative deviation from median)' );
+	ylabel( 'f1-onset frequency (relative deviation from median)' );
 	xlim( [min( binxs ), max( binxs )] );
 	ylim( [min( binys ), max( binys )] );
 
@@ -155,7 +165,7 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 	hc = colorbar();
 	ylabel( hc, 'rate' );
 
-	style.print( fullfile( outdir, 'global_formant.png' ) );
+	style.print( fullfile( outdir, 'global_formant_ta.png' ) );
 
 	delete( fig );
 
