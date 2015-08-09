@@ -79,16 +79,16 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 		trials = [run.trials];
 		resps = [run.resps_lab];
 
-		dels = [];
-		for j = 1:numel( resps )
-			if ~strcmp( trials(j).cuelabel, 'ta' )
-				dels(end+1) = j;
-			end
-		end
-		resps(dels) = [];
+		%dels = [];
+		%for j = 1:numel( resps )
+			%if ~strcmp( trials(j).cuelabel, 'ta' )
+				%dels(end+1) = j;
+			%end
+		%end
+		%resps(dels) = [];
 
 		bos = transpose( [resps.bo] );
-		f0s = cat( 1, resps.f0 );
+		f0s = cat( 1, resps.f2 );
 		f1s = cat( 1, resps.f1 );
 
 		f0onsets = f0s(:, 1) - bos;
@@ -131,7 +131,7 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 		hc = colorbar();
 		ylabel( hc, 'rate' );
 
-		style.print( fullfile( outdir, sprintf( 'run_%d_formant_ta.png', i ) ) );
+		style.print( fullfile( outdir, sprintf( 'run_%d_formant.png', i ) ) );
 
 		delete( fig );
 
@@ -165,7 +165,7 @@ function debug_formant( indir, outdir, ids, ntrials, seed )
 	hc = colorbar();
 	ylabel( hc, 'rate' );
 
-	style.print( fullfile( outdir, 'global_formant_ta.png' ) );
+	style.print( fullfile( outdir, 'global_formant.png' ) );
 
 	delete( fig );
 
