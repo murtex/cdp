@@ -71,23 +71,23 @@ function label( run, cfg )
 				done = true;
 				delete( fig );
 
-			case 'buttonup' % mouse input
-			case 'buttondown'
-				switch get( fig, 'SelectionType' )
+			%case 'buttonup' % mouse input
+			%case 'buttondown'
+				%switch get( fig, 'SelectionType' )
 
-					case 'normal' % range start
-						cp = get( src, 'CurrentPoint' );
-						resp.range(1) = trial.range(1) + cp(1, 1) / 1000;
-						recompute = true;
-						update();
+					%case 'normal' % range start
+						%cp = get( src, 'CurrentPoint' );
+						%resp.range(1) = trial.range(1) + cp(1, 1) / 1000;
+						%recompute = true;
+						%update();
 
-					case 'alt' % range stop
-						cp = get( src, 'CurrentPoint' );
-						resp.range(2) = trial.range(1) + cp(1, 1) / 1000;
-						recompute = true;
-						update();
+					%case 'alt' % range stop
+						%cp = get( src, 'CurrentPoint' );
+						%resp.range(2) = trial.range(1) + cp(1, 1) / 1000;
+						%recompute = true;
+						%update();
 
-				end
+				%end
 
 			case 'keypress' % keyboard input
 			case 'keyrelease'
@@ -127,10 +127,10 @@ function label( run, cfg )
 						sound( respts, run.audiorate );
 
 					case 'backspace' % reset data
-						resp.range = [NaN, NaN];
-						resp.bo = NaN;
-						resp.vo = NaN;
-						resp.vr = NaN;
+						%resp.range = [NaN, NaN];
+						%resp.bo = NaN;
+						%resp.vo = NaN;
+						%resp.vr = NaN;
 						resp.f0 = [NaN, NaN];
 						resp.f1 = [NaN, NaN];
 						resp.f2 = [NaN, NaN];
@@ -138,30 +138,30 @@ function label( run, cfg )
 						recompute = true;
 						update();
 
-					case 'b' % landmarks
-						if zoom
-							[x, ~] = ginput( 1 );
-							if ~isempty( x )
-								resp.bo = trial.range(1) + x / 1000;
-								update();
-							end
-						end
-					case 'v'
-						if zoom
-							[x, ~] = ginput( 1 );
-							if ~isempty( x )
-								resp.vo = trial.range(1) + x / 1000;
-								update();
-							end
-						end
-					case 'r'
-						if zoom
-							[x, ~] = ginput( 1 );
-							if ~isempty( x )
-								resp.vr = trial.range(1) + x / 1000;
-								update();
-							end
-						end
+					%case 'b' % landmarks
+						%if zoom
+							%[x, ~] = ginput( 1 );
+							%if ~isempty( x )
+								%resp.bo = trial.range(1) + x / 1000;
+								%update();
+							%end
+						%end
+					%case 'v'
+						%if zoom
+							%[x, ~] = ginput( 1 );
+							%if ~isempty( x )
+								%resp.vo = trial.range(1) + x / 1000;
+								%update();
+							%end
+						%end
+					%case 'r'
+						%if zoom
+							%[x, ~] = ginput( 1 );
+							%if ~isempty( x )
+								%resp.vr = trial.range(1) + x / 1000;
+								%update();
+							%end
+						%end
 
 					case 'f' % formants
 						if zoom
