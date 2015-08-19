@@ -1,7 +1,7 @@
 function sec = smp2sec( smp, rate )
 % samples to seconds
 %
-% sec = SMP2sec( smp, rate )
+% sec = SMP2SEC( smp, rate )
 %
 % INPUT
 % smp : samples (numeric)
