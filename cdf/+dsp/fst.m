@@ -59,7 +59,7 @@ function [st, freqs] = fst( ts, rate, lofreq, hifreq, nfreqs )
 	tslen = 2^nextpow2( max( rate, tslenorig ) );
 	ts = cat( 1, ts, zeros( tslen - tslenorig, 1 ) );
 
-		% compute hilbert transform (the real(?!) way)
+		% compute hilbert transform (the real [sic!] way)
 	ts = fft( real( ts ) );
 	h = [1; ...
 		2*ones( fix( (tslen-1)/2 ), 1 ); ...
