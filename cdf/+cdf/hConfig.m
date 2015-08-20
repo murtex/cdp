@@ -9,6 +9,13 @@ classdef (Sealed = true) hConfig < handle
 		sync_smooth = 0.002; % smoothing (scalar numeric)
 		sync_thresh = 3.0; % mahalanobis threshold (scalar numeric)
 
+			% formant-onset detection
+		fod_freqband = [0, 2000]; % frequency band (row numeric)
+		fod_nfreqs = 200; % frequency resolution (scalar numeric)
+
+		fod_contrast = 3.5; % spectral contrast (scalar numeric)
+		fod_peakratio = 0.25; % spectral peak ratio (scalar numeric)
+
 			% voice activity detection
 		vad_frlength = 0.006; % short-time length (scalar numeric)
 		vad_froverlap = 0.5; % short-time overlap (scalar numeric)
