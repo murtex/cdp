@@ -9,7 +9,7 @@ IDS="1:47"
 	# reset output directory
 rm -rf $OUTDIR
 
-	# spread workload
+	# workload
 matlab -nosplash -nodesktop -r "convert( $INDIR, $OUTDIR, $IDS ); exit();" &
 
 wait

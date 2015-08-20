@@ -7,7 +7,7 @@ OUTDIR="'../../data/klein-dev/sync/'"
 	# reset output directory
 rm -rf $OUTDIR
 
-	# spread workload
+	# workload
 matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 1:5 ); exit();" &
 sleep 3
 matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 6:10 ); exit();" &
