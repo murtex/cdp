@@ -13,8 +13,11 @@ classdef (Sealed = true) hConfig < handle
 		fod_freqband = [0, 2000]; % frequency band (row numeric)
 		fod_nfreqs = 200; % frequency resolution (scalar numeric)
 
-		fod_contrast = 3.5; % spectral contrast (scalar numeric)
-		fod_peakratio = 0.25; % spectral peak ratio (scalar numeric)
+		fod_gamma = 3.5; % spectral gamma (scalar numeric)
+
+		fod_peakratio = 0.3; % peak ratio (scalar numeric)
+		fod_peakgap = 0.01; % peak gap (scalar numeric)
+		fod_peakleap = 50.0; % peak leap (scalar numeric)
 
 			% voice activity detection
 		vad_frlength = 0.006; % short-time length (scalar numeric)

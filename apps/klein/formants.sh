@@ -29,7 +29,7 @@ rm -rf $OUTDIR
 #matlab -nosplash -nodesktop -r "formants( $INDIR, $OUTDIR, 46:47 ); exit();" &
 
 	# DEBUG
-IDS=13
+IDS=46
 matlab -nosplash -nodesktop -r "formants( $INDIR, $OUTDIR, $IDS ); exit();" &
 
 wait

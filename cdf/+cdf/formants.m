@@ -55,11 +55,11 @@ function formants( run, cfg, lab )
 		[sd, freqs] = dsp.fst( ts, run.audiorate, cfg.fod_freqband(1), cfg.fod_freqband(2), cfg.fod_nfreqs );
 
 		sd = sd .* conj( sd );
-		sd = sd .^ cfg.fod_contrast;
+		sd = sd .^ cfg.fod_gamma;
 		sd = log( sd + eps );
 
 			% get formant-onsets
-		k15.fod( sd, freqs, run.audiorate, cfg.fod_peakratio, 4 );
+		k15.fod( sd, freqs, run.audiorate, 5, cfg.fod_peakratio, cfg.fod_peakgap, cfg.fod_peakleap );
 
 			% DEBUG
 		break;
