@@ -1,5 +1,5 @@
 function formants( run, cfg, lab )
-% detect formant-onsets
+% track formant trajectories
 %
 % FORMANTS( run, cfg, lab )
 %
@@ -22,7 +22,7 @@ function formants( run, cfg, lab )
 	end
 
 	logger = xis.hLogger.instance();
-	logger.tab( 'detect formant-onsets...' );
+	logger.tab( 'track formant trajectories...' )
 
 		% proceed trials
 	ntrials = numel( run.trials );
@@ -51,15 +51,15 @@ function formants( run, cfg, lab )
 
 		ts = run.audiodata(r(1):r(2), 1);
 
-			% set spectral decomposition
-		[sd, freqs] = dsp.fst( ts, run.audiorate, cfg.fod_freqband(1), cfg.fod_freqband(2), cfg.fod_nfreqs );
+			% get spectral decomposition
+		[sd, freqs] = dsp.fst( ts, run.audiorate, cfg.ftt_freqband(1), cfg.ftt_freqband(2), cfg.ftt_nfreqs );
 
 		sd = sd .* conj( sd );
-		sd = sd .^ cfg.fod_gamma;
+		sd = sd .^ cfg.ftt_gamma;
 		sd = log( sd + eps );
 
-			% get formant-onsets
-		k15.fod( sd, freqs, run.audiorate, 5, cfg.fod_peakratio, cfg.fod_peakgap, cfg.fod_peakleap );
+			% get formant trajectories
+		k15.ftt( sd, freqs, run.audiorate, 4, cfg.ftt_peakratio, cfg.ftt_peakgap, cfg.ftt_peakleap );
 
 			% DEBUG
 		break;

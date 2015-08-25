@@ -1,5 +1,5 @@
 function formants( indir, outdir, ids )
-% detect formant-onsets
+% track formant trajectories
 %
 % FORMANTS( indir, outdir, ids )
 %
@@ -34,7 +34,7 @@ function formants( indir, outdir, ids )
 	addpath( '../../cdf/' );
 
 	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'formants_%d-%d.log', min( ids ), max( ids ) ) ) );
-	logger.tab( 'detect formant-onsets...' );
+	logger.tab( 'track formant trajectories...' );
 
 	cfg = cdf.hConfig(); % use defaults
 
@@ -54,7 +54,7 @@ function formants( indir, outdir, ids )
 
 		read_audio( run, run.audiofile, true );
 
-			% detect formant-onsets
+			% track formant trajectories
 		cdf.formants( run, cfg, true );
 
 			% write output data

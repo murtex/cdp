@@ -9,15 +9,15 @@ classdef (Sealed = true) hConfig < handle
 		sync_smooth = 0.002; % smoothing (scalar numeric)
 		sync_thresh = 3.0; % mahalanobis threshold (scalar numeric)
 
-			% formant-onset detection
-		fod_freqband = [0, 2000]; % frequency band (row numeric)
-		fod_nfreqs = 200; % frequency resolution (scalar numeric)
+			% formant trajectory tracking
+		ftt_freqband = [0, 2000]; % frequency band (row numeric)
+		ftt_nfreqs = 200; % frequency resolution (scalar numeric)
 
-		fod_gamma = 3.5; % spectral gamma (scalar numeric)
+		ftt_gamma = 3.5; % spectral gamma (scalar numeric)
 
-		fod_peakratio = 0.3; % peak ratio (scalar numeric)
-		fod_peakgap = 0.01; % peak gap (scalar numeric)
-		fod_peakleap = 50.0; % peak leap (scalar numeric)
+		ftt_peakratio = 0.2; % peak ratio (scalar numeric)
+		ftt_peakgap = 0.01; % peak gap (scalar numeric)
+		ftt_peakleap = 50.0; % peak leap (scalar numeric)
 
 			% voice activity detection
 		vad_frlength = 0.006; % short-time length (scalar numeric)
