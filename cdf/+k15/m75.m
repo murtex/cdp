@@ -25,23 +25,17 @@ function p = m75( ts, ratio )
 		% set convex hull
 	[tsmax, tsmaxi] = max( ts );
 
-	h = -Inf( size( ts ) );
-	h(1) = ts(1);
-	h(tsmaxi) = tsmax;
-	h(end) = ts(end);
+	h = ts; % pre-allocation
 
 	for i = 2:tsmaxi-1 % lhs
-		if ts(i) > h(i-1)
-			h(i) = ts(i);
-		else
+		if h(i) < h(i-1)
 			h(i) = h(i-1);
 		end
 	end
 
-	for i = numel( ts )-1:-1:tsmaxi+1 % rhs
-		if ts(i) > h(i+1)
-			h(i) = ts(i);
-		else
+	n = numel( h ); % rhs
+	for i = n-1:-1:tsmaxi+1
+		if h(i) < h(i+1)
 			h(i) = h(i+1);
 		end
 	end
