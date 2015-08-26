@@ -28,7 +28,7 @@ function formants( run, cfg, lab )
 	ntrials = numel( run.trials );
 
 	logger.progress();
-	for i = 1:ntrials
+	for i = 1:20 % DEBUG
 		trial = run.trials(i);
 		resp = run.resps_det(i);
 
@@ -51,18 +51,111 @@ function formants( run, cfg, lab )
 
 		ts = run.audiodata(r(1):r(2), 1);
 
-			% get spectral decomposition
+			% set spectral decomposition
 		[sd, freqs] = dsp.fst( ts, run.audiorate, cfg.ftt_freqband(1), cfg.ftt_freqband(2), cfg.ftt_nfreqs );
 
-		sd = sd .* conj( sd );
-		sd = sd .^ cfg.ftt_gamma;
-		sd = log( sd + eps );
+		sd = pow2db( sd .* conj( sd ) + eps ); % decibel scale
 
-			% get formant trajectories
-		k15.ftt( sd, freqs, run.audiorate, 4, cfg.ftt_peakratio, cfg.ftt_peakgap, cfg.ftt_peakleap );
+		sdmin = min( sd(:) ); % normalization
+		sdmax = max( sd(:) );
+		sd = (sd - sdmin) / (sdmax - sdmin);
 
-			% DEBUG
-		break;
+		sdlen = size( sd, 2 );
+
+			% get peak series
+		sdg = sd .^ cfg.ftt_gamma; % gamma correction
+
+		nformants = 4;
+		npeaks = 2 * nformants;
+		peaks = NaN( npeaks, sdlen ); % pre-allocation
+
+		for j = 1:sdlen
+			p = sort( k15.m75( sdg(:, j), cfg.ftt_peakratio ) );
+
+			n = min( npeaks, numel( p ) ); % stack peaks
+			peaks(1:n, j) = freqs(p(1:n));
+		end
+
+			% link trajectories
+		trajs = k15.traj( peaks, dsp.sec2smp( cfg.ftt_trajgap, run.audiorate ), cfg.ftt_trajleap );
+
+		trajlens = cellfun( @( x ) x(end, 1)-x(1, 1)+1, trajs ); % remove stubs
+		trajs(trajlens < max( trajlens )/2) = [];
+
+			% trim fade-ins
+		for j = 1:numel( trajs )
+			tmp = trajs{j};
+
+			t = tmp(:, 1); % get (uncorrected) spectral values
+			f = tmp(:, 2);
+			fi = arrayfun( @( x ) find( freqs == x ), f );
+			is = sub2ind( size( sd ), fi, t );
+			sdvals = sd(is);
+
+			[sdvalmax, sdvalmaxi] = max( sdvals ); % get tail value-range
+			sdvalmin = min( sdvals(sdvalmaxi:end) );
+
+			dels = 1:find( sdvals(1:sdvalmaxi) < (sdvalmin+sdvalmax)/2, 1, 'last' ); % trim trajectory head
+			tmp(dels, :) = [];
+			trajs{j} = tmp;
+		end
+
+			% sort by median frequencies
+		trajfreqs = cellfun( @( x ) median( x(:, 2) ), trajs );
+		[~, order] = sort( trajfreqs );
+		trajs = trajs(order);
+
+			% DEBUG: formants
+		i
+
+		style = xis.hStyle.instance();
+		fig = style.figure();
+
+		xlabel( 'time in milliseconds' );
+		ylabel( 'frequency in hertz' );
+
+		xlim( dsp.smp2msec( [0, sdlen-1], run.audiorate ) );
+		ylim( [min( freqs ), max( freqs )] );
+
+		colormap( style.gradient( 256, [1, 1, 1], style.color( 'cold', -2 ) ) ); % decomposition
+		imagesc( dsp.smp2msec( 0:sdlen-1, run.audiorate ), freqs, sd );
+
+		%for j = 1:npeaks % peaks
+			%scatter( dsp.smp2msec( 0:sdlen-1, run.audiorate ), peaks(j, :), ...
+				%'.', 'MarkerEdgeColor', style.color( 'warm', 0 ) );
+		%end
+
+		for j = 1:numel( trajs ) % trajectories
+			tmp = trajs{j};
+			plot( dsp.smp2msec( tmp(:, 1)-1, run.audiorate ), tmp(:, 2) );
+		end
+
+		style.print( sprintf( 'debug/f_%d.png', i ) );
+		delete( fig );
+
+			% DEBUG: trajectories
+		%for j = 1:numel( trajs )
+			%fig = style.figure();
+
+			%xlabel( 'time in milliseconds' );
+			%ylabel( 'spectral value' );
+
+			%xlim( dsp.smp2msec( [0, sdlen-1], run.audiorate ) );
+			%ylim( [0, 1] );
+
+			%tmp = trajs{j};
+			%t = tmp(:, 1);
+			%f = tmp(:, 2);
+			%fi = arrayfun( @( x ) find( freqs == x ), f );
+			%is = sub2ind( size( sd ), fi, t );
+			%sdvals = sd(is);
+
+			%plot( dsp.smp2msec( t-1, run.audiorate ), sdvals, ...
+				%'Color', style.color( 'warm', 0 ) );
+
+			%style.print( sprintf( 'debug/f_%d-t_%d.png', i, j ) );
+			%delete( fig );
+		%end
 
 		logger.progress( i, ntrials );
 	end

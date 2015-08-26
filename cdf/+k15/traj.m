@@ -5,8 +5,8 @@ function ts = traj( peaks, gap, leap )
 %
 % INPUT
 % peaks : peaks (matrix numeric)
-% gap : peak gap (scalar numeric)
-% leap : peak leap (scalar numeric)
+% gap : trajectory gap (scalar numeric)
+% leap : trajectory leap (scalar numeric)
 %
 % OUTPUT
 % ts : trajectories (cell array)
