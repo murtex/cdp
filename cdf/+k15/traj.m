@@ -81,7 +81,13 @@ function ts = traj( peaks, gap, leap )
 		end
 
 			% append trajectory
-		ts{end+1} = t;
+		nvals = size( t, 1 );
+		nnvals = sum( diff( t(:, 1) ) - 1 );
+		len = t(end, 1) - t(1, 1) + 1;
+
+		if nvals > nnvals && len > gap
+			ts{end+1} = t;
+		end
 		
 	end
 
