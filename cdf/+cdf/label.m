@@ -1,11 +1,12 @@
-function label( run, cfg )
+function label( run, cfg, trialstart )
 % label data
 %
-% LABEL( run, cfg )
+% LABEL( run, cfg, trialstart=1 )
 %
 % INPUT
 % run : cue-distractor run (scalar object)
 % cfg : framework configuration (scalar object)
+% trialstart : trial identifier to start with (scalar numeric)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
@@ -14,6 +15,13 @@ function label( run, cfg )
 
 	if nargin < 2 || ~isscalar( cfg ) || ~isa( cfg, 'cdf.hConfig' )
 		error( 'invalid argument: cfg' );
+	end
+
+	if nargin < 3
+		trialstart = 1;
+	end
+	if ~isscalar( trialstart ) || ~isnumeric( trialstart ) || trialstart > numel( run.trials )
+		error( 'invalid argument: trialstart' );
 	end
 
 	logger = xis.hLogger.instance();
@@ -238,7 +246,7 @@ function label( run, cfg )
 	contrast = 3;
 
 	ntrials = numel( run.trials );
-	id = 1;
+	id = trialstart;
 
 	while ~done
 

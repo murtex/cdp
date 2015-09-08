@@ -1,12 +1,13 @@
-function label( indir, outdir, ids )
+function label( indir, outdir, ids, trialstarts )
 % label data
 %
-% LABEL( indir, outdir, ids )
+% LABEL( indir, outdir, ids, trialstarts=ones )
 % 
 % INPUT
 % indir : input directory (row char)
 % outdir : output directory (row char)
 % ids : subject identifiers (row numeric)
+% trialstarts : trial identifiers to start with (row numeric)
 
 		% safeguard
 	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
@@ -19,6 +20,13 @@ function label( indir, outdir, ids )
 
 	if nargin < 3 || ~isrow( ids ) || ~isnumeric( ids )
 		error( 'invalid argument: ids' );
+	end
+
+	if nargin < 4
+		trialstarts = ones( numel( ids ), 1 );
+	end
+	if ~isrow( trialstarts ) || ~isnumeric( trialstart ) || numel( trialstarts ) ~= numel( ids )
+		error( 'invalid argument: trialstarts' );
 	end
 
 		% prepare directories
@@ -42,7 +50,9 @@ function label( indir, outdir, ids )
 	cfg.lab_nfreqs = 200;
 
 		% proceed subject identifiers
+	ci = 0;
 	for i = ids
+		ci = ci + 1;
 		logger.tab( 'subject: %d', i );
 
 			% read input data
@@ -58,7 +68,7 @@ function label( indir, outdir, ids )
 		read_audio( run, run.audiofile, true );
 
 			% label data
-		cdf.label( run, cfg );
+		cdf.label( run, cfg, trialstarts(ci) );
 
 			% write output data
 		run.audiodata = []; % do not write redundant audio data
