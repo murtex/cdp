@@ -25,7 +25,7 @@ function label( indir, outdir, ids, trialstarts )
 	if nargin < 4
 		trialstarts = ones( numel( ids ), 1 );
 	end
-	if ~isrow( trialstarts ) || ~isnumeric( trialstart ) || numel( trialstarts ) ~= numel( ids )
+	if ~isrow( trialstarts ) || ~isnumeric( trialstarts ) || numel( trialstarts ) ~= numel( ids )
 		error( 'invalid argument: trialstarts' );
 	end
 
