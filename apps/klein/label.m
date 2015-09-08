@@ -44,9 +44,9 @@ function label( indir, outdir, ids, trialstarts )
 	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'label_%d-%d.log', min( ids ), max( ids ) ) ) );
 	logger.tab( 'label data...' );
 
-	cfg = cdf.hConfig(); % formant config
+	cfg = cdf.hConfig(); % default config
 
-	cfg.lab_freqband = [0, 2000];
+	cfg.lab_freqband = [0, 1200]; % labeling config
 	cfg.lab_nfreqs = 200;
 
 		% proceed subject identifiers
