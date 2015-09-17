@@ -73,7 +73,7 @@ function convert( indir, outdir, ids )
 
 	fig = style.figure();
 
-	title( sprintf( 'trial numbers (subjects: %d)', numel( ids ) ) );
+	title( sprintf( 'raw conversion (subjects: %d)', numel( ids ) ) );
 	xlabel( 'subject identifier' );
 	ylabel( 'number of trials' );
 
