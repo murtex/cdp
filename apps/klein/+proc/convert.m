@@ -35,7 +35,7 @@ function convert( indir, outdir, ids )
 	logger = xis.hLogger.instance( logfile );
 	logger.tab( 'convert raw data...' );
 
-		% proceed subject identifiers
+		% proceed subjects
 	for i = ids
 		logger.tab( 'subject: %d', i );
 
