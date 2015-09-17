@@ -9,7 +9,7 @@ function convert( indir, outdir, ids )
 % ids : subject identifiers (row numeric)
 
 		% safeguard
-	if nargin < 1 || ~isrow( indir ) || ~ischar( indir ) || exist( indir, 'dir' ) ~= 7
+	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
 		error( 'invalid argument: indir' );
 	end
 
@@ -21,7 +21,11 @@ function convert( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-		% prepare for output
+		% check/prepare directories
+	if exist( indir, 'dir' ) ~= 7
+		error( 'invalid argument: indir' );
+	end
+
 	if exist( outdir, 'dir' ) ~= 7
 		mkdir( outdir );
 	end
