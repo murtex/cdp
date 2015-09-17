@@ -9,7 +9,7 @@ function convert( indir, outdir, ids )
 % ids : subject identifiers (row numeric)
 
 		% safeguard
-	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
+	if nargin < 1 || ~isrow( indir ) || ~ischar( indir ) || exist( indir, 'dir' ) ~= 7
 		error( 'invalid argument: indir' );
 	end
 
@@ -21,11 +21,7 @@ function convert( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-		% prepare directories
-	if exist( indir, 'dir' ) ~= 7
-		error( 'invalid argument: indir' );
-	end
-
+		% prepare for output
 	if exist( outdir, 'dir' ) ~= 7
 		mkdir( outdir );
 	end
@@ -33,7 +29,10 @@ function convert( indir, outdir, ids )
 		% initialize framework
 	addpath( '../../cdf/' );
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'convert_%d-%d.log', min( ids ), max( ids ) ) ) );
+	stamp = datestr( now(), 'yymmdd-HHMMSS-FFF' );
+	logfile = fullfile( outdir, sprintf( 'proc_convert_%s.log', stamp ) );
+
+	logger = xis.hLogger.instance( logfile );
 	logger.tab( 'convert raw data...' );
 
 		% proceed subject identifiers
@@ -53,9 +52,9 @@ function convert( indir, outdir, ids )
 			% read raw data
 		run = cdf.hRun();
 
-		read_audio( run, audiofile, false );
-		read_trials( run, trialfile );
-		read_labels( run, labelfile );
+		proc.read_audio( run, audiofile, false );
+		proc.read_trials( run, trialfile );
+		proc.read_labels( run, labelfile );
 
 			% write cdf data
 		cdffile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );

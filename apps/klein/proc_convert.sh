@@ -1,8 +1,8 @@
 #!/bin/sh
 
 	# script arguments
-INDIR="'../../data/klein-dev/raw/'"
-OUTDIR="'../../data/klein-dev/convert/'"
+INDIR="../../data/klein-dev/raw/"
+OUTDIR="../../data/klein-dev/convert/proc/"
 
 IDS="1:47"
 
@@ -10,7 +10,7 @@ IDS="1:47"
 rm -rf $OUTDIR
 
 	# workload
-matlab -nosplash -nodesktop -r "convert( $INDIR, $OUTDIR, $IDS ); exit();" &
+matlab -nosplash -nodesktop -r "proc.convert( '$INDIR', '$OUTDIR', $IDS ); exit();" &
 
 wait
 

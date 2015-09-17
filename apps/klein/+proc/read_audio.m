@@ -42,6 +42,11 @@ function read_audio( run, audiofile, readdata )
 	end
 
 	warning( ws ); % (re-)enable warnings
+
+		% logging
+	logger.log( 'rate: %d/s', run.audiorate );
+	logger.log( 'channels: %d', run.audiosize(2) );
+	logger.log( 'length: %.3fs', dsp.smp2sec( run.audiosize(1)-1, run.audiorate ) );
 	
 	logger.untab();
 end

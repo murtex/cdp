@@ -31,6 +31,8 @@ function read_labels( run, labelfile )
 	end
 
 		% setup responses
+	nvaltrials = 0;
+
 	for i = 1:ntrials
 		trial = run.trials(i);
 		resp = run.resps_lab(i);
@@ -47,6 +49,8 @@ function read_labels( run, labelfile )
 			continue;
 		end
 
+		nvaltrials = nvaltrials + 1;
+
 			% activity
 		resp.range(1) = trial.cue + fdata{i, 8};
 		resp.range(2) = resp.range(1) + fdata{i, 9} + fdata{i, 10};
@@ -57,6 +61,9 @@ function read_labels( run, labelfile )
 		resp.vr = resp.range(2);
 
 	end
+
+		% logging
+	logger.log( 'valid trials: %d', nvaltrials );
 
 	logger.untab();
 end
