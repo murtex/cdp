@@ -1,36 +1,25 @@
 #!/bin/sh
 
 	# script arguments
-INDIR="'../../data/klein-dev/convert/'"
-OUTDIR="'../../data/klein-dev/sync/'"
+INDIR="../../data/klein-dev/convert/proc/"
+OUTDIR="../../data/klein-dev/sync/proc/"
+
+IDS1="1:5"
+IDS2="6:9"
+IDS3="10:15"
+IDS4="16:19"
+IDS5="20:25"
+IDS6="26:29"
+IDS7="30:35"
+IDS8="36:39"
+IDS9="40:45"
+IDS10="46:47"
 
 	# reset output directory
 rm -rf $OUTDIR
 
 	# workload
-matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 1:5 ); exit();" &
-sleep 3
-matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 6:10 ); exit();" &
-sleep 3
-matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 11:15 ); exit();" &
-sleep 3
-matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 16:20 ); exit();" &
-sleep 3
-matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 21:25 ); exit();" &
-sleep 3
-matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 26:30 ); exit();" &
-sleep 3
-matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 31:35 ); exit();" &
-sleep 3
-matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 36:40 ); exit();" &
-sleep 3
-matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 41:45 ); exit();" &
-sleep 3
-matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, 46:47 ); exit();" &
-
-	# DEBUG
-#IDS=5
-#matlab -nosplash -nodesktop -r "sync( $INDIR, $OUTDIR, $IDS ); exit();" &
+matlab -nosplash -nodesktop -r "proc.sync( '$INDIR', '$OUTDIR', $IDS1 ); exit();" &
 
 wait
 

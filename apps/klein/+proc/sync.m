@@ -1,5 +1,5 @@
 function sync( indir, outdir, ids )
-% sync timings
+% sync raw timings
 %
 % SYNC( indir, outdir, ids )
 %
@@ -21,7 +21,7 @@ function sync( indir, outdir, ids )
 		error( 'invalid argument: ids' );
 	end
 
-		% prepare directories
+		% check/prepare directories
 	if exist( indir, 'dir' ) ~= 7
 		error( 'invalid argument: indir' );
 	end
@@ -30,19 +30,28 @@ function sync( indir, outdir, ids )
 		mkdir( outdir );
 	end
 
+	auxdir = fullfile( outdir, 'aux/' );
+	if exist( auxdir, 'dir' ) ~= 7
+		mkdir( auxdir );
+	end
+
 		% initialize framework
 	addpath( '../../cdf/' );
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'sync_%d-%d.log', min( ids ), max( ids ) ) ) );
-	logger.tab( 'sync timings...' );
+	stamp = datestr( now(), 'yymmdd-HHMMSS-FFF' );
+	logfile = fullfile( outdir, sprintf( 'proc_sync_%s.log', stamp ) );
 
-	cfg = cdf.hConfig(); % use defaults
+	logger = xis.hLogger.instance( logfile );
+	logger.tab( 'sync raw timings...' );
 
-		% proceed subject identifiers
+		% configure framework
+	cfg = cdf.hConfig();
+
+		% proceed subjects
 	for i = ids
 		logger.tab( 'subject: %d', i );
 
-			% read input data
+			% read input
 		cdffile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
 		if exist( cdffile, 'file' ) ~= 2
 			logger.untab( 'skipping...' );
@@ -52,23 +61,21 @@ function sync( indir, outdir, ids )
 		logger.log( 'read cdf data (''%s'')...', cdffile );
 		load( cdffile, 'run' );
 
-		read_audio( run, run.audiofile, true );
+		proc.read_audio( run, run.audiofile, true );
 
-			% sync timings and plot offsets
+			% sync timings
 		[sync0, synchints, syncs] = cdf.sync( run, cfg );
 
-		cdf.plot.sync( run, sync0, syncs, fullfile( outdir, sprintf( 'run_%d_sync.png', i ) ) );
-
-			% write output data
+			% write output
 		run.audiodata = []; % do not write redundant audio data
 
 		cdffile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
 		logger.log( 'write cdf data (''%s'')...', cdffile );
 		save( cdffile, 'run' );
 
-		syncfile = fullfile( outdir, sprintf( 'syncs_%d.mat', i ) );
-		logger.log( 'write sync data (''%s'')...', syncfile );
-		save( syncfile, 'sync0', 'synchints', 'syncs' );
+		auxfile = fullfile( auxdir, sprintf( 'run_%d_sync_aux.mat', i ) );
+		logger.log( 'write aux data (''%s'')...', auxfile );
+		save( auxfile, 'sync0', 'synchints', 'syncs' );
 
 			% clean up
 		delete( run );

@@ -1,48 +1,34 @@
-function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
-% debug syncing
-% 
-% DEBUG_SYNC( cdfindir, syncindir, outdir, ids, ntrials, seed )
+function sync( indir, outdir, ids )
+% test raw syncings
+%
+% SYNC( indir, outdir, ids )
 %
 % INPUT
-% cdfindir : cdf input directory (row char)
-% syncindir : sync input directory (row char)
-% outdir : debug directory (row char)
+% indir : input directory (row char)
+% outdir : output directory (row char)
 % ids : subject identifiers (row numeric)
-% ntrials : number of trials (scalar numeric)
-% seed : randomization seed (scalar numeric)
 
 		% safeguard
-	if nargin < 1 || ~isrow( cdfindir ) || ~ischar( cdfindir )
-		error( 'invalid argument: cdfindir' );
+	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
+		error( 'invalid argument: indir' );
 	end
-
-	if nargin < 2 || ~isrow( syncindir ) || ~ischar( syncindir )
-		error( 'invalid argument: syncindir' );
-	end
-
-	if nargin < 3 || ~isrow( outdir ) || ~ischar( outdir )
+	
+	if nargin < 2 || ~isrow( outdir ) || ~ischar( outdir )
 		error( 'invalid argument: outdir' );
 	end
 
-	if nargin < 4 || ~isrow( ids ) || ~isnumeric( ids )
+	if nargin < 3 || ~isrow( ids ) || ~isnumeric( ids )
 		error( 'invalid argument: ids' );
 	end
 
-	if nargin < 5 || ~isscalar( ntrials ) || ~isnumeric( ntrials )
-		error( 'invalid argument: ntrials' );
+		% check/prepare directories
+	if exist( indir, 'dir' ) ~= 7
+		error( 'invalid argument: indir' );
 	end
 
-	if nargin < 6 || ~isscalar( seed ) || ~isnumeric( seed )
-		error( 'invalid argument: seed' );
-	end
-
-		% prepare directories
-	if exist( cdfindir, 'dir' ) ~= 7
-		error( 'invalid argument: cdfindir' );
-	end
-
-	if exist( syncindir, 'dir' ) ~= 7
-		error( 'invalid argument: syncindir' );
+	auxdir = fullfile( indir, 'aux/' );
+	if exist( auxdir, 'dir' ) ~= 7
+		error( 'invalid argument: indir' );
 	end
 
 	if exist( outdir, 'dir' ) ~= 7
@@ -52,20 +38,23 @@ function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
 		% initialize framework
 	addpath( '../../cdf/' );
 
-	logger = xis.hLogger.instance( fullfile( outdir, sprintf( 'debug_sync_%d-%d.log', min( ids ), max( ids ) ) ) );
-	logger.tab( 'debug syncing...' );
+	stamp = datestr( now(), 'yymmdd-HHMMSS-FFF' );
+	logfile = fullfile( outdir, sprintf( 'test_sync_%s.log', stamp ) );
 
-	cfg = cdf.hConfig(); % use defaults
+	logger = xis.hLogger.instance( logfile );
+	logger.tab( 'test raw syncings...' );
 
-		% proceed subject identifiers
+	style = xis.hStyle.instance();
+
+		% proceed subjects
 	for i = ids
 		logger.tab( 'subject: %d', i );
 
-			% read input data
-		cdffile = fullfile( cdfindir, sprintf( 'run_%d.mat', i ) );
-		syncfile = fullfile( syncindir, sprintf( 'syncs_%d.mat', i ) );
+			% read input
+		cdffile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
+		auxfile = fullfile( auxdir, sprintf( 'run_%d_sync_aux.mat', i ) );
 
-		if exist( cdffile, 'file' ) ~= 2 || exist( syncfile, 'file' ) ~= 2
+		if exist( cdffile, 'file' ) ~= 2 || exist( auxfile, 'file' ) ~= 2
 			logger.untab( 'skipping...' );
 			continue;
 		end
@@ -73,48 +62,32 @@ function debug_sync( cdfindir, syncindir, outdir, ids, ntrials, seed )
 		logger.log( 'read cdf data (''%s'')...', cdffile );
 		load( cdffile, 'run' );
 
-		logger.log( 'read sync data (''%s'')...', syncfile );
-		load( syncfile, 'sync0', 'synchints', 'syncs' );
+		logger.log( 'read aux data (''%s'')...', auxfile );
+		load( auxfile, 'sync0', 'synchints', 'syncs' );
 
-		read_audio( run, run.audiofile, true );
+			% plot syncings
+		plotfile = fullfile( outdir, sprintf( 'test_sync_run_%d.png', i ) );
+		logger.log( 'plot syncings (''%s'')...', plotfile );
 
-			% plot sync offsets
-		cdf.plot.sync( run, sync0, syncs, fullfile( outdir, sprintf( 'run_%d_sync.png', i ) ) );
+		fig = style.figure();
 
-			% reset specific directory
-		specdir = fullfile( outdir, sprintf( 'run_%d', i ) );
-		if exist( specdir, 'dir' ) == 7
-			rmdir( specdir, 's' );
-		end
-		mkdir( specdir );
-
-			% sample random trials
-		rs = rng(); % push randomness
-		rng( seed, 'twister' );
-
-		trialids = 1:numel( run.trials ); % valid trials
-		invalids = [];
-		for j = trialids
-			if isnan( run.trials(j).cue ) || isnan( syncs(j) )
-				invalids(end+1) = j;
-			end
-		end
-		trialids(invalids) = [];
-
-		if numel( trialids ) > 1 && numel( trialids ) > ntrials % sample trials
-			trialids = randsample( trialids, ntrials );
+		if any( isnan( syncs ) )
+			set( fig, 'Color', style.color( 'warm', +2 ) );
 		end
 
-		rng( rs ); % pop randomness
+		title( sprintf( 'syncing (subject: %d)', i ) );
+		xlabel( 'marker position in seconds' );
+		ylabel( 'marker offset in milliseconds' );
 
-			% plot trials
-		for j = trialids
-			cdf.plot.trial_sync( run, cfg, j, sync0, synchints(j), syncs(j), ...
-				fullfile( specdir, sprintf( 'run_%d_trial_%d_sync.png', i, j ) ) );
-		end
+		xlim( [0, dsp.smp2sec( run.audiosize(1)-1, run.audiorate )] );
 
-			% clean up
-		delete( run );
+		scatter( [run.trials.cue], 1000 * syncs, ...
+			'Marker', '+', ...
+			'MarkerEdgeColor', style.color( 'cold', 0 ), 'MarkerFaceColor', style.color( 'cold', 0 ) );
+
+		style.print( plotfile );
+
+		delete( fig );
 
 		logger.untab();
 	end
