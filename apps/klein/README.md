@@ -13,10 +13,15 @@ Raw data
 Processing
 ----------
 
-- `proc.convert` -- raw to cdf conversion
+- `proc.convert` --- raw to cdf conversion
 
 Testing
 -------
 
 - `test.convert` -- test raw conversion
 
+
+Analysis
+--------
+
+- TODO
