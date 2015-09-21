@@ -1,12 +1,10 @@
 Basis application
 =================
 
-A collection of scripts for Eugen Klein's thesis data...
-
 Raw data
 --------
 
-- stimuli ([psychtoolbox](http://psychtoolbox.org/))
+- stimuli (via [psychtoolbox](http://psychtoolbox.org/))
 - responses (audio recordings)
 - labels (manually measured)
 
