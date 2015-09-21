@@ -10,7 +10,7 @@ Raw data
 - responses (wave audio recordings)
 - labels (manually measured)
 
-Data processing
+Processing
 ----------
 
 - `proc.convert` -- raw to cdf conversion
@@ -21,7 +21,7 @@ Testing
 - `test.convert` -- test raw conversion
 
 
-Data analysis
+Analysis
 --------
 
 - TODO
