@@ -6,7 +6,9 @@ A collection of scripts for Eugen Klein's thesis data...
 Raw data
 ---------
 
-- `proc.read_*.m` -- methods for reading raw data
+- stimuli (triggered via [psychtoolbox](http://psychtoolbox.org/))
+- responses (wave audio recordings)
+- labels (manually measured)
 
 Processing
 ----------
