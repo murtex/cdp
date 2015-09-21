@@ -34,7 +34,7 @@ function convert( indir, outdir, ids )
 	addpath( '../../cdf/' );
 
 	stamp = datestr( now(), 'yymmdd-HHMMSS-FFF' );
-	logfile = fullfile( outdir, sprintf( 'proc_convert_%s.log', stamp ) );
+	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
 	logger.tab( 'convert raw data...' );
