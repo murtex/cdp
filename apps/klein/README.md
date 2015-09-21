@@ -4,10 +4,10 @@ Basis application
 A collection of scripts for Eugen Klein's thesis data...
 
 Raw data
----------
+--------
 
-- stimuli (triggered via [psychtoolbox](http://psychtoolbox.org/))
-- responses (wave audio recordings)
+- stimuli ([psychtoolbox](http://psychtoolbox.org/))
+- responses (audio recordings)
 - labels (manually measured)
 
 Processing
