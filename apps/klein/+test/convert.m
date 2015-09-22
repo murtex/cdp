@@ -1,5 +1,5 @@
 function convert( indir, outdir, ids )
-% test raw conversion
+% raw conversion stats
 %
 % CONVERT( indir, outdir, ids )
 %
@@ -30,7 +30,7 @@ function convert( indir, outdir, ids )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'test raw conversion...' );
+	logger.tab( 'raw conversion stats...' );
 
 	style = xis.hStyle.instance();
 

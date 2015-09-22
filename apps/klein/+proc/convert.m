@@ -1,5 +1,5 @@
 function convert( indir, outdir, ids )
-% convert raw data
+% raw to cdf conversion
 %
 % CONVERT( indir, outdir, ids )
 %
@@ -30,13 +30,15 @@ function convert( indir, outdir, ids )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'convert raw data...' );
+	logger.tab( 'raw to cdf conversion...' );
 
 		% proceed subjects
 	for i = ids
 		logger.tab( 'subject: %d', i );
 
-			% prepare raw filenames
+			% read raw data
+		run = cdf.hRun();
+
 		audiofile = fullfile( indir, sprintf( 'participant_%d_1.wav', i ) );
 		trialfile = fullfile( indir, sprintf( 'participant_%d.txt', i ) );
 		labelfile = fullfile( indir, sprintf( 'participant_%d.xlsx', i ) );
@@ -45,9 +47,6 @@ function convert( indir, outdir, ids )
 			logger.untab( 'skipping...' );
 			continue;
 		end
-
-			% read raw data
-		run = cdf.hRun();
 
 		proc.read_audio( run, audiofile, false );
 		proc.read_trials( run, trialfile );
