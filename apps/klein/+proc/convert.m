@@ -1,5 +1,5 @@
 function convert( indir, outdir, ids )
-% raw to cdf conversion
+% raw conversion
 %
 % CONVERT( indir, outdir, ids )
 %
@@ -30,7 +30,7 @@ function convert( indir, outdir, ids )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'raw to cdf conversion...' );
+	logger.tab( 'raw conversion...' );
 
 		% proceed subjects
 	for i = ids
