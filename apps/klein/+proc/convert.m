@@ -53,6 +53,8 @@ function convert( indir, outdir, ids )
 		proc.read_labels( run, labelfile );
 
 			% write cdf data
+		run.audiodata = []; % do ot write redundant audio data
+
 		cdffile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
 		logger.log( 'write cdf data (''%s'')...', cdffile );
 		save( cdffile, 'run' );
