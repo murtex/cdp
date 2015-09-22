@@ -18,6 +18,16 @@ Processing
 
 ##### Detection
 
+- `proc.activity` -- TODO
+- `proc.landmarks` -- TODO
+- `proc.formants` -- TODO
+
+##### Classification
+
+- `proc.features` -- TODO
+- `proc.train` -- TODO
+- `proc.classify` -- TODO
+
 Testing
 -------
 

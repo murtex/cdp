@@ -54,7 +54,7 @@ function sync( indir, outdir, ids )
 		[sync0, synchints, syncs] = cdf.sync( run, cfg );
 
 			% write output
-		run.audiodata = []; % do ot write redundant audio data
+		run.audiodata = []; % do not write redundant audio data
 
 		cdffile = fullfile( outdir, sprintf( 'run_%d.mat', i ) );
 		logger.log( 'write cdf data (''%s'')...', cdffile );
