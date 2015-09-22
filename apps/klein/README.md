@@ -1,6 +1,3 @@
-Basis application
-=================
-
 Raw data
 --------
 
