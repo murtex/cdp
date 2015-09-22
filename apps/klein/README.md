@@ -11,13 +11,20 @@ Raw data
 Processing
 ----------
 
+### Preprocessing
+
 - `proc.convert` -- raw to cdf conversion
+- `proc.sync` -- marker synchronization
+
+### Detection
 
 Testing
 -------
 
-- `test.convert` -- test raw conversion
+### Statistics and overviews
 
+- `test.convert` -- raw conversion stats
+- `test.sync` -- synchronization stats
 
 Analysis
 --------
