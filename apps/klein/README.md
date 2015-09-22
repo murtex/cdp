@@ -11,22 +11,22 @@ Raw data
 Processing
 ----------
 
-#### Preprocessing
+##### Preprocessing
 
 - `proc.convert` -- raw conversion
 - `proc.sync` -- marker synchronization
 
-#### Detection
+##### Detection
 
 Testing
 -------
 
-#### Statistics
+##### Statistics
 
 - `test.convert` -- raw conversion stats
 - `test.sync` -- marker synchronization stats
 
-#### Samples
+##### Samples
 
 Analysis
 --------
