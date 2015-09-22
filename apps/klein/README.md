@@ -32,12 +32,12 @@ Testing
 
 - `test.convert` -- conversion stats
 - `test.sync` -- synchronization stats
-- `test.activity` -- activity detection stats
+- `test.activity` -- activity stats
 
 ##### Samples
 
 - `test.sync_samples` -- synchronization samples
-- `test.activity_samples` -- activity detection samples
+- `test.activity_samples` -- activity samples
 
 Analysis
 --------

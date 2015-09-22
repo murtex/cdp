@@ -53,7 +53,7 @@ function sync( indir, outdir, ids )
 		logger.log( 'read aux data (''%s'')...', auxfile );
 		load( auxfile, 'sync0', 'synchints', 'syncs' );
 
-			% plot marker offsets
+			% plot stats
 		plotfile = fullfile( outdir, sprintf( 'sync_%d.png', i ) );
 		logger.log( 'plot marker offsets (''%s'')...', plotfile );
 
