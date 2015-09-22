@@ -9,32 +9,25 @@ function convert( indir, outdir, ids )
 % ids : subject identifiers (row numeric)
 
 		% safeguard
-	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
+	if nargin < 1 || ~isrow( indir ) || ~ischar( indir ) || exist( indir, 'dir' ) ~= 7
 		error( 'invalid argument: indir' );
 	end
-	
+
 	if nargin < 2 || ~isrow( outdir ) || ~ischar( outdir )
 		error( 'invalid argument: outdir' );
+	elseif exist( outdir, 'dir' ) ~= 7
+		mkdir( outdir );
 	end
 
 	if nargin < 3 || ~isrow( ids ) || ~isnumeric( ids )
 		error( 'invalid argument: ids' );
 	end
 
-		% check/prepare directories
-	if exist( indir, 'dir' ) ~= 7
-		error( 'invalid argument: indir' );
-	end
-
-	if exist( outdir, 'dir' ) ~= 7
-		mkdir( outdir );
-	end
-
 		% initialize framework
 	addpath( '../../cdf/' );
 
 	stamp = datestr( now(), 'yymmdd-HHMMSS-FFF' );
-	logfile = fullfile( outdir, sprintf( 'test_convert_%s.log', stamp ) );
+	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
 	logger.tab( 'test raw conversion...' );
@@ -72,7 +65,7 @@ function convert( indir, outdir, ids )
 	end
 
 		% plot trial numbers
-	plotfile = fullfile( outdir, sprintf( 'test_convert_%s.png', stamp ) );
+	plotfile = fullfile( outdir, sprintf( 'convert_%s.png', stamp ) );
 	logger.log( 'plot trial numbers (''%s'')...', plotfile );
 
 	fig = style.figure();
