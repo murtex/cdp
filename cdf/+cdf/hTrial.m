@@ -18,8 +18,8 @@ classdef (Sealed = true) hTrial < handle
 		vot = NaN; % distractor voice-onset time (scalar numeric)
 
 			% responses
-		resplab = cdf.hResponse();
-		respdet = cdf.hResponse();
+		resplab = cdf.hResponse.empty(); % manually labeled response (scalar object)
+		respdet = cdf.hResponse.empty(); % automatically detected response (scalar object)
 
 	end
 

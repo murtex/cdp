@@ -35,8 +35,9 @@ function convert( indir, outdir, ids )
 	style = xis.hStyle.instance();
 
 		% proceed subjects
-	ntrials(ids) = 0; % pre-allocation
-	nlabtrials(ids) = 0;
+	sexes = cell( 1, max( ids ) ); % pre-allocation
+	ntrials(ids) = 0;
+	nresps(ids) = 0;
 
 	for i = ids
 		logger.tab( 'subject: %d', i );
@@ -51,12 +52,14 @@ function convert( indir, outdir, ids )
 		logger.log( 'read cdf data (''%s'')...', cdffile );
 		load( cdffile, 'run' );
 
-			% update trial numbers
+			% gather stats
+		sexes{i} = run.sex;
+
 		ntrials(i) = numel( run.trials );
 
-		resps = run.resps_lab;
+		resps = [run.trials.resplab];
 		ranges = cat( 1, resps.range );
-		nlabtrials(i) = sum( ~isnan( diff( ranges, 1, 2 ) ) ); % validate by trial range
+		nresps(i) = sum( ~isnan( diff( ranges, 1, 2 ) ) ); % validate by response ranges
 
 			% clean up
 		delete( run );
@@ -64,26 +67,47 @@ function convert( indir, outdir, ids )
 		logger.untab();
 	end
 
-		% plot trial numbers
+		% post-process stats
+	fmals = false( 1, max( ids ) );
+	ffems = false( 1, max( ids ) );
+
+	for i = ids
+		if strcmp( sexes{i}, 'm' ) % male
+			fmals(i) = true;
+		elseif strcmp( sexes{i}, 'w' ) % female
+			ffems(i) = true;
+		end
+	end
+
+	nmals = sum( fmals );
+	nfems = sum( ffems );
+
+		% plot stats
 	plotfile = fullfile( outdir, sprintf( 'convert_%s.png', stamp ) );
-	logger.log( 'plot trial numbers (''%s'')...', plotfile );
+	logger.log( 'plot conversion stats (''%s'')...', plotfile );
 
 	fig = style.figure();
 
-	title( sprintf( 'conversion (subjects: %d)', numel( ids ) ) );
+	title( sprintf( 'conversion (subjects: [%d+%d]/%d)', sum( fmals ), sum( ffems ), numel( ids ) ) );
 	xlabel( 'subject identifier' );
-	ylabel( 'number of trials' );
+	ylabel( 'number of trials/responses' );
 
-	xlim( [min( ids )-0.5, max( ids )+0.5] );
+	xlim( [min( ids ) - 0.5, max( ids ) + 0.5] );
 	ylim( [0, max( ntrials )] );
 
-	hb = bar( ids, cat( 2, transpose( nlabtrials ), transpose( ntrials-nlabtrials ) ), ...
+			% males
+	hbm = bar( ids(fmals), cat( 2, transpose( nresps(fmals) ), transpose( ntrials(fmals) - nresps(fmals) ) ), ...
 		'stacked', 'BarWidth', 1 );
+	set( hbm(1), 'EdgeColor', style.color( 'neutral', -2 ), 'FaceColor', style.color( 'cold', 0 ) );
+	set( hbm(2), 'EdgeColor', style.color( 'neutral', -2 ), 'FaceColor', style.color( 'cold', +2 ) );
 
-	set( hb(1), 'EdgeColor', style.color( 'neutral', -2 ), 'FaceColor', style.color( 'cold', 0 ) );
-	set( hb(2), 'EdgeColor', style.color( 'neutral', -2 ), 'FaceColor', style.color( 'cold', +2 ) );
+			% females
+	hbf = bar( ids(ffems), cat( 2, transpose( nresps(ffems) ), transpose( ntrials(ffems) - nresps(ffems) ) ), ...
+		'stacked', 'BarWidth', 1 );
+	set( hbf(1), 'EdgeColor', style.color( 'neutral', -2 ), 'FaceColor', style.color( 'warm', -1 ) );
+	set( hbf(2), 'EdgeColor', style.color( 'neutral', -2 ), 'FaceColor', style.color( 'warm', +1 ) );
 
-	legend( [hb(2), hb(1)], {'total', 'labeled'}, ...
+	legend( [hbm(2), hbf(2)], {'male', 'female'}, ...
 		'Location', 'southeast' );
 
 	style.print( plotfile );

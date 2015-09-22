@@ -71,11 +71,19 @@ function read_trials( run, trialfile )
 		end
 	end
 
+		% setup general
+	run.sex = fdata{3}{1};
+	run.age = fdata{2}(1);
+
 		% setup trials
 	run.trials(ntrials) = cdf.hTrial(); % pre-allocation
 
 	for i = ntrials:-1:1
 		trial = run.trials(i);
+
+			% responses
+		trial.resplab = cdf.hResponse();
+		trial.respdet = cdf.hResponse();
 
 			% experimental features
 		trial.soa = fdata{14}(i);

@@ -31,7 +31,7 @@ function read_labels( run, labelfile )
 	end
 
 		% setup responses
-	nlabtrials = 0;
+	nlabresps = 0;
 
 	for i = 1:ntrials
 		trial = run.trials(i);
@@ -49,7 +49,7 @@ function read_labels( run, labelfile )
 			continue;
 		end
 
-		nlabtrials = nlabtrials + 1;
+		nlabresps = nlabresps + 1;
 
 			% activity
 		resp.range(1) = trial.cue + fdata{i, 8};
@@ -60,15 +60,13 @@ function read_labels( run, labelfile )
 		resp.vo = resp.range(1) + fdata{i, 9};
 		resp.vr = resp.range(2);
 
-			% formants, TODO!
-
 			% classification
 		resp.label = resplabel;
 
 	end
 
 		% logging
-	logger.log( 'trials: %d', nlabtrials );
+	logger.log( 'labeled: %d', nlabresps );
 
 	logger.untab();
 end

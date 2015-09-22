@@ -4,6 +4,10 @@ classdef (Sealed = true) hRun < handle
 		% properties
 	properties (Access = public)
 
+			% general
+		sex = ''; % subject sex (row char)
+		age = NaN; % subject age (scalar numeric)
+
 			% audio data
 		audiofile = ''; % audio filename (row char)
 
