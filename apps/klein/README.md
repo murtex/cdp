@@ -21,12 +21,13 @@ Processing
 Testing
 -------
 
-#### Statistics and overviews
+#### Statistics
 
 - `test.convert` -- raw conversion stats
-- `test.sync` -- synchronization stats
+- `test.sync` -- marker synchronization stats
+
+#### Samples
 
 Analysis
 --------
 
-- TODO

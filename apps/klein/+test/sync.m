@@ -1,5 +1,5 @@
 function sync( indir, outdir, ids )
-% synchronization stats
+% marker synchronization stats
 %
 % SYNC( indir, outdir, ids )
 %
@@ -30,7 +30,7 @@ function sync( indir, outdir, ids )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'synchronization stats...' );
+	logger.tab( 'marker synchronization stats...' );
 
 	style = xis.hStyle.instance();
 
