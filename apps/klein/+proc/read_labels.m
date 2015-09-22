@@ -35,7 +35,7 @@ function read_labels( run, labelfile )
 
 	for i = 1:ntrials
 		trial = run.trials(i);
-		resp = run.resps_lab(i);
+		resp = trial.resplab;
 
 			% skip unlabeled/unreasonable data
 		resplabel = fdata{i, 7};
@@ -59,6 +59,11 @@ function read_labels( run, labelfile )
 		resp.bo = resp.range(1);
 		resp.vo = resp.range(1) + fdata{i, 9};
 		resp.vr = resp.range(2);
+
+			% formants, TODO!
+
+			% classification
+		resp.label = resplabel;
 
 	end
 

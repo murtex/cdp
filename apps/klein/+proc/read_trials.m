@@ -73,8 +73,6 @@ function read_trials( run, trialfile )
 
 		% setup trials
 	run.trials(ntrials) = cdf.hTrial(); % pre-allocation
-	run.resps_det(ntrials) = cdf.hResponse();
-	run.resps_lab(ntrials) = cdf.hResponse();
 
 	for i = ntrials:-1:1
 		trial = run.trials(i);

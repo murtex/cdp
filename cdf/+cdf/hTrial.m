@@ -5,7 +5,7 @@ classdef (Sealed = true) hTrial < handle
 	properties (Access = public)
 
 			% general
-		range = [NaN, NaN]; % trial range (row numeric)
+		range = [NaN, NaN]; % trial range [start, stop] (row numeric)
 
 		cue = NaN; % cue position (scalar numeric)
 		dist = NaN; % distractor position (scalar numeric)
@@ -16,6 +16,10 @@ classdef (Sealed = true) hTrial < handle
 			% experimental features
 		soa = NaN; % stimulus-onset asynchrony (scalar numeric)
 		vot = NaN; % distractor voice-onset time (scalar numeric)
+
+			% responses
+		resplab = cdf.hResponse();
+		respdet = cdf.hResponse();
 
 	end
 

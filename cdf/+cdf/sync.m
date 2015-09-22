@@ -1,5 +1,5 @@
 function [sync0, synchints, syncs] = sync( run, cfg )
-% sync timings
+% marker synchronization
 %
 % [sync0, synchints, syncs] = SYNC( run, cfg )
 %
@@ -25,7 +25,7 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 	end
 
 	logger = xis.hLogger.instance();
-	logger.tab( 'sync timings...' );
+	logger.tab( 'marker synchronization...' );
 
 		% pre-estimate cue/distractor noise
 	ntrials = numel( run.trials );
@@ -150,6 +150,8 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 
 	end
 
+		% done
 	logger.untab();
+
 end
 

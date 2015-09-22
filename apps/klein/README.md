@@ -15,7 +15,7 @@ Processing
 
 ##### Detection
 
-- `proc.activity` -- TODO
+- `proc.activity` -- voice activity detection
 - `proc.landmarks` -- TODO
 - `proc.formants` -- TODO
 
@@ -32,10 +32,12 @@ Testing
 
 - `test.convert` -- conversion stats
 - `test.sync` -- synchronization stats
+- `test.activity` -- activity detection stats
 
 ##### Samples
 
 - `test.sync_samples` -- synchronization samples
+- `test.activity_samples` -- activity detection samples
 
 Analysis
 --------
