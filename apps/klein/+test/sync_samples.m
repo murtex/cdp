@@ -62,6 +62,8 @@ function sync_samples( indir, outdir, ids, seed, nsamples )
 		logger.log( 'read cdf data (''%s'')...', cdffile );
 		load( cdffile, 'run' );
 
+		proc.read_audio( run, run.audiofile, true );
+
 		logger.log( 'read aux data (''%s'')...', auxfile );
 		load( auxfile, 'sync0', 'synchints', 'syncs' );
 
@@ -101,7 +103,7 @@ function sync_samples( indir, outdir, ids, seed, nsamples )
 			yl = max( abs( cdts ) ) * style.scale( 1/2 ) * [-1, 1];
 
 				% plot
-			plotfile = fullfile( plotdir, sprintf( 'sync_%d.png', j ) );
+			plotfile = fullfile( plotdir, sprintf( 'sync_%d_%d.png', i, j ) );
 			logger.log( 'plot sync sample (''%s'')...', plotfile );
 
 			fig = style.figure();
