@@ -15,6 +15,5 @@ MATLAB="matlab -nosplash -nodesktop -r"
 $MATLAB "test.convert( '$INDIR', '$OUTDIR', $IDS ); exit();" &
 sleep 3
 
-	# done
 wait
 

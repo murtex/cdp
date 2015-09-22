@@ -23,10 +23,12 @@ Testing
 
 ##### Statistics
 
-- `test.convert` -- raw conversion stats
-- `test.sync` -- marker synchronization stats
+- `test.convert` -- conversion stats
+- `test.sync` -- synchronization stats
 
 ##### Samples
+
+- `test.sync_samples` -- synchronization samples
 
 Analysis
 --------

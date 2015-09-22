@@ -15,6 +15,9 @@ IDS8="36:40"
 IDS9="41:45"
 IDS10="46:47"
 
+SEED=1
+NSAMPLES=20
+
 	# reset output
 rm -rf $OUTDIR
 
@@ -42,6 +45,28 @@ sleep 3
 $MATLAB "test.sync( '$INDIR', '$OUTDIR', $IDS10 ); exit();" &
 sleep 3
 
-	# done
+wait
+
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS1, $SEED, $NSAMPLES ); exit();" &
+sleep 3
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS2, $SEED, $NSAMPLES ); exit();" &
+sleep 3
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS3, $SEED, $NSAMPLES ); exit();" &
+sleep 3
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS4, $SEED, $NSAMPLES ); exit();" &
+sleep 3
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS5, $SEED, $NSAMPLES ); exit();" &
+sleep 3
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS6, $SEED, $NSAMPLES ); exit();" &
+sleep 3
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS7, $SEED, $NSAMPLES ); exit();" &
+sleep 3
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS8, $SEED, $NSAMPLES ); exit();" &
+sleep 3
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS9, $SEED, $NSAMPLES ); exit();" &
+sleep 3
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS10, $SEED, $NSAMPLES ); exit();" &
+sleep 3
+
 wait
 

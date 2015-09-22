@@ -1,5 +1,5 @@
 function sync( indir, outdir, ids )
-% marker synchronization stats
+% synchronization stats
 %
 % SYNC( indir, outdir, ids )
 %
@@ -30,7 +30,7 @@ function sync( indir, outdir, ids )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'marker synchronization stats...' );
+	logger.tab( 'synchronization stats...' );
 
 	style = xis.hStyle.instance();
 
@@ -63,7 +63,7 @@ function sync( indir, outdir, ids )
 			set( fig, 'Color', style.color( 'warm', +2 ) );
 		end
 
-		title( sprintf( 'marker synchronization (subject: %d)', i ) );
+		title( sprintf( 'synchronization (subject: %d)', i ) );
 		xlabel( 'position in seconds' );
 		ylabel( 'offset in milliseconds' );
 

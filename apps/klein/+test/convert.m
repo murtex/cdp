@@ -1,5 +1,5 @@
 function convert( indir, outdir, ids )
-% raw conversion stats
+% conversion stats
 %
 % CONVERT( indir, outdir, ids )
 %
@@ -30,7 +30,7 @@ function convert( indir, outdir, ids )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'raw conversion stats...' );
+	logger.tab( 'conversion stats...' );
 
 	style = xis.hStyle.instance();
 
@@ -70,7 +70,7 @@ function convert( indir, outdir, ids )
 
 	fig = style.figure();
 
-	title( sprintf( 'raw conversion (subjects: %d)', numel( ids ) ) );
+	title( sprintf( 'conversion (subjects: %d)', numel( ids ) ) );
 	xlabel( 'subject identifier' );
 	ylabel( 'number of trials' );
 

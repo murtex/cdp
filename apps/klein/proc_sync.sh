@@ -42,6 +42,5 @@ sleep 3
 $MATLAB "proc.sync( '$INDIR', '$OUTDIR', $IDS10 ); exit();" &
 sleep 3
 
-	# done
 wait
 
