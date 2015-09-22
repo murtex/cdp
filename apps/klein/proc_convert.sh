@@ -10,9 +10,9 @@ IDS="1:47"
 rm -rf $OUTDIR
 
 	# workload
-MLARGS="-nosplash -nodesktop"
+MATLAB="matlab -nosplash -nodesktop -r"
 
-matlab $MLARGS -r "proc.convert( '$INDIR', '$OUTDIR', $IDS ); exit();" &
+$MATLAB "proc.convert( '$INDIR', '$OUTDIR', $IDS ); exit();" &
 sleep 3
 
 	# done
