@@ -20,6 +20,7 @@ function [st, freqs] = stransf( ts, rate, lofreq, hifreq, nfreqs )
 %
 % TODO
 % implement vectorized version (via gaussian window matrix)
+% A Guide to the FFT -- 2nd Edition Plus (https://www.mathworks.com/matlabcentral/fileexchange/5654-a-guide-to-the-fft-2nd-edition-plus)
 
 		% safeguard
 	if nargin < 1 || ~iscolumn( ts ) || ~isnumeric( ts )
