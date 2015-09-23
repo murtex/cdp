@@ -73,7 +73,10 @@ function sync_samples( indir, outdir, ids, seed, nsamples )
 
 		if numel( itrials ) > nsamples
 			rng( seed );
-			itrials = sort( itrials(randsample( numel( itrials ), nsamples )) );
+
+			ilast = itrials(end);
+			itrials = sort( itrials(randsample( numel( itrials ), nsamples-1 )) );
+			itrials(end+1) = ilast; % always keep last trial
 		end
 
 			% plot samples
