@@ -1,7 +1,7 @@
 function sync_samples( indir, outdir, ids, seed, nsamples )
 % synchronization samples
 %
-% SYNC_SAMPLES( indir, outdir, ids )
+% SYNC_SAMPLES( indir, outdir, ids, seed, nsamples )
 %
 % INPUT
 % indir : input directory (row char)
