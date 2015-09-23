@@ -111,7 +111,7 @@ function sync_samples( indir, outdir, ids, seed, nsamples )
 					% vicinity
 			subplot( 2, 1, 1 );
 
-			title( sprintf( 'synchronization (subject: %d, trial: %d)', i, j ) );
+			title( sprintf( 'SYNC (subject: %d, trial: %d)', i, j ) );
 			xlabel( 'time in milliseconds (expected: t=0)' );
 			ylabel( 'distractor channel' );
 

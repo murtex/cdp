@@ -36,8 +36,8 @@ function convert( indir, outdir, ids )
 
 		% proceed subjects
 	sexes = cell( 1, max( ids ) ); % pre-allocation
-	ntrials(ids) = 0;
-	nresps(ids) = 0;
+	ntrials = zeros( 1, max( ids ) );
+	nresps = zeros( 1, max( ids ) );
 
 	for i = ids
 		logger.tab( 'subject: %d', i );
@@ -79,20 +79,20 @@ function convert( indir, outdir, ids )
 		end
 	end
 
-	nmals = sum( fmals );
-	nfems = sum( ffems );
-
 		% plot stats
 	plotfile = fullfile( outdir, sprintf( 'convert_%s.png', stamp ) );
 	logger.log( 'plot conversion stats (''%s'')...', plotfile );
 
 	fig = style.figure();
 
-	title( sprintf( 'conversion (subjects: [%d+%d]/%d)', sum( fmals ), sum( ffems ), numel( ids ) ) );
+	title( sprintf( 'CONVERT [subjects: (%d+%d)/%d, trials: (%d+%d)/%d]', ...
+		sum( fmals ), sum( ffems ), numel( ids ), ...
+		sum( ntrials(fmals) ), sum( ntrials(ffems) ), sum( ntrials ) ) );
 	xlabel( 'subject identifier' );
 	ylabel( 'number of trials/responses' );
 
-	xlim( [min( ids ) - 0.5, max( ids ) + 0.5] );
+	xl = [min( ids ) - 0.5, max( ids ) + 0.5];
+	xlim( xl );
 	ylim( [0, max( ntrials )] );
 
 			% males
@@ -107,9 +107,10 @@ function convert( indir, outdir, ids )
 	set( hbf(1), 'EdgeColor', style.color( 'neutral', -2 ), 'FaceColor', style.color( 'warm', -1 ) );
 	set( hbf(2), 'EdgeColor', style.color( 'neutral', -2 ), 'FaceColor', style.color( 'warm', +1 ) );
 
-	legend( [hbm(2), hbf(2)], {'male', 'female'}, ...
-		'Location', 'southeast' );
+			% legend
+	legend( [hbm(2), hbf(2)], {'male', 'female'}, 'Location', 'southeast' );
 
+			% print
 	style.print( plotfile );
 
 	delete( fig );

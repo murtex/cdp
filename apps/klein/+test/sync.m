@@ -63,7 +63,7 @@ function sync( indir, outdir, ids )
 			set( fig, 'Color', style.color( 'warm', +2 ) );
 		end
 
-		title( sprintf( 'synchronization (subject: %d)', i ) );
+		title( sprintf( 'SYNC (subject: %d)', i ) );
 		xlabel( 'position in seconds' );
 		ylabel( 'offset in milliseconds' );
 
