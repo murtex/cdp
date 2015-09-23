@@ -35,7 +35,7 @@ Testing
 - `test.activity` -- activity stats
 - `test.landmarks` -- landmark stats
 - `test.formants` -- formant stats
-- `test.features` -- feature stats
+- `test.train` -- training stats
 - `test.classify` -- classification stats
 
 ##### Samples
