@@ -69,7 +69,8 @@ function [st, freqs] = stransf( ts, rate, lofreq, hifreq, nfreqs )
 	ts = ifft( ts );
 
 		% compute fourier transforms
-	fts = fft( ts );
+	fts = fft( ts ) / tslen;
+	%fts = fftshift( fft( fftshift( ts ) ) ) / tslen;
 	fts = [fts, fts];
 
 		% compute fourier frequencies
