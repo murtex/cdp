@@ -16,14 +16,14 @@ Processing
 ##### Detection
 
 - `proc.activity` -- voice activity detection
-- `proc.landmarks` -- TODO
-- `proc.formants` -- TODO
+- `proc.landmarks` -- landmark detection
+- `proc.formants` -- formant detection
 
 ##### Classification
 
-- `proc.features` -- TODO
-- `proc.train` -- TODO
-- `proc.classify` -- TODO
+- `proc.features` -- feature extraction
+- `proc.train` -- training
+- `proc.classify` -- classification
 
 Testing
 -------
@@ -33,11 +33,18 @@ Testing
 - `test.convert` -- conversion stats
 - `test.sync` -- synchronization stats
 - `test.activity` -- activity stats
+- `test.landmarks` -- landmark stats
+- `test.formants` -- formant stats
+- `test.features` -- feature stats
+- `test.classify` -- classification stats
 
 ##### Samples
 
 - `test.sync_samples` -- synchronization samples
 - `test.activity_samples` -- activity samples
+- `test.landmarks_samples` -- landmark samples
+- `test.formants_samples` -- formant samples
+- `test.classify_samples` -- classification samples
 
 Analysis
 --------
