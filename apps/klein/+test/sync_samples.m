@@ -79,10 +79,10 @@ function sync_samples( indir, outdir, ids, seed, nsamples )
 			itrials(end+1) = ilast; % always keep last trial
 		end
 
-			% plot samples
-		plotdir = fullfile( outdir, sprintf( 'run_%d/', i ) );
-		if exist( plotdir, 'dir' ) ~= 7
-			mkdir( plotdir );
+			% output samples
+		rundir = fullfile( outdir, sprintf( 'run_%d/', i ) );
+		if exist( rundir, 'dir' ) ~= 7
+			mkdir( rundir );
 		end
 
 		for j = itrials
@@ -105,8 +105,8 @@ function sync_samples( indir, outdir, ids, seed, nsamples )
 			xl = [min( xs ), max( xs )];
 			yl = max( abs( cdts ) ) * style.scale( 1/2 ) * [-1, 1];
 
-				% plot
-			plotfile = fullfile( plotdir, sprintf( 'sync_%d_%d.png', i, j ) );
+				% plot sample
+			plotfile = fullfile( rundir, sprintf( 'sync_%d_%d.png', i, j ) );
 			logger.log( 'plot sync sample (''%s'')...', plotfile );
 
 			fig = style.figure();

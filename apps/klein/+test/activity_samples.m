@@ -109,10 +109,10 @@ function activity_samples( indir, outdir, ids, seed, nsamples, type )
 			itrials = sort( itrials(randsample( numel( itrials ), nsamples )) );
 		end
 
-			% plot samples
-		plotdir = fullfile( outdir, sprintf( 'run_%d/', i ) );
-		if exist( plotdir, 'dir' ) ~= 7
-			mkdir( plotdir );
+			% output samples
+		rundir = fullfile( outdir, sprintf( 'run_%d/', i ) );
+		if exist( rundir, 'dir' ) ~= 7
+			mkdir( rundir );
 		end
 
 		for j = itrials
@@ -140,8 +140,8 @@ function activity_samples( indir, outdir, ids, seed, nsamples, type )
 			xl = [min( xs ), max( xs )];
 			yl = max( abs( [cdts; respts] ) ) * style.scale( 1/4 ) * [-1, 1];
 
-				% plot
-			plotfile = fullfile( plotdir, sprintf( 'activity_%d_%d.png', i, j ) );
+				% plot sample
+			plotfile = fullfile( rundir, sprintf( 'activity_%d_%d.png', i, j ) );
 			logger.log( 'plot activity sample (''%s'')...', plotfile );
 
 			fig = style.figure();
@@ -209,6 +209,17 @@ function activity_samples( indir, outdir, ids, seed, nsamples, type )
 			style.print( plotfile );
 
 			delete( fig );
+
+				% write sample
+			audiofile = fullfile( rundir, sprintf( 'activity_%d_%d.wav', i, j ) );
+			logger.log( 'write activity sample (''%s'')...', audiofile );
+
+			ws = warning(); % disable warnings
+			warning( 'off', 'all' );
+
+			wavwrite( cat( 2, respts, cdts ), run.audiorate, audiofile );
+			
+			warning( ws ); % (re-)enable warnings
 
 		end
 
