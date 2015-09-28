@@ -1,7 +1,7 @@
-function activity_samples( indir, outdir, ids, seed, nsamples )
+function activity_samples( indir, outdir, ids, seed, nsamples, type )
 % activity samples
 %
-% ACTIVITY_SAMPLES( indir, outdir, ids, seed, nsamples )
+% ACTIVITY_SAMPLES( indir, outdir, ids, seed, nsamples, type )
 %
 % INPUT
 % indir : input directory (row char)
@@ -9,6 +9,7 @@ function activity_samples( indir, outdir, ids, seed, nsamples )
 % ids : subject identifiers (row numeric)
 % seed : random seed (scalar numeric)
 % nsamples : number of trial samples (scalar numeric)
+% type : sample type ['any' | 'valid' | 'invalid'] (row char)
 
 		% safeguard
 	if nargin < 1 || ~isrow( indir ) || ~ischar( indir ) || exist( indir, 'dir' ) ~= 7
@@ -31,6 +32,10 @@ function activity_samples( indir, outdir, ids, seed, nsamples )
 
 	if nargin < 5 || ~isscalar( nsamples ) || ~isnumeric( nsamples )
 		error( 'invalid argument: nsamples' );
+	end
+
+	if nargin < 6 || ~isrow( type ) || ~ischar( type )
+		error( 'invalid argument: type' );
 	end
 
 		% initialize framework
@@ -75,7 +80,31 @@ function activity_samples( indir, outdir, ids, seed, nsamples )
 			% sample trials
 		itrials = 1:numel( run.trials );
 
-		if numel( itrials ) > nsamples
+		resplabs = [run.trials(itrials).resplab]; % constrain sample type
+		respdets = [run.trials(itrials).respdet];
+
+		rlabs = cat( 1, resplabs.range );
+		rdets = cat( 1, respdets.range );
+
+		dstarts = rdets(:, 1) - rlabs(:, 1);
+		dstops = rdets(:, 2) - rlabs(:, 2);
+
+		switch type
+			case 'any' % any samples
+
+			case 'valid' % valid samples only
+				vals = dstarts <= 0 & dstops >= 0;
+				itrials(~vals) = [];
+
+			case 'invalid' % invalid samples only
+				invals = dstarts > 0 | dstops < 0;
+				itrials(~invals) = [];
+
+			otherwise
+				error( 'invalid argument: type' );
+		end
+
+		if numel( itrials ) > nsamples % choose random samples
 			rng( seed );
 			itrials = sort( itrials(randsample( numel( itrials ), nsamples )) );
 		end
