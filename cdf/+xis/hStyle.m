@@ -2,8 +2,7 @@ classdef (Sealed = true) hStyle < handle
 % uniform styling (singleton)
 %
 % SEE
-% old-phoenix-styled colors
-% http://paletton.com/#uid=33F0E0ktwsofoExmjuXvCloGWen
+% The Color Scheme Designer: http://paletton.com/#uid=30m0l1kt5kgiutFprq0B5eKPr7VkmKooaAEFhttfroje-LcmkeQfG7qsMcim5lrcSs182
 
 		% properties
 	properties (GetAccess = public, SetAccess = private)
@@ -119,52 +118,59 @@ classdef (Sealed = true) hStyle < handle
 			white = [1, 1, 1];
 
 			function rgb = cold( shade )
-				switch shade
+				switch round( shade )
 					case -2
-						rgb = hex2dec( {'04', '21', '4c'} )/255;
+						rgb = [3, 39, 63];
 					case -1
-						rgb = hex2dec( {'0b', '34', '70'} )/255;
+						rgb = [19, 67, 98];
 					case 0
-						rgb = hex2dec( {'18', '4a', '95'} )/255;
+						rgb = [41, 92, 124];
 					case +1
-						rgb = hex2dec( {'3b', '65', 'a3'} )/255;
+						rgb = [73, 119, 149];
 					case +2
-						rgb = hex2dec( {'6d', '8f', 'c2'} )/255;
+						rgb = [131, 167, 191];
 				end
-				rgb = transpose( rgb );
+
+				rgb = rgb / 255;
 			end
 
 			function rgb = warm( shade )
-				switch shade
+				switch round( shade )
 					case -2
-						rgb = hex2dec( {'72', '1d', '00'} )/255;
+						rgb = [6, 50,  9];
 					case -1
-						rgb = hex2dec( {'aa', '2d', '02'} )/255;
+						rgb = [27, 81, 30];
 					case 0
-						rgb = hex2dec( {'e2', '47', '12'} )/255;
+						rgb = [53, 98, 56];
 					case +1
-						rgb = hex2dec( {'f7', '77', '4b'} )/255;
+						rgb = [85, 138, 89];
 					case +2
-						rgb = hex2dec( {'ff', 'a4', '84'} )/255;
+						rgb = [139, 180, 141];
 				end
-				rgb = transpose( rgb );
+
+				rgb = rgb / 255;
+			end
+
+			function rgb = signal( shade )
+				switch round( shade )
+					case -2
+						rgb = [63, 23,  0];
+					case -1
+						rgb = [117, 44,  0];
+					case 0
+						rgb = [161, 69, 15];
+					case +1
+						rgb = [207,104, 43];
+					case +2
+						rgb = [236,151,100];
+				end
+
+				rgb = rgb / 255;
 			end
 
 			function rgb = neutral( shade )
-				switch shade
-					case -2
-						rgb = 0.10 * white;
-					case -1
-						rgb = 0.13 * white;
-					case 0
-						rgb = 0.25 * white;
-					case +1
-						rgb = 0.50 * white;
-					case +2
-						rgb = 0.70 * white;
-				end
+				rgb = mean( (cold( shade ) + warm( shade ) + signal( shade )) / 3 ) * [1, 1, 1];
 			end
-
 
 				% set shaded color
 			rgb1 = neutral( 0 );
@@ -177,6 +183,9 @@ classdef (Sealed = true) hStyle < handle
 				case 'warm'
 					rgb1 = warm( floor( shade ) );
 					rgb2 = warm( ceil( shade ) );
+				case 'signal'
+					rgb1 = signal( floor( shade ) );
+					rgb2 = signal( ceil( shade ) );
 				case 'neutral'
 					rgb1 = neutral( floor( shade ) );
 					rgb2 = neutral( ceil( shade ) );
