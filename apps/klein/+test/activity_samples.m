@@ -137,6 +137,7 @@ function activity_samples( indir, outdir, ids, seed, nsamples, type )
 			[sdiv, threshs, vact] = k15.vad( respsd, noisd ); % activity
 
 			xs = dsp.smp2msec( 0:r(2)-r(1), run.audiorate ); % axes scaling
+			xdist = 1000 * (trial.dist - trial.range(1));
 			xl = [min( xs ), max( xs )];
 			yl = max( abs( [cdts; respts] ) ) * style.scale( 1/4 ) * [-1, 1];
 
@@ -168,6 +169,8 @@ function activity_samples( indir, outdir, ids, seed, nsamples, type )
 
 			xlim( xl );
 			ylim( yl );
+
+			plot( xdist * [1, 1], yl, 'Color', style.color( 'signal', 0 ) );
 
 			hl = plot( xs, cdts, 'Color', style.color( 'cold', 0 ) );
 
