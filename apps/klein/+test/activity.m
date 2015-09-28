@@ -46,7 +46,7 @@ function activity( indir, outdir, ids )
 
 		fig = style.figure();
 
-		if any( dstarts > 0 ) || any( dstops < 0 )
+		if ndstarts ~= nvaldstarts || ndstops ~= nvaldstops
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
@@ -245,7 +245,7 @@ function activity( indir, outdir, ids )
 		global_dstarts, global_dstartpos, global_dstartns, global_ndstarts, global_valdstartpos, global_valdstartns, global_nvaldstarts, ...
 		global_dstops, global_dstoppos, global_dstopns, global_ndstops, global_valdstoppos, global_valdstopns, global_nvaldstops )
 
-		% plot summary
+		% plot summary, TODO
 	plotfile = fullfile( outdir, 'activity_sum.png' );
 	logger.log( 'plot activity summary (''%s'')...', plotfile );
 
