@@ -174,7 +174,8 @@ function activity_samples( indir, outdir, ids, seed, nsamples, type )
 
 			hl = plot( xs, cdts, 'Color', style.color( 'cold', 0 ) );
 
-			legend( hl, sprintf( '''%s''/''%s''', trial.cuelabel, trial.distlabel ), 'Location', 'southeast' );
+			legend( hl, sprintf( '''%s''/''%s''', trial.cuelabel, trial.distlabel ), ...
+				'Location', 'northeast' );
 
 			subplot( 4, 2, 7 ); % response
 
@@ -195,7 +196,8 @@ function activity_samples( indir, outdir, ids, seed, nsamples, type )
 
 			hl = plot( xs, respts, 'Color', style.color( 'cold', 0 ) ); % waveform
 
-			legend( hl, sprintf( '''%s''/''%s''', resplab.label, respdet.label ), 'Location', 'southeast' );
+			legend( hl, sprintf( '''%s''/''%s''', resplab.label, respdet.label ), ...
+				'Location', 'northeast' );
 
 					% spectral decomposition
 			subplot( 4, 2, [6, 8] );
