@@ -21,11 +21,11 @@ function activity( run, cfg )
 
 		% proceed trials
 	ntrials = numel( run.trials );
+	nrespdets = 0;
 
 	logger.progress();
 	for i = 1:ntrials
 		trial = run.trials(i);
-		resplab = trial.resplab;
 		respdet = trial.respdet;
 
 			% reset activity
@@ -43,19 +43,30 @@ function activity( run, cfg )
 			% detect activity
 		[sdiv, threshs, vact] = k15.vad( respsd, noisd );
 
-			% set activity, TODO: check against distractor! multiple activities?
+			% set activity
 		vdiff = diff( [false, vact, false] );
 
-		vstart = find( vdiff == 1, 1 ) - 1;
-		vstop = find( vdiff == -1, 1 ) - 1;
+		vstarts = find( vdiff == 1 ) - 1;
+		vstops = find( vdiff == -1 ) - 1;
 
-		if ~isempty( vstart ) && ~isempty( vstop )
-			respdet.range(1) = dsp.smp2sec( vstart + r(1) - 1, run.audiorate );
-			respdet.range(2) = dsp.smp2sec( vstop + r(1) - 1, run.audiorate );
+		vstarts = dsp.smp2sec( vstarts + r(1) - 1, run.audiorate );
+		vstops = dsp.smp2sec( vstops + r(1) - 1, run.audiorate );
+
+		skips = vstops - vstarts < cfg.vad_minlen; % skip too shorts
+		vstarts(skips) = [];
+		vstops(skips) = [];
+
+		if ~isempty( vstarts ) && ~isempty( vstops ) % set range
+			respdet.range(1) = vstarts(1);
+			respdet.range(2) = vstops(1);
+
+			nrespdets = nrespdets + 1;
 		end
 
 		logger.progress( i, ntrials );
 	end
+
+	logger.log( 'responses: %d/%d', nrespdets, ntrials );
 
 		% done
 	logger.untab();

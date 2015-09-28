@@ -13,6 +13,8 @@ classdef (Sealed = true) hConfig < handle
 		vad_freqband = [150, 8000]; % frequency band [lower, upper] (row numeric)
 		vad_nfreqs = 200; % frequency resolution
 
+		vad_minlen = 0.075; % minimum activity length [klein's labeled data: 0.082] (scalar numeric)
+
 	end
 
 end
