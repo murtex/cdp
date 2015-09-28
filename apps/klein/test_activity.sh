@@ -21,7 +21,7 @@ SEED=1
 NSAMPLES=20
 
 	# reset output
-rm -rf $OUTDIR
+#rm -rf $OUTDIR
 
 	# workload
 MATLAB="matlab -nosplash -nodesktop -r"
@@ -31,26 +31,26 @@ sleep 3
 
 wait
 
-$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS1, $SEED, $NSAMPLES ); exit();" &
-sleep 3
-$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS2, $SEED, $NSAMPLES ); exit();" &
-sleep 3
-$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS3, $SEED, $NSAMPLES ); exit();" &
-sleep 3
-$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS4, $SEED, $NSAMPLES ); exit();" &
-sleep 3
-$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS5, $SEED, $NSAMPLES ); exit();" &
-sleep 3
-$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS6, $SEED, $NSAMPLES ); exit();" &
-sleep 3
-$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS7, $SEED, $NSAMPLES ); exit();" &
-sleep 3
-$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS8, $SEED, $NSAMPLES ); exit();" &
-sleep 3
-$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS9, $SEED, $NSAMPLES ); exit();" &
-sleep 3
-$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS10, $SEED, $NSAMPLES ); exit();" &
-sleep 3
+#$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS1, $SEED, $NSAMPLES ); exit();" &
+#sleep 3
+#$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS2, $SEED, $NSAMPLES ); exit();" &
+#sleep 3
+#$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS3, $SEED, $NSAMPLES ); exit();" &
+#sleep 3
+#$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS4, $SEED, $NSAMPLES ); exit();" &
+#sleep 3
+#$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS5, $SEED, $NSAMPLES ); exit();" &
+#sleep 3
+#$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS6, $SEED, $NSAMPLES ); exit();" &
+#sleep 3
+#$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS7, $SEED, $NSAMPLES ); exit();" &
+#sleep 3
+#$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS8, $SEED, $NSAMPLES ); exit();" &
+#sleep 3
+#$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS9, $SEED, $NSAMPLES ); exit();" &
+#sleep 3
+#$MATLAB "test.activity_samples( '$INDIR', '$OUTDIR', $IDS10, $SEED, $NSAMPLES ); exit();" &
+#sleep 3
 
-wait
+#wait
 

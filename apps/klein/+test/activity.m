@@ -46,7 +46,7 @@ function activity( indir, outdir, ids )
 
 		fig = style.figure();
 
-		if any( dstarts > 0 ) | any( dstops < 0 )
+		if any( dstarts > 0 ) || any( dstops < 0 )
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
