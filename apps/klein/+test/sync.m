@@ -60,7 +60,7 @@ function sync( indir, outdir, ids )
 		fig = style.figure();
 
 		if any( isnan( syncs ) )
-			set( fig, 'Color', style.color( 'warm', +2 ) );
+			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
 		title( sprintf( 'SYNC (subject: %d)', i ) );

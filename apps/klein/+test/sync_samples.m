@@ -121,9 +121,10 @@ function sync_samples( indir, outdir, ids, seed, nsamples )
 			xlim( xl );
 			ylim( yl );
 
-			plot( 1000 * syncs(j) * [1, 1], yl, ...
-				'Color', style.color( 'warm', 0 ) );
-			plot( xs, cdts, ...
+			plot( 1000 * syncs(j) * [1, 1], yl, ... % marker
+				'Color', style.color( 'signal', 0 ) );
+
+			plot( xs, cdts, ... % signal
 				'Color', style.color( 'cold', 0 ) );
 
 					% detail
@@ -137,9 +138,10 @@ function sync_samples( indir, outdir, ids, seed, nsamples )
 			xlim( 1000 * (syncs(j) + 5*cfg.sync_smooth * [-1, 1]) );
 			ylim( yl );
 
-			plot( 1000 * syncs(j) * [1, 1], yl, ...
-				'Color', style.color( 'warm', 0 ) );
-			plot( xs, cdts, ...
+			plot( 1000 * syncs(j) * [1, 1], yl, ... % marker
+				'Color', style.color( 'signal', 0 ) );
+
+			plot( xs, cdts, ... % signal
 				'Color', style.color( 'cold', 0 ) );
 
 			style.print( plotfile );
