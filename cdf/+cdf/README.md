@@ -8,7 +8,7 @@ Framework configuration
 	- default: `[NaN, NaN]`, Klein: `[-0.125, 0.025]`
 - `hConfig.sync_smooth`
 - `hConfig.sync_thresh`
-	- mahalanobis distance threshold
+	- Mahalanobis distance threshold
 
 ##### Voice activity detection
 
