@@ -4,6 +4,7 @@ Framework configuration
 ##### Marker synchronization
 
 - `hConfig.sync_range` (search range)
+	- search range is relative to expected marker position
 - `hConfig.sync_smooth` (smoothing)
 - `hConfig.sync_thresh` (mahalanobis threshold)
 
