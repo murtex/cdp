@@ -44,7 +44,12 @@ function sync_samples( indir, outdir, ids, seed, nsamples )
 
 	style = xis.hStyle.instance();
 
-	cfg = cdf.hConfig(); % defaults
+		% configure framework
+	cfg = cdf.hConfig();
+
+	cfg.sync_range = [-0.125, 0.025]; % search range
+	cfg.sync_smooth = 0.002; % smoothing
+	cfg.sync_thresh = 3.0; % mahalanobis threshold
 
 		% proceed subjects
 	for i = ids

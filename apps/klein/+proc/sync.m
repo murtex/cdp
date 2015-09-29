@@ -32,7 +32,12 @@ function sync( indir, outdir, ids )
 	logger = xis.hLogger.instance( logfile );
 	logger.tab( 'marker synchronization...' );
 
-	cfg = cdf.hConfig(); % defaults
+		% configure framework
+	cfg = cdf.hConfig();
+
+	cfg.sync_range = [-0.125, 0.025]; % search range
+	cfg.sync_smooth = 0.002; % smoothing
+	cfg.sync_thresh = 3.0; % mahalanobis threshold
 
 		% proceed subjects
 	for i = ids

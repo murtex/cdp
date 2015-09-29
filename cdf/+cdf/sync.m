@@ -48,9 +48,6 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 	smooth = dsp.sec2smp( cfg.sync_smooth, run.audiorate );
 	lsmooth = ceil( (smooth-1) / 2 );
 	rsmooth = floor( (smooth-1) / 2 );
-	if smooth < 1
-		error( 'invalid value: smooth' );
-	end
 
 	cdts = abs( run.audiodata(:, 2) - noimu ) / noisigma / smooth; % standardization
 	cdtslen = numel( cdts );
@@ -58,7 +55,7 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 	for i = 1:cdtslen-smooth
 		cdtsfr = sum( cdts(i:i+smooth-1) );
 
-		if cdtsfr >= 3*cfg.sync_thresh % enlarged threshold
+		if cdtsfr >= 3 * cfg.sync_thresh % enlarged threshold, TODO: configurable?
 			sync0 = i - 1;
 			break;
 		end
@@ -66,9 +63,6 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 
 		% estimate cue/distractor noise
 	noir = sync0 + dsp.sec2smp( run.trials(1).cue + cfg.sync_range, run.audiorate ) + [1, 0]; % estimated noise range
-	if any( isnan( noir ) ) || any( noir < 1 ) || any( noir > run.audiosize(1) )
-		error( 'invalid value: noir' );
-	end
 
 	noits = run.audiodata(noir(1):noir(2), 2);
 	noimu = mean( noits);

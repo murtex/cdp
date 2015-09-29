@@ -5,9 +5,9 @@ classdef (Sealed = true) hConfig < handle
 	properties (Access = public)
 
 			% marker synchronization
-		sync_range = [-0.125, 0.025]; % search range (row numeric)
-		sync_smooth = 0.002; % smoothing (scalar numeric)
-		sync_thresh = 3.0; % mahalanobis threshold (scalar numeric)
+		sync_range = [NaN, NaN]; % search range [start, stop] (row numeric)
+		sync_smooth = NaN; % smoothing (scalar numeric)
+		sync_thresh = NaN; % mahalanobis threshold (scalar numeric)
 
 			% voice activity detection
 		vad_freqband = [150, 8000]; % frequency band [lower, upper] (row numeric)

@@ -3,7 +3,7 @@ Framework configuration
 
 ##### Marker synchronization
 
-- `hConfig.sync_range = [NaN, NaN]` -- TODO
+- `hConfig.sync_range = [NaN, NaN]` -- marker search range (relative to expected position)
 - `hConfig.sync_smooth = NaN` -- TODO
 - `hConfig.sync_thresh = NaN` -- TODO
 
