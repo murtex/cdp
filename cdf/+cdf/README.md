@@ -3,9 +3,9 @@ Framework configuration
 
 ##### Marker synchronization
 
-- `hConfig.sync_range` (search range)
+- `hConfig.sync_range` (**search range**)
 	- search range is relative to expected marker position
-	- **default:** `[NaN, NaN]`, **klein:** `[-0.125, 0.025]`
+	- default: `[NaN, NaN]`, Klein: `[-0.125, 0.025]`
 - `hConfig.sync_smooth` (smoothing)
 - `hConfig.sync_thresh` (mahalanobis threshold)
 
