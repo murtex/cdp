@@ -21,6 +21,8 @@ Cue-distractor framework
 Digital signal processing
 -------------------------
 
+- `dsp.stransf` -- stockwell transform
+
 Detection functions
 -------------------
 
