@@ -24,6 +24,11 @@ Digital signal processing
 Detection functions
 -------------------
 
-Convenience functions
----------------------
+- `k15.vad` -- voice activity detection
+
+Convenience classes
+-------------------
+
+- `xis.hLogger` -- hierachic logging
+- `xis.hStyle` -- uniform styling
 
