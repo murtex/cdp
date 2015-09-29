@@ -21,7 +21,8 @@ function activity( run, cfg )
 
 		% proceed trials
 	ntrials = numel( run.trials );
-	nrespdets = 0;
+
+	nrespdets = 0; % pre-allocation
 
 	logger.progress();
 	for i = 1:ntrials
@@ -44,21 +45,32 @@ function activity( run, cfg )
 		[sdiv, threshs, vact] = k15.vad( respsd, noisd );
 
 			% set activity
-		vdiff = diff( [false, vact, false] );
+		vadiff = diff( [false, vact, false] );
 
-		vstarts = find( vdiff == 1 ) - 1;
-		vstops = find( vdiff == -1 ) - 1;
+		vastarts = find( vadiff == 1 ) - 1;
+		vastops = find( vadiff == -1 ) - 1;
 
-		vstarts = dsp.smp2sec( vstarts + r(1) - 1, run.audiorate );
-		vstops = dsp.smp2sec( vstops + r(1) - 1, run.audiorate );
+		vastarts = dsp.smp2sec( vastarts + r(1) - 1, run.audiorate );
+		vastops = dsp.smp2sec( vastops + r(1) - 1, run.audiorate );
 
-		skips = vstops - vstarts < cfg.vad_minlen; % skip too shorts
-		vstarts(skips) = [];
-		vstops(skips) = [];
+		skips = vastops - vastarts < cfg.vad_minlen; % skip too shorts, DEBUG: activity-2
+		vastarts(skips) = [];
+		vastops(skips) = [];
 
-		if ~isempty( vstarts ) && ~isempty( vstops ) % set range
-			respdet.range(1) = vstarts(1);
-			respdet.range(2) = vstops(1);
+		%while sum( vastarts < trial.dist + cfg.vad_maxdist ) > 1 % skip leading exposureds, DEBUG: activuty-3
+			%vastarts(1) = [];
+			%vastops(1) = [];
+		%end
+
+		while sum( vastarts < trial.dist + cfg.vad_maxdist ) > 1 ... % skip distractor echoes, DEBUG: activity-4
+				&& vastarts(2) - vastops(1) <= cfg.vad_maxgap
+			vastarts(1) = [];
+			vastops(1) = [];
+		end
+
+		if ~isempty( vastarts ) % set range
+			respdet.range(1) = vastarts(1);
+			respdet.range(2) = vastops(1);
 
 			nrespdets = nrespdets + 1;
 		end
