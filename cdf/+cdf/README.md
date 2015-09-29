@@ -3,11 +3,11 @@ Framework configuration
 
 ##### Marker synchronization
 
-- `hConfig.sync_range` (**search range**)
+- `hConfig.sync_range` (search range)
 	- search range relative to expected marker position
 	- default: `[NaN, NaN]`, Klein: `[-0.125, 0.025]`
-- `hConfig.sync_smooth` (**smoothing**)
-- `hConfig.sync_thresh` (**mahalanobis threshold**)
+- `hConfig.sync_smooth` (smoothing)
+- `hConfig.sync_thresh` (mahalanobis threshold)
 
 ##### Voice activity detection
 
