@@ -16,8 +16,8 @@ Processing
 ##### Detection
 
 - `proc.activity` -- voice activity detection
-- `proc.landmarks` -- landmark detection
-- `proc.formants` -- formant detection
+- `proc.landmarks` -- landmarks detection
+- `proc.formants` -- formants detection
 
 ##### Classification
 
@@ -33,8 +33,8 @@ Testing
 - `test.convert` -- conversion stats
 - `test.sync` -- synchronization stats
 - `test.activity` -- activity stats
-- `test.landmarks` -- landmark stats
-- `test.formants` -- formant stats
+- `test.landmarks` -- landmarks stats
+- `test.formants` -- formants stats
 - `test.train` -- training stats
 - `test.classify` -- classification stats
 
@@ -42,8 +42,8 @@ Testing
 
 - `test.sync_samples` -- synchronization samples
 - `test.activity_samples` -- activity samples
-- `test.landmarks_samples` -- landmark samples
-- `test.formants_samples` -- formant samples
+- `test.landmarks_samples` -- landmarks samples
+- `test.formants_samples` -- formants samples
 - `test.classify_samples` -- classification samples
 
 Analysis
