@@ -20,10 +20,6 @@ classdef (Sealed = true) hConfig < handle
 
 		vad_maxdet = 2.2; % maximum detection length [klein: 2.038] (scalar numeric)
 
-			% landmarks detection
-		lmd_freqband = [150, 8000]; % frequency band [lower, upper] (row numeric)
-		lmd_nfreqs = 200; % frequency resolution (scalar numeric)
-
 	end
 
 end
