@@ -1,6 +1,6 @@
 Cue-distractor package
 ----------------------
 
-- `apps` -- showcase applications
+- `apps` -- show-case applications
 - `cdf` -- cue-distractor framework
 
