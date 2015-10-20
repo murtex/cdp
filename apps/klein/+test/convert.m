@@ -1,5 +1,5 @@
 function convert( indir, outdir, ids )
-% conversion stats
+% raw conversion statistics
 %
 % CONVERT( indir, outdir, ids )
 %
@@ -30,7 +30,7 @@ function convert( indir, outdir, ids )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'conversion stats...' );
+	logger.tab( 'conversion statistics...' );
 
 	style = xis.hStyle.instance();
 
@@ -53,7 +53,7 @@ function convert( indir, outdir, ids )
 		logger.log( 'read cdf data (''%s'')...', cdffile );
 		load( cdffile, 'run' );
 
-			% gather stats
+			% gather statistics
 		global_sexes{i} = run.sex;
 
 		global_ntrials(i) = numel( run.trials );
@@ -68,7 +68,7 @@ function convert( indir, outdir, ids )
 		logger.untab();
 	end
 
-		% post-process stats
+		% post-process statistics
 	fmals = false( 1, max( ids ) );
 	ffems = false( 1, max( ids ) );
 
@@ -80,9 +80,9 @@ function convert( indir, outdir, ids )
 		end
 	end
 
-		% plot stats
+		% plot statistics
 	plotfile = fullfile( outdir, sprintf( 'convert_%s.png', stamp ) );
-	logger.log( 'plot conversion stats (''%s'')...', plotfile );
+	logger.log( 'plot raw conversion statistics (''%s'')...', plotfile );
 
 	fig = style.figure();
 

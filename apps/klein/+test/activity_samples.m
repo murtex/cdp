@@ -1,5 +1,5 @@
 function activity_samples( indir, outdir, ids, seed, nsamples, type )
-% activity samples
+% voice activity detection samples
 %
 % ACTIVITY_SAMPLES( indir, outdir, ids, seed, nsamples, type )
 %
@@ -45,7 +45,7 @@ function activity_samples( indir, outdir, ids, seed, nsamples, type )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'activity samples...' );
+	logger.tab( 'voice activity detection samples...' );
 
 	style = xis.hStyle.instance();
 

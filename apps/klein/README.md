@@ -30,20 +30,20 @@ Testing
 
 ##### Statistics
 
-- `test.convert` -- conversion stats
-- `test.sync` -- synchronization stats
-- `test.activity` -- activity stats
-- `test.landmarks` -- landmarks stats
-- `test.formants` -- formants stats
-- `test.train` -- training stats
-- `test.classify` -- classification stats
+- `test.convert` -- raw conversion statistics
+- `test.sync` -- marker synchronization statistics
+- `test.activity` -- voice activity detection statistics
+- `test.landmarks` -- landmarks detection statistics
+- `test.formants` -- formants detection statistics
+- `test.train` -- training statistics
+- `test.classify` -- classification statistics
 
 ##### Samples
 
-- `test.sync_samples` -- synchronization samples
-- `test.activity_samples` -- activity samples
-- `test.landmarks_samples` -- landmarks samples
-- `test.formants_samples` -- formants samples
+- `test.sync_samples` -- marker synchronization samples
+- `test.activity_samples` -- voice activity detection samples
+- `test.landmarks_samples` -- landmarks detection samples
+- `test.formants_samples` -- formants detection samples
 - `test.classify_samples` -- classification samples
 
 Analysis

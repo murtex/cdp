@@ -1,5 +1,5 @@
 function activity( indir, outdir, ids )
-% activity stats
+% voice activity detection statistics
 %
 % ACTIVITY( indir, outdir, ids )
 %
@@ -30,19 +30,19 @@ function activity( indir, outdir, ids )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'activity stats...' );
+	logger.tab( 'voice activity detection statistics...' );
 
 	style = xis.hStyle.instance();
 
 		% helper functions
 	MAXDELTA = 0.3;
 
-	function figstats( plotfile, figtitle, ... % activity stats
+	function figstatistics( plotfile, figtitle, ... % activity statistics
 			nresplabs, ...
 			dstarts, dstartpos, dstartns, ndstarts, valdstartpos, valdstartns, nvaldstarts, ...
 			dstops, dstoppos, dstopns, ndstops, valdstoppos, valdstopns, nvaldstops )
 
-		logger.log( 'plot activity stats (''%s'')...', plotfile );
+		logger.log( 'plot voice activity detection statistics (''%s'')...', plotfile );
 
 		fig = style.figure();
 
@@ -151,7 +151,7 @@ function activity( indir, outdir, ids )
 		logger.log( 'read cdf data (''%s'')...', cdffile );
 		load( cdffile, 'run' );
 
-			% gather stats
+			% gather statistics
 		resplabs = [run.trials.resplab];
 		respdets = [run.trials.respdet];
 
@@ -173,7 +173,7 @@ function activity( indir, outdir, ids )
 		valdstops = dstops(dstops >= 0);
 		nvaldstops = numel( valdstops );
 
-		global_nruns = global_nruns + 1; % global stats
+		global_nruns = global_nruns + 1; % global statistics
 
 		global_sexes{i} = run.sex;
 
@@ -205,11 +205,11 @@ function activity( indir, outdir, ids )
 		valdstoppos = linspace( min( valdstops ), max( valdstops ), style.bins( valdstops ) );
 		valdstopns = hist( valdstops, valdstoppos );
 
-			% plot stats
+			% plot statistics
 		plotfile = fullfile( outdir, sprintf( 'activity_%d.png', i ) );
 		figtitle = sprintf( 'ACTIVITY (subject: %d, resps: %d/%d)', i, global_nresplabs(i), global_ntrials(i) );
 
-		figstats( plotfile, figtitle, ...
+		figstatistics( plotfile, figtitle, ...
 			global_nresplabs(i), ...
 			dstarts, dstartpos, dstartns, ndstarts, valdstartpos, valdstartns, nvaldstarts, ...
 			dstops, dstoppos, dstopns, ndstops, valdstoppos, valdstopns, nvaldstops )
@@ -220,7 +220,7 @@ function activity( indir, outdir, ids )
 		logger.untab();
 	end
 
-		% post-process global stats
+		% postprocess global statistics
 	global_dstarts(abs( global_dstarts ) > MAXDELTA ) = []; % binning
 	global_valdstarts(abs( global_valdstarts ) > MAXDELTA ) = [];
 	global_dstops(abs( global_dstops ) > MAXDELTA ) = [];
@@ -236,11 +236,11 @@ function activity( indir, outdir, ids )
 	global_valdstoppos = linspace( min( global_valdstops ), max( global_valdstops ), style.bins( global_valdstops ) );
 	global_valdstopns = hist( global_valdstops, global_valdstoppos );
 
-		% plot global stats
+		% plot global statistics
 	plotfile = fullfile( outdir, 'activity.png' );
 	figtitle = sprintf( 'ACTIVITY (subjects: %d, resps: %d/%d)', global_nruns, sum( global_nresplabs ), sum( global_ntrials ) );
 
-	figstats( plotfile, figtitle, ...
+	figstatistics( plotfile, figtitle, ...
 		sum( global_nresplabs ), ...
 		global_dstarts, global_dstartpos, global_dstartns, global_ndstarts, global_valdstartpos, global_valdstartns, global_nvaldstarts, ...
 		global_dstops, global_dstoppos, global_dstopns, global_ndstops, global_valdstoppos, global_valdstopns, global_nvaldstops )

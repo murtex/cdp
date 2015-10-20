@@ -1,5 +1,5 @@
 function sync_samples( indir, outdir, ids, seed, nsamples )
-% synchronization samples
+% marker synchronization samples
 %
 % SYNC_SAMPLES( indir, outdir, ids, seed, nsamples )
 %
@@ -40,7 +40,7 @@ function sync_samples( indir, outdir, ids, seed, nsamples )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'synchronization samples...' );
+	logger.tab( 'marker synchronization samples...' );
 
 	style = xis.hStyle.instance();
 

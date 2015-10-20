@@ -1,5 +1,5 @@
 function sync( indir, outdir, ids )
-% synchronization stats
+% marker synchronization statistics
 %
 % SYNC( indir, outdir, ids )
 %
@@ -30,7 +30,7 @@ function sync( indir, outdir, ids )
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
-	logger.tab( 'synchronization stats...' );
+	logger.tab( 'marker synchronization statistics...' );
 
 	style = xis.hStyle.instance();
 
@@ -53,7 +53,7 @@ function sync( indir, outdir, ids )
 		logger.log( 'read aux data (''%s'')...', auxfile );
 		load( auxfile, 'sync0', 'synchints', 'syncs' );
 
-			% plot stats
+			% plot statistics
 		plotfile = fullfile( outdir, sprintf( 'sync_%d.png', i ) );
 		logger.log( 'plot marker offsets (''%s'')...', plotfile );
 
