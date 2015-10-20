@@ -92,7 +92,7 @@ function activity_samples( indir, outdir, ids, seed, nsamples, type )
 		switch type
 			case 'any' % any samples
 
-			case 'valid' % valid samples only
+			case 'valid' % valid samples only, TODO: never tested!
 				vals = dstarts <= 0 & dstops >= 0;
 				itrials(~vals) = [];
 
@@ -124,6 +124,10 @@ function activity_samples( indir, outdir, ids, seed, nsamples, type )
 
 			r = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % signals
 			relnoir = dsp.sec2smp( [trial.cue, trial.dist], run.audiorate ) + [1, 0] - r(1) + 1;
+
+			if diff( trial.range ) > cfg.vad_maxdet
+				r(2) = r(1) - 1 + dsp.sec2smp( cfg.vad_maxdet, run.audiorate );
+			end
 
 			labr = dsp.sec2smp( resplab.range, run.audiorate ) + [1, 0];
 			detr = dsp.sec2smp( respdet.range, run.audiorate ) + [1, 0];

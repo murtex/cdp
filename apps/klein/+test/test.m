@@ -33,6 +33,8 @@ function test( indir, outdir, ids )
 	logger.tab( 'test template...' );
 
 		% proceed subjects
+	global_respstops = [];
+
 	for i = ids
 		logger.tab( 'subject: %d', i );
 
@@ -46,11 +48,27 @@ function test( indir, outdir, ids )
 		logger.log( 'read cdf data (''%s'')...', cdffile );
 		load( cdffile, 'run' );
 
+			% gather stats
+		trials = [run.trials];
+		resplabs = [run.trials.resplab];
+		respdets = [run.trials.respdet];
+
+		labr = cat( 1, resplabs.range );
+
+		respstops = labr(:, 2) - transpose( [trials.cue] );
+		global_respstops = cat( 1, global_respstops, respstops );
+
+			% log stats
+		max( respstops )
+
 			% clean up
 		delete( run );
 
 		logger.untab();
 	end
+
+		% log global stats
+	max( global_respstops )
 
 		% done
 	logger.untab( 'done' );

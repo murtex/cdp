@@ -36,6 +36,10 @@ function activity( run, cfg )
 		r = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0];
 		relnoir = dsp.sec2smp( [trial.cue, trial.dist], run.audiorate ) + [1, 0] - r(1) + 1;
 
+		if diff( trial.range ) > cfg.vad_maxdet % limit detection length, DEBUG: activity-5
+			r(2) = r(1) - 1 + dsp.sec2smp( cfg.vad_maxdet, run.audiorate );
+		end
+
 		respts = run.audiodata(r(1):r(2), 1);
 
 		[respsd, respfreqs] = dsp.stransf( respts, run.audiorate, cfg.vad_freqband(1), cfg.vad_freqband(2), cfg.vad_nfreqs );
@@ -62,7 +66,7 @@ function activity( run, cfg )
 			%vastops(1) = [];
 		%end
 
-		while sum( vastarts < trial.dist + cfg.vad_maxdist ) > 1 ... % skip distractor echoes, DEBUG: activity-4
+		while sum( vastarts < trial.dist + cfg.vad_maxdist ) > 1 ... % skip distractor shadows, DEBUG: activity-4
 				&& vastarts(2) - vastops(1) <= cfg.vad_maxgap
 			vastarts(1) = [];
 			vastops(1) = [];

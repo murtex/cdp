@@ -4,11 +4,13 @@ Framework configuration
 ##### Marker synchronization
 
 - `hConfig.sync_range`
-	- search range relative to expected marker position
+	- search range relative to expected marker position (seconds)
 	- default: `[NaN, NaN]`, Klein: `[-0.125, 0.025]`
 - `hConfig.sync_smooth`
+	- waveform smoothing (seconds)
+	- default: `NaN`, Klein: `0.002`
 - `hConfig.sync_thresh`
-	- Mahalanobis distance threshold
+	- Mahalanobis distance threshold (number of sigmas)
 	- default: `NaN`, Klein: `3.0`
 
 ##### Voice activity detection

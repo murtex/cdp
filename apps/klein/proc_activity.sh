@@ -2,7 +2,7 @@
 
 	# arguments
 INDIR="../../data/klein-dev/sync/"
-OUTDIR="../../data/klein-dev/activity/"
+OUTDIR="../../data/klein-dev/activity-5/"
 
 IDS1="setdiff( 1:5, 4 )"
 IDS2="6:10"
