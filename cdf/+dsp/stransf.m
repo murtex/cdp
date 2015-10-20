@@ -100,7 +100,7 @@ function [st, freqs] = stransf( ts, rate, lofreq, hifreq, nfreqs )
 
 	end
 
-		% trim zero-padding
+		% undo zero-padding
 	st = st(:, 1:tslenorig);
 
 end
