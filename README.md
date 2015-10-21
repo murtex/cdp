@@ -1,7 +1,7 @@
 Cue-distractor package
 ----------------------
 
-- `apps` -- (show-case) applications
+- `apps` -- cue-distractor applications
 - `cdf` -- cue-distractor framework
 - `data` -- distributed data
 
