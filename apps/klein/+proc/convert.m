@@ -26,7 +26,7 @@ function convert( indir, outdir, ids )
 		% initialize framework
 	addpath( '../../cdf/' );
 
-	stamp = datestr( now(), 'yymmdd-HHMMSS-FFF' );
+	stamp = num2str( sum( ids ) ); % TODO: simple hashing
 	logfile = fullfile( outdir, sprintf( '%s.log', stamp ) );
 
 	logger = xis.hLogger.instance( logfile );
