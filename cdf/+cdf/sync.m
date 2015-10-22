@@ -16,15 +16,16 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 % (2005) Saha, Chakroborty, Senapati : A New Silence Removal and Endpoint Detection Algorithm for Speech and Speaker Recognition Applications
 
 		% safeguard
-	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
+	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' ) % cue-distractor run
 		error( 'invalid argument: run' );
 	end
 
-	if nargin < 2 || ~isscalar( cfg ) || ~isa( cfg, 'cdf.hConfig' )
+	if nargin < 2 || ~isscalar( cfg ) || ~isa( cfg, 'cdf.hConfig' ) % framework configuration
 		error( 'invalid argument: cfg' );
 	end
 
-	logger = xis.hLogger.instance();
+		% init
+	logger = xis.hLogger.instance(); % start logging
 	logger.tab( 'marker synchronization...' );
 
 		% pre-estimate cue/distractor noise
@@ -34,7 +35,7 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 	end
 
 	noir = [1, dsp.sec2smp( run.trials(1).dist, run.audiorate )]; % initial noise range
-	if any( isnan( noir ) ) || any( noir < 1 ) || any( noir > run.audiosize(1) )
+	if any( isnan( noir ) ) || any( noir < 1 ) || any( noir > size( run.audiodata, 1 ) )
 		error( 'invalid value: noir' );
 	end
 
@@ -92,7 +93,7 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 		end
 
 		sr(sr < 1) = 1; % clamp range
-		sr(sr > run.audiosize(1)) = run.audiosize(1);
+		sr(sr > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 
 			% track marker
 		for j = sr(1)+lsmooth:sr(2)-rsmooth
@@ -129,7 +130,7 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 	logger.log( 'sync markers: %d/%d', sum( ~isnan( syncs ) ), ntrials );
 
 		% apply sync offsets
-	maxt = dsp.smp2sec( run.audiosize(1), run.audiorate );
+	maxt = dsp.smp2sec( size( run.audiodata, 1 ), run.audiorate );
 
 	for i = 1:ntrials
 		trial = run.trials(i);
@@ -144,8 +145,8 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 
 	end
 
-		% done
-	logger.untab();
+		% exit
+	logger.untab(); % stop logging
 
 end
 
