@@ -53,28 +53,28 @@ classdef (Sealed = true) hStyle < handle
 	
 		end
 
-		function print( this, plotfile )
+		function print( this, figfile )
 		% print figure
 		%
-		% print( this, plotfile )
+		% print( this, figfile )
 		%
 		% INPUT
 		% this : style (scalar object)
-		% plotfile : plot filename (row char)
+		% figfile : plot filename (row char)
 
 				% safeguard
 			if ~isscalar( this )
 				error( 'invalid argument: this' );
 			end
 
-			if nargin < 2 || ~isrow( plotfile ) || ~ischar( plotfile )
-				error( 'invalid argument: plotfile' );
+			if nargin < 2 || ~isrow( figfile ) || ~ischar( figfile )
+				error( 'invalid argument: figfile' );
 			end
 
 				% print figure
-			print( plotfile, '-dpng', '-r128' );
+			print( figfile, '-dpng', '-r128' );
 
-			%imwrite( hardcopy( gcf(), '-dzbuffer', '-r120' ), sprintf( '%s.png', plotfile ), 'png' );
+			%imwrite( hardcopy( gcf(), '-dzbuffer', '-r120' ), sprintf( '%s.png', figfile ), 'png' );
 
 		end
 
