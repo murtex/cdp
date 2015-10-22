@@ -5,7 +5,7 @@ classdef (Sealed = true) hConfig < handle
 	properties (Access = public)
 
 			% marker synchronization
-		sync_range = [NaN, NaN]; % search range [start, stop] (row numeric)
+		sync_range = [NaN, NaN]; % (relative) search range [start, stop] (row numeric)
 		sync_smooth = NaN; % smoothing (scalar numeric)
 		sync_thresh = NaN; % mahalanobis threshold (scalar numeric)
 
