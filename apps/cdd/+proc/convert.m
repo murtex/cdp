@@ -42,7 +42,7 @@ function convert( indir, outdir, ids, logfile )
 
 		% workload
 	cid = 1;
-	for id = ids
+	for id = ids % proceed subjects
 		logger.tab( 'subject: %d (%d/%d)...', id, cid, numel( ids ) );
 
 			% read raw data
