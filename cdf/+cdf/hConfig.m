@@ -6,8 +6,8 @@ classdef (Sealed = true) hConfig < handle
 
 			% marker synchronization
 		sync_range = [NaN, NaN]; % (relative) search range [start, stop] (row numeric)
-		sync_smooth = NaN; % sample smoothing (scalar numeric)
-		sync_thresh = NaN; % mahalanobis threshold (scalar numeric)
+		sync_smooth = NaN; % sample smoothing [approx. marker length] (scalar numeric)
+		sync_thresh = NaN; % mahalanobis threshold [sigmas] (scalar numeric)
 
 			% voice activity detection
 		vad_freqband = [150, 8000]; % frequency band [lower, upper] (row numeric)
