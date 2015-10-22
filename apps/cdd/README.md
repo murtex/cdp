@@ -1,8 +1,8 @@
 Raw data
 --------
 
-- `proc.read_psych` -- read raw psychtoolbox data
 - `proc.read_audio` -- read raw audio data
+- `proc.read_psych` -- read raw psychtoolbox data
 
 Preprocessing
 -------------
