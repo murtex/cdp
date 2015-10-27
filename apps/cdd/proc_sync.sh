@@ -13,6 +13,9 @@ IDS6="[26:30]"
 IDS7="[31:35]"
 IDS8="[36:40]"
 
+	# workload
+MATLAB="matlab -nosplash -nodesktop -r"
+
 LOGFILE1="${OUTDIR}/${IDS1}.log"
 LOGFILE2="${OUTDIR}/${IDS2}.log"
 LOGFILE3="${OUTDIR}/${IDS3}.log"
@@ -21,9 +24,6 @@ LOGFILE5="${OUTDIR}/${IDS5}.log"
 LOGFILE6="${OUTDIR}/${IDS6}.log"
 LOGFILE7="${OUTDIR}/${IDS7}.log"
 LOGFILE8="${OUTDIR}/${IDS8}.log"
-
-	# workload
-MATLAB="matlab -nosplash -nodesktop -r"
 
 $MATLAB "proc.sync( '$INDIR', '$OUTDIR', $IDS1, '$LOGFILE1' ); exit();" &
 $MATLAB "proc.sync( '$INDIR', '$OUTDIR', $IDS2, '$LOGFILE2' ); exit();" &
