@@ -4,7 +4,7 @@
 INDIR="../../data/cdd/convert/"
 OUTDIR="${INDIR}/test/"
 
-IDS="setdiff( [1:40], 11 )" # 11th subject is malicious (two recordings)
+IDS="setdiff( [1:40], 11 )" # 11: two recordings
 
 LOGFILE="${OUTDIR}/${IDS}.log"
 
