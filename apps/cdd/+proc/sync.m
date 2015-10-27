@@ -49,7 +49,7 @@ function sync( indir, outdir, ids, logfile )
 		logger.tab( 'subject: %d (%d/%d)...', id, cid, numel( ids ) );
 
 			% read data
-		cdffile = fullfile( indir, sprintf( 'run_%d.mat', id ) );
+		cdffile = fullfile( indir, sprintf( 'run_%d.mat', id ) ); % cdf data
 		logger.tab( 'read cdf data (''%s'')...', cdffile );
 
 		load( cdffile, 'run' );
@@ -60,7 +60,7 @@ function sync( indir, outdir, ids, logfile )
 
 		logger.untab();
 
-		proc.read_audio( run, run.audiofile ); % read audio data
+		proc.read_audio( run, run.audiofile ); % audio data
 
 			% sync markers
 		[sync0, synchints, syncs] = cdf.sync( run, cfg );
