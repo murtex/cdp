@@ -10,20 +10,13 @@ function convert( indir, outdir, ids, logfile )
 % logfile : logger filename (row char)
 
 		% safeguard
-	if nargin < 1 || ~isrow( indir ) || ~ischar( indir ) % input directory
-		error( 'invalid argument: indir' );
-	end
-
-	if exist( indir, 'dir' ) ~= 7
+	if nargin < 1 || ~isrow( indir ) || ~ischar( indir ) || ... % input directory
+			exist( indir, 'dir' ) ~= 7
 		error( 'invalid argument: indir' );
 	end
 
 	if nargin < 2 || ~isrow( outdir ) || ~ischar( outdir ) % output directory
 		error( 'invalid argument: outdir' );
-	end
-
-	if exist( outdir, 'dir' ) ~= 7
-		mkdir( outdir );
 	end
 
 	if nargin < 3 || ~isvector( ids ) || ~isnumeric( ids ) % subject identifiers
@@ -35,6 +28,10 @@ function convert( indir, outdir, ids, logfile )
 	end
 
 		% init
+	if exist( outdir, 'dir' ) ~= 7 % prepare for output
+		mkdir( outdir );
+	end
+
 	addpath( '../../cdf/' ); % include framework
 
 	logger = xis.hLogger.instance( logfile ); % start logging

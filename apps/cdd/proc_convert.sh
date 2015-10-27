@@ -6,7 +6,7 @@ OUTDIR="../../data/cdd/convert/"
 
 IDS="setdiff( [1:40], 11 )" # 11th subject is malicious (two recordings)
 
-LOGFILE="${OUTDIR}/convert_${IDS}.log"
+LOGFILE="${OUTDIR}/${IDS}.log"
 
 	# workload
 MATLAB="matlab -nosplash -nodesktop -r"
