@@ -107,11 +107,11 @@ function sync_samples( indir, outdir, ids, ntrials, rndseed, logfile )
 				% prepare
 			trial = run.trials(itrial);
 
-			detected_cue = trial.cue; % ranges
+			detected_cue = trial.cue; % cues
 			original_cue = detected_cue - syncs(itrial);
 			expected_cue = original_cue + synchints(itrial);
 
-			sr = dsp.sec2smp( cfg.sync_range * style.scale( 1 ) + expected_cue, run.audiorate ) + [1, 0];
+			sr = dsp.sec2smp( cfg.sync_range * style.scale( 1 ) + expected_cue, run.audiorate ) + [1, 0]; % ranges
 			detr = dsp.sec2smp( cfg.sync_smooth * [-1, 1] * style.scale( 1 ) + detected_cue, run.audiorate ) + [1, 0];
 
 			sts = run.audiodata(sr(1):sr(2), 2); % signals
