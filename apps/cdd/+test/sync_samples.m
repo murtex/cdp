@@ -86,7 +86,7 @@ function sync_samples( indir, outdir, ids, ntrials, rndseed, logfile )
 			% sample trials
 		itrials = 1:numel( run.trials );
 
-		itrials(isnan( syncs )) = []; % skip invalids
+		itrials(isnan( syncs )) = []; % remove invalids
 
 		if numel( itrials ) > ntrials % sample randomly, always keep last (valid) trial
 			rng( rndseed );
