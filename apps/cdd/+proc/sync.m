@@ -36,7 +36,7 @@ function sync( indir, outdir, ids, logfile )
 
 	cfg = cdf.hConfig(); % configure framework
 
-	cfg.sync_range = [-0.125, 0.025];
+	cfg.sync_range = [-0.050, 0.010]; % enlarge if too many lost syncs!
 	cfg.sync_smooth = 0.002;
 	cfg.sync_thresh = 3.0;
 
