@@ -19,7 +19,7 @@ RNDSEED="1"
 	# workload
 MATLAB="matlab -nosplash -nodesktop -r"
 
-LOGFILE1="${OUTDIR}/${IDS1}.log"
+LOGFILE1="${OUTDIR}/${IDS1}.log" # statistics
 LOGFILE2="${OUTDIR}/${IDS2}.log"
 LOGFILE3="${OUTDIR}/${IDS3}.log"
 LOGFILE4="${OUTDIR}/${IDS4}.log"
@@ -37,7 +37,7 @@ $MATLAB "test.sync( '$INDIR', '$OUTDIR', $IDS6, '$LOGFILE6' ); exit();" &
 $MATLAB "test.sync( '$INDIR', '$OUTDIR', $IDS7, '$LOGFILE7' ); exit();" &
 $MATLAB "test.sync( '$INDIR', '$OUTDIR', $IDS8, '$LOGFILE8' ); exit();" &
 
-LOGFILE1="${OUTDIR}/${IDS1}_samples.log"
+LOGFILE1="${OUTDIR}/${IDS1}_samples.log" # samples
 LOGFILE2="${OUTDIR}/${IDS2}_samples.log"
 LOGFILE3="${OUTDIR}/${IDS3}_samples.log"
 LOGFILE4="${OUTDIR}/${IDS4}_samples.log"
