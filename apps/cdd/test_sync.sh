@@ -14,7 +14,7 @@ IDS7="[31:35]"
 IDS8="[36:40]"
 
 NTRIALS="20"
-TRIALTYPE="any"
+RNDSEED="1"
 
 	# workload
 MATLAB="matlab -nosplash -nodesktop -r"
@@ -46,14 +46,14 @@ LOGFILE6="${OUTDIR}/${IDS6}_samples.log"
 LOGFILE7="${OUTDIR}/${IDS7}_samples.log"
 LOGFILE8="${OUTDIR}/${IDS8}_samples.log"
 
-$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS1, $NTRIALS, '$TRIALTYPE', '$LOGFILE1' ); exit();" &
-$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS2, $NTRIALS, '$TRIALTYPE', '$LOGFILE2' ); exit();" &
-$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS3, $NTRIALS, '$TRIALTYPE', '$LOGFILE3' ); exit();" &
-$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS4, $NTRIALS, '$TRIALTYPE', '$LOGFILE4' ); exit();" &
-$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS5, $NTRIALS, '$TRIALTYPE', '$LOGFILE5' ); exit();" &
-$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS6, $NTRIALS, '$TRIALTYPE', '$LOGFILE6' ); exit();" &
-$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS7, $NTRIALS, '$TRIALTYPE', '$LOGFILE7' ); exit();" &
-$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS8, $NTRIALS, '$TRIALTYPE', '$LOGFILE8' ); exit();" &
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS1, $NTRIALS, $RNDSEED, '$LOGFILE1' ); exit();" &
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS2, $NTRIALS, $RNDSEED, '$LOGFILE2' ); exit();" &
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS3, $NTRIALS, $RNDSEED, '$LOGFILE3' ); exit();" &
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS4, $NTRIALS, $RNDSEED, '$LOGFILE4' ); exit();" &
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS5, $NTRIALS, $RNDSEED, '$LOGFILE5' ); exit();" &
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS6, $NTRIALS, $RNDSEED, '$LOGFILE6' ); exit();" &
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS7, $NTRIALS, $RNDSEED, '$LOGFILE7' ); exit();" &
+$MATLAB "test.sync_samples( '$INDIR', '$OUTDIR', $IDS8, $NTRIALS, $RNDSEED, '$LOGFILE8' ); exit();" &
 
 wait
 

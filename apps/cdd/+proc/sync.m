@@ -78,6 +78,11 @@ function sync( indir, outdir, ids, logfile )
 
 		save( auxfile, 'sync0', 'synchints', 'syncs' );
 
+		cfgfile = fullfile( outdir, sprintf( 'run_%d_cfg.mat', id ) ); % configuration
+		logger.log( 'write configuration (''%s'')...', cfgfile );
+
+		save( cfgfile, 'cfg' );
+
 			% clean up
 		delete( run );
 

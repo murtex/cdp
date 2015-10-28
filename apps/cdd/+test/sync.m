@@ -45,7 +45,7 @@ function sync( indir, outdir, ids, logfile )
 		logger.tab( 'subject: %d (%d/%d)...', id, cid, numel( ids ) );
 
 			% read data
-		cdffile = fullfile( indir, sprintf( 'run_%d.mat', id ) );
+		cdffile = fullfile( indir, sprintf( 'run_%d.mat', id ) ); % cdf data
 		logger.tab( 'read cdf data (''%s'')...', cdffile );
 
 		load( cdffile, 'run' );
@@ -56,7 +56,7 @@ function sync( indir, outdir, ids, logfile )
 
 		logger.untab();
 
-		auxfile = fullfile( indir, sprintf( 'run_%d_aux.mat', id ) );
+		auxfile = fullfile( indir, sprintf( 'run_%d_aux.mat', id ) ); % auxiliary data
 		logger.tab( 'read auxiliary data (''%s'')...', auxfile );
 
 		load( auxfile, 'sync0', 'synchints', 'syncs' );
