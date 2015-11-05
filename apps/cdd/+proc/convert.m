@@ -46,7 +46,7 @@ function convert( indir, outdir, ids, logfile )
 		run = cdf.hRun();
 
 		proc.read_audio( run, fullfile( indir, sprintf( 'participant_%d.wav', id ) ) );
-		proc.read_psych( run, fullfile( indir, sprintf( 'participant_%d.txt', id ) ) );
+		proc.read_trials( run, fullfile( indir, sprintf( 'participant_%d.txt', id ) ) );
 
 			% write converted data
 		cdffile = fullfile( outdir, sprintf( 'run_%d.mat', id ) );
