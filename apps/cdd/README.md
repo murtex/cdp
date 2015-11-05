@@ -2,7 +2,7 @@ Raw data
 --------
 
 - `proc.read_audio` -- read raw audio data
-- `proc.read_psych` -- read raw psychtoolbox data
+- `proc.read_trials` -- read raw trial data
 
 Preprocessing
 -------------
