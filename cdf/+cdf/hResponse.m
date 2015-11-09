@@ -10,7 +10,6 @@ classdef (Sealed = true) hResponse < handle
 			% landmarks
 		bo = NaN; % burst-onset (scalar numeric)
 		vo = NaN; % voice-onset (scalar numeric)
-		vr = NaN; % voice-release (scalar numeric)
 
 			% formants
 		f0 = [NaN, NaN]; % f0 onset [time, frequency] (row numeric)
