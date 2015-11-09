@@ -15,11 +15,11 @@ Labeling
 
 - `proc.apply` -- apply labels
 
-###### Manually
+###### Manual
 
 - `proc.label` -- labeling tool
 
-###### Automatically
+###### Automatic
 
 - `proc.activity` -- voice activity detection
 - `proc.landmarks` -- landmarks detection
