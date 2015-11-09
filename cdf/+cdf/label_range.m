@@ -66,7 +66,7 @@ function label_range( run, cfg )
 						sound( rts, run.audiorate );
 
 					case 'l' % scaling
-						logscale = ~logscale;
+						viewlog = ~viewlog;
 						fig_update();
 
 					case 'backspace' % clearing
@@ -120,7 +120,7 @@ function label_range( run, cfg )
 	ntrials = numel( run.trials );
 	itrial = 1;
 
-	logscale = false;
+	viewlog = false;
 
 	while ~done
 
@@ -130,12 +130,12 @@ function label_range( run, cfg )
 		tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % signal
 
 		rts = run.audiodata(tr(1):tr(2), 1);
-		if logscale
+		if viewlog
 			rts = log( abs( rts ) );
 		end
 
 		yl = max( abs( rts ) ) * [-1, 1] * style.scale( 1 ); % axes
-		if logscale
+		if viewlog
 			yl = [min( rts(~isinf( rts )) ), max( rts )];
 			yl(2) = yl(2) + diff( yl ) * (style.scale( 1 ) - 1) / 2;
 		end
@@ -143,7 +143,7 @@ function label_range( run, cfg )
 			% plot
 		clf( fig );
 
-		h = subplot( 4, 1, [1, 3] ); % signal/range
+		h = subplot( 4, 1, [1, 3] ); % signal
 		title( sprintf( 'LABEL_RANGE (trial: %d/%d)', itrial, ntrials ) );
 		xlabel( 'time in milliseconds' );
 		ylabel( 'response' );
