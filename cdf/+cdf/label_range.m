@@ -127,9 +127,9 @@ function label_range( run, cfg )
 			% prepare data
 		trial = run.trials(itrial);
 
-		tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % ranges
+		tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % signal
 
-		rts = run.audiodata(tr(1):tr(2), 1); % signals
+		rts = run.audiodata(tr(1):tr(2), 1);
 		if logscale
 			rts = log( abs( rts ) );
 		end
