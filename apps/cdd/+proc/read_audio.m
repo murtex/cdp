@@ -21,7 +21,12 @@ function read_audio( run, audiofile )
 
 		% read audio file
 	run.audiofile = audiofile;
-	[run.audiodata, run.audiorate] = audioread( audiofile );
+
+	if exist( 'audioread', 'builtin' )
+		[run.audiodata, run.audiorate] = audioread( audiofile );
+	else
+		[run.audiodata, run.audiorate] = wavread( audiofile );
+	end
 
 		% logging
 	logger.log( 'rate: %d', run.audiorate );
