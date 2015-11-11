@@ -13,6 +13,9 @@ classdef (Sealed = true) hConfig < handle
 		lab_activity_det1 = [NaN, NaN]; % (relative) activity detail #1 [start, stop] (row numeric)
 		lab_activity_det2 = [NaN, NaN]; % (relative) activity detail #2 [start, stop] (row numeric)
 
+		lab_landmarks_det1 = [NaN, NaN]; % (relative) landmarks detail #1 [start, stop] (row numeric)
+		lab_landmarks_det2 = [NaN, NaN]; % (relative) landmarks detail #2 [start, stop] (row numeric)
+
 	end
 
 end
