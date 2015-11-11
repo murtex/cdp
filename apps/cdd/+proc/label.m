@@ -44,6 +44,9 @@ function label( indir, outdir, ids, labmode, logfile )
 	cfg.lab_activity_det1 = [-0.025, 0.05];
 	cfg.lab_activity_det2 = [-0.05, 0.025];
 
+	cfg.lab_landmarks_det1 = [-0.025, 0.05];
+	cfg.lab_landmarks_det2 = [-0.025, 0.05];
+
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'labeling tool...' );
 

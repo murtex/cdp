@@ -23,6 +23,7 @@ function label_activity( run, cfg )
 	style = xis.hStyle.instance(); % prepare interactive figure
 
 	fig = style.figure( 'Visible', 'on' );
+	figcol = get( fig, 'Color' );
 
 	set( fig, 'WindowKeyPressFcn', {@fig_dispatch, 'keypress'} );
 	set( fig, 'CloseRequestFcn', {@fig_dispatch, 'close'} );
@@ -153,6 +154,12 @@ function label_activity( run, cfg )
 
 		det1f = ~any( isnan( det1r ) );
 		det2f = ~any( isnan( det2r ) );
+
+		if ~det1f || ~det2f
+			set( fig, 'Color', style.color( 'signal', +2 ) );
+		else
+			set( fig, 'Color', figcol );
+		end
 
 		ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
 		if det1f
