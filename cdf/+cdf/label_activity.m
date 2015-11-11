@@ -1,7 +1,7 @@
-function label_range( run, cfg )
-% range labeling tool
+function label_activity( run, cfg )
+% activity labeling tool
 %
-% LABEL_RANGE( run, cfg )
+% LABEL_ACTIVITY( run, cfg )
 % 
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -18,7 +18,7 @@ function label_range( run, cfg )
 
 		% init
 	logger = xis.hLogger.instance(); % start logging
-	logger.tab( 'range labeling tool...' );
+	logger.tab( 'activity labeling tool...' );
 
 	style = xis.hStyle.instance(); % prepare interactive figure
 
@@ -143,8 +143,8 @@ function label_range( run, cfg )
 		resp = resps(itrial);
 
 		ovrr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % ranges
-		det1r = dsp.sec2smp( resp.range(1) + cfg.lab_range_det1, run.audiorate ) + [1, 0];
-		det2r = dsp.sec2smp( resp.range(2) + cfg.lab_range_det2, run.audiorate ) + [1, 0];
+		det1r = dsp.sec2smp( resp.range(1) + cfg.lab_activity_det1, run.audiorate ) + [1, 0];
+		det2r = dsp.sec2smp( resp.range(2) + cfg.lab_activity_det2, run.audiorate ) + [1, 0];
 
 		det1r(det1r < 1) = 1;
 		det1r(det1r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
@@ -197,7 +197,7 @@ function label_range( run, cfg )
 		clf( fig );
 
 		hovr = subplot( 4, 2, [1, 2], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
-		title( sprintf( 'LABEL_RANGE (trial: %d/%d)', itrial, ntrials ) );
+		title( sprintf( 'LABEL_ACTIVITY (trial: %d/%d)', itrial, ntrials ) );
 		xlabel( 'time in milliseconds' );
 		ylabel( 'response' );
 
@@ -227,7 +227,7 @@ function label_range( run, cfg )
 			xlabel( 'time in milliseconds' );
 			ylabel( 'range start detail' );
 
-			xlim( (resp.range(1) + cfg.lab_range_det1 - trial.range(1)) * 1000 );
+			xlim( (resp.range(1) + cfg.lab_activity_det1 - trial.range(1)) * 1000 );
 			ylim( det1yl );
 
 			if ~any( isnan( resp.range ) ) % range
@@ -254,7 +254,7 @@ function label_range( run, cfg )
 			xlabel( 'time in milliseconds' );
 			ylabel( 'range stop detail' );
 
-			xlim( (resp.range(2) + cfg.lab_range_det2 - trial.range(1)) * 1000 );
+			xlim( (resp.range(2) + cfg.lab_activity_det2 - trial.range(1)) * 1000 );
 			ylim( det2yl );
 
 			if ~any( isnan( resp.range ) ) % range
@@ -279,12 +279,12 @@ function label_range( run, cfg )
 		str = { ... % information
 			'INFORMATION', ...
 			'', ...
-			sprintf( 'class: ''%s''', resp.label ), ...
-			'', ...
 			sprintf( 'range: [%.1f, %.1f]', (resp.range - trial.range(1)) * 1000 ), ...
 			'', ...
 			sprintf( 'burst onset: %.1f', (resp.bo - trial.range(1)) * 1000 ), ...
 			sprintf( 'voice onset: %.1f', (resp.vo - trial.range(1)) * 1000 ), ...
+			'', ...
+			sprintf( 'class: ''%s''', resp.label ), ...
 			'', ...
 			sprintf( 'F0 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
 			sprintf( 'F1 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...

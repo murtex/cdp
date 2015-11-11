@@ -10,8 +10,8 @@ classdef (Sealed = true) hConfig < handle
 		sync_thresh = NaN; % mahalanobis threshold [sigmas] (scalar numeric)
 
 			% manual labeling
-		lab_range_det1 = [-0.025, 0.05]; % range detail #1 [preceding, succeeding] (row numeric)
-		lab_range_det2 = [-0.05, 0.025]; % range detail #2 [preceding, succeeding] (row numeric)
+		lab_activity_det1 = [NaN, NaN]; % (relative) activity detail #1 [start, stop] (row numeric)
+		lab_activity_det2 = [NaN, NaN]; % (relative) activity detail #2 [start, stop] (row numeric)
 
 	end
 
