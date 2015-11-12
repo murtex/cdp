@@ -250,7 +250,7 @@ function label_formants( run, cfg )
 		ylabel( 'response' );
 
 		xlim( (resp.range - trial.range(1)) * 1000 );
-		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1 );
+		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 		ylim( yl );
 
 		plot( (dsp.smp2sec( (ovrr(1):ovrr(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, ovrts, ... % signal

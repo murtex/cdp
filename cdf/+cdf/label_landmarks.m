@@ -241,7 +241,7 @@ function label_landmarks( run, cfg )
 		ylabel( 'response' );
 
 		xlim( (resp.range - trial.range(1)) * 1000 );
-		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1 );
+		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 		ylim( yl );
 
 		plot_landmarks( trial, yl ); % landmarks
@@ -256,7 +256,7 @@ function label_landmarks( run, cfg )
 			ylabel( 'burst onset detail' );
 
 			xlim( (resp.bo + cfg.lab_landmarks_det1 - trial.range(1)) * 1000 );
-			yl = max( abs( det1ts ) ) * [-1, 1] * style.scale( 1 );
+			yl = max( abs( det1ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
 			plot_landmarks( trial, yl ); % landmarks
@@ -272,7 +272,7 @@ function label_landmarks( run, cfg )
 			ylabel( 'voice onset detail' );
 
 			xlim( (resp.vo + cfg.lab_landmarks_det2 - trial.range(1)) * 1000 );
-			yl = max( abs( det2ts ) ) * [-1, 1] * style.scale( 1 );
+			yl = max( abs( det2ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
 			plot_landmarks( trial, yl ); % landmarks

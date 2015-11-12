@@ -259,7 +259,7 @@ function label_activity( run, cfg )
 		ylabel( 'response' );
 
 		xlim( (trial.range - trial.range(1)) * 1000 );
-		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1 );
+		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 		ylim( yl );
 
 		plot_activity( trial, yl ); % activity range
@@ -274,7 +274,7 @@ function label_activity( run, cfg )
 			ylabel( 'activity start detail' );
 
 			xlim( (resp.range(1) + cfg.lab_activity_det1 - trial.range(1)) * 1000 );
-			yl = max( abs( det1ts ) ) * [-1, 1] * style.scale( 1 );
+			yl = max( abs( det1ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
 			plot_activity( trial, yl ); % activity range
@@ -290,7 +290,7 @@ function label_activity( run, cfg )
 			ylabel( 'activity stop detail' );
 
 			xlim( (resp.range(2) + cfg.lab_activity_det2 - trial.range(1)) * 1000 );
-			yl = max( abs( det2ts ) ) * [-1, 1] * style.scale( 1 );
+			yl = max( abs( det2ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
 			plot_activity( trial, yl ); % activity range
