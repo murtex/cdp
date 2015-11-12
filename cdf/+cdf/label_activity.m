@@ -28,62 +28,128 @@ function label_activity( run, cfg )
 	set( fig, 'WindowKeyPressFcn', {@fig_dispatch, 'keypress'} );
 	set( fig, 'CloseRequestFcn', {@fig_dispatch, 'close'} );
 
-		% figure event dispatching
+		% helper functions
+	function f = is_valid( trials )
+		f = true( size( trials ) );
+		for i = 1:numel( trials )
+			if any( isnan( trials(i).range ) )
+				f(i) = false;
+			end
+		end
+	end
+
+	function f = is_labeled( trials )
+		f = true( size( trials ) );
+		for i = 1:numel( trials )
+			if strcmp( trials(i).resplab.label, '' ) || any( isnan( trials(i).resplab.range ) )
+				f(i) = false;
+			end
+		end
+	end
+
+	function i = next_unlabeled( trials, i )
+		inext = find( ~is_labeled( trials(i+1:end) ), 1 );
+		if ~isempty( inext )
+			i = i + inext;
+		end
+	end
+
+	function plot_activity( trial, yl )
+		if ~any( isnan( trial.resplab.range ) )
+			rectangle( 'Position', [ ...
+				(trial.resplab.range(1) - trial.range(1)) * 1000, yl(1), ...
+				diff( trial.resplab.range ) * 1000, diff( yl )], ...
+				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
+				'FaceColor', style.color( 'warm', +2 ), 'EdgeColor', 'none' );
+		end
+		plot( (trial.resplab.range(1) * [1, 1] - trial.range(1)) * 1000, yl, ...
+			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
+			'Color', style.color( 'signal', +1 ) );
+		plot( (trial.resplab.range(2) * [1, 1] - trial.range(1)) * 1000, yl, ...
+			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
+			'Color', style.color( 'signal', +1 ) );
+	end
+
+		% event dispatching
 	function fig_dispatch( src, event, type )
 		switch type
 
 				% key presses
 			case 'keypress'
+				nmods = size( event.Modifier, 2 );
+
 				switch event.Key
-					case 'space' % browse
-						rrs = cat( 1, resps(itrial+1:end).range );
-						if ~isempty( rrs )
-							itrial = itrial + min( find( isnan( rrs(:, 1) ), 1, 'first' ), find( isnan( rrs(:, 2) ), 1, 'first' ) );
+
+					case 'space' % trial browsing
+						if nmods == 0
+							itrial = next_unlabeled( trials, itrial );
 							fig_update();
 						end
 
-					case {'rightarrow', 'downarrow'}
-						step = 1;
-						if any( strcmp( event.Modifier, 'shift' ) )
-							step = 10;
+					case 'pagedown'
+						if nmods < 2 && itrial ~= ntrials
+							step = 1;
+							if strcmp( event.Modifier, 'shift' )
+								step = 10;
+							elseif strcmp( event.Modifier, 'control' )
+								step = 100;
+							end
+							itrial = min( itrial + step, ntrials );
+							fig_update();
 						end
-						if any( strcmp( event.Modifier, 'control' ) )
-							step = 100;
+					case 'pageup'
+						if nmods < 2 && itrial ~= 1
+							step = 1;
+							if strcmp( event.Modifier, 'shift' )
+								step = 10;
+							elseif strcmp( event.Modifier, 'control' )
+								step = 100;
+							end
+							itrial = max( itrial - step, 1 );
+							fig_update();
 						end
-						itrial = min( itrial + step, ntrials );
-						fig_update();
-					case {'leftarrow', 'uparrow'}
-						step = 1;
-						if any( strcmp( event.Modifier, 'shift' ) )
-							step = 10;
-						end
-						if any( strcmp( event.Modifier, 'control' ) )
-							step = 100;
-						end
-						itrial = max( itrial - step, 1 );
-						fig_update();
 
 					case 'home'
-						itrial = 1;
-						fig_update();
+						if nmods == 0 && itrial ~= 1
+							itrial = 1;
+							fig_update();
+						end
 					case 'end'
-						itrial = ntrials;
-						fig_update();
+						if nmods == 0 && itrial ~= ntrials
+							itrial = ntrials;
+							fig_update();
+						end
 
-					case 'return' % playback, TODO: untested!
-						sound( ovrts, run.audiorate );
+					case 'return' % playback
+						if nmods == 0
+							sound( ovrts / max( abs( ovrts ) ), run.audiorate );
+						elseif nmods == 1 && strcmp( event.Modifier, 'shift' ) && fresp
+							sound( respts / max( abs( respts ) ), run.audiorate );
+						end
 
-					case 'l' % scaling
-						logscale = ~logscale;
-						fig_update();
+					case 'k' % class setting
+						if nmods == 0
+							trial.resplab.label = 'ka';
+							fig_update();
+						end
+					case 't'
+						if nmods == 0
+							trial.resplab.label = 'ta';
+							fig_update();
+						end
 
 					case 'backspace' % clearing
-						resp.range = [NaN, NaN];
-						fig_update();
+						if nmods == 0
+							resp.label = '';
+							resp.range = [NaN, NaN];
+							fig_update();
+						end
 
 					case 'escape' % quit
-						done = true;
-						fig_update();
+						if nmods == 0
+							done = true;
+							fig_update();
+						end
 
 					otherwise % DEBUG
 						logger.log( 'keypress: %s', event.Key );
@@ -91,19 +157,18 @@ function label_activity( run, cfg )
 
 				% button presses
 			case 'buttondown'
-				while ~strcmp( get( src, 'Type' ), 'axes' ) % get parent axes
+				while ~strcmp( get( src, 'Type' ), 'axes' ) % get parent axis
 					src = get( src, 'Parent' );
 				end
 
+				cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000; % activity range setting
 				switch get( fig, 'SelectionType' )
-					case 'normal' % set range start
-						cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000;
+					case 'normal'
 						if isnan( resp.range(2) ) || cp(1) < resp.range(2)
 							resp.range(1) = cp(1);
 							fig_update();
 						end
-					case 'alt' % set range stop
-						cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000;
+					case 'alt'
 						if isnan( resp.range(1) ) || cp(1) > resp.range(1)
 							resp.range(2) = cp(1);
 							fig_update();
@@ -126,208 +191,152 @@ function label_activity( run, cfg )
 		end
 	end
 
-		% figure interaction loop
-	done = false;
+		% interaction loop
+	trials = [run.trials]; % prepare trials
+	trials(~is_valid( trials )) = [];
 
-	logscale = false;
-
-	trials = [run.trials];
 	ntrials = numel( trials );
-	itrial = 1;
+	itrial = next_unlabeled( trials, 0 );
 
-	resps = [trials.resplab];
+	done = false; % init flags
 
 	while ~done
 
 			% prepare data
-		trial = trials(itrial); % objects
-		resp = resps(itrial);
+		trial = trials(itrial);
+		resp = trial.resplab;
 
 		ovrr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % ranges
-		det1r = dsp.sec2smp( resp.range(1) + cfg.lab_activity_det1, run.audiorate ) + [1, 0];
-		det2r = dsp.sec2smp( resp.range(2) + cfg.lab_activity_det2, run.audiorate ) + [1, 0];
 
+		respr = dsp.sec2smp( resp.range, run.audiorate ) + [1, 0];
+		fresp = ~any( isnan( respr ) );
+
+		det1r = dsp.sec2smp( resp.range(1) + cfg.lab_activity_det1, run.audiorate ) + [1, 0];
 		det1r(det1r < 1) = 1;
 		det1r(det1r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
+		fdet1 = ~any( isnan( det1r ) );
+
+		det2r = dsp.sec2smp( resp.range(2) + cfg.lab_activity_det2, run.audiorate ) + [1, 0];
 		det2r(det2r < 1) = 1;
 		det2r(det2r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
-
-		det1f = ~any( isnan( det1r ) );
-		det2f = ~any( isnan( det2r ) );
-
-		if ~det1f || ~det2f
-			set( fig, 'Color', style.color( 'signal', +2 ) );
-		else
-			set( fig, 'Color', figcol );
-		end
+		fdet2 = ~any( isnan( det2r ) );
 
 		ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
-		if det1f
+
+		respts = [];
+		if fresp
+			respts = run.audiodata(respr(1):respr(2), 1);
+		end
+
+		det1ts = [];
+		if fdet1
 			det1ts = run.audiodata(det1r(1):det1r(2), 1);
 		end
-		if det2f
+
+		det2ts = [];
+		if fdet2
 			det2ts = run.audiodata(det2r(1):det2r(2), 1);
-		end
-
-		if logscale
-			ovrts = log( abs( ovrts ) );
-			if det1f
-				det1ts = log( abs( det1ts ) );
-			end
-			if det2f
-				det2ts = log( abs( det2ts ) );
-			end
-		end
-
-		ovryl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1 ); % axes
-		if det1f
-			det1yl = max( abs( det1ts ) ) * [-1, 1] * style.scale( 1 );
-		end
-		if det2f
-			det2yl = max( abs( det2ts ) ) * [-1, 1] * style.scale( 1 );
-		end
-
-		if logscale
-			ovryl = [min( ovrts(~isinf( ovrts )) ), max( ovrts )];
-			ovryl(2) = ovryl(2) + diff( ovryl ) * (style.scale( 1 ) - 1) / 2;
-			if det1f
-				det1yl = [min( det1ts(~isinf( det1ts )) ), max( det1ts )];
-				det1yl(2) = det1yl(2) + diff( det1yl ) * (style.scale( 1 ) - 1) / 2;
-			end
-			if det2f
-				det2yl = [min( det2ts(~isinf( det2ts )) ), max( det2ts )];
-				det2yl(2) = det2yl(2) + diff( det2yl ) * (style.scale( 1 ) - 1) / 2;
-			end
 		end
 
 			% plot
 		clf( fig );
 
-		hovr = subplot( 4, 2, [1, 2], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
+		subplot( 4, 2, [1, 2], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
 		title( sprintf( 'LABEL_ACTIVITY (trial: %d/%d)', itrial, ntrials ) );
-		xlabel( 'time in milliseconds' );
+		xlabel( 'trial time in milliseconds' );
 		ylabel( 'response' );
 
 		xlim( (trial.range - trial.range(1)) * 1000 );
-		ylim( ovryl );
+		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1 );
+		ylim( yl );
 
-		if ~any( isnan( resp.range ) ) % range
-			rectangle( 'Position', [ ...
-				(resp.range(1) - trial.range(1)) * 1000, ovryl(1), ...
-				diff( resp.range ) * 1000, ovryl(2)-ovryl(1) ], ...
-				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-				'FaceColor', style.color( 'warm', +2 ), 'EdgeColor', 'none' );
-		end
-		plot( (resp.range(1) * [1, 1] - trial.range(1)) * 1000, ovryl, ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-			'Color', style.color( 'warm', +1 ) );
-		plot( (resp.range(2) * [1, 1] - trial.range(1)) * 1000, ovryl, ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-			'Color', style.color( 'warm', +1 ) );
+		plot_activity( trial, yl ); % activity range
 
 		plot( (dsp.smp2sec( (ovrr(1):ovrr(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, ovrts, ... % signal
 			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 			'Color', style.color( 'cold', -1 ) );
 
-		if det1f % detail #1
-			hdet1 = subplot( 4, 2, [3, 5], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-			xlabel( 'time in milliseconds' );
-			ylabel( 'range start detail' );
+		if fdet1 % detail #1 (activity start)
+			subplot( 4, 2, [3, 5], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
+			xlabel( 'trial time in milliseconds' );
+			ylabel( 'activity start detail' );
 
 			xlim( (resp.range(1) + cfg.lab_activity_det1 - trial.range(1)) * 1000 );
-			ylim( det1yl );
+			yl = max( abs( det1ts ) ) * [-1, 1] * style.scale( 1 );
+			ylim( yl );
 
-			if ~any( isnan( resp.range ) ) % range
-				rectangle( 'Position', [ ...
-					(resp.range(1) - trial.range(1)) * 1000, det1yl(1), ...
-					diff( resp.range ) * 1000, det1yl(2)-det1yl(1) ], ...
-					'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-					'FaceColor', style.color( 'warm', +2 ), 'EdgeColor', 'none' );
-			end
-			plot( (resp.range(1) * [1, 1] - trial.range(1)) * 1000, det1yl, ...
-				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-				'Color', style.color( 'warm', +1 ) );
-			plot( (resp.range(2) * [1, 1] - trial.range(1)) * 1000, det1yl, ...
-				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-				'Color', style.color( 'warm', +1 ) );
+			plot_activity( trial, yl ); % activity range
 
 			plot( (dsp.smp2sec( (det1r(1):det1r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, det1ts, ... % signal
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
 
-		if det2f % detail #2
-			hdet2 = subplot( 4, 2, [4, 6], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-			xlabel( 'time in milliseconds' );
-			ylabel( 'range stop detail' );
+		if fdet2 % detail #2 (activity stop)
+			subplot( 4, 2, [4, 6], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
+			xlabel( 'trial time in milliseconds' );
+			ylabel( 'activity stop detail' );
 
 			xlim( (resp.range(2) + cfg.lab_activity_det2 - trial.range(1)) * 1000 );
-			ylim( det2yl );
+			yl = max( abs( det2ts ) ) * [-1, 1] * style.scale( 1 );
+			ylim( yl );
 
-			if ~any( isnan( resp.range ) ) % range
-				rectangle( 'Position', [ ...
-					(resp.range(1) - trial.range(1)) * 1000, det2yl(1), ...
-					diff( resp.range ) * 1000, det2yl(2)-det2yl(1) ], ...
-					'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-					'FaceColor', style.color( 'warm', +2 ), 'EdgeColor', 'none' );
-			end
-			plot( (resp.range(1) * [1, 1] - trial.range(1)) * 1000, det2yl, ...
-				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-				'Color', style.color( 'warm', +1 ) );
-			plot( (resp.range(2) * [1, 1] - trial.range(1)) * 1000, det2yl, ...
-				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-				'Color', style.color( 'warm', +1 ) );
+			plot_activity( trial, yl ); % activity range
 
 			plot( (dsp.smp2sec( (det2r(1):det2r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, det2ts, ... % signal
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
 
-		str = { ... % information
+		s = { ... % information
 			'INFORMATION', ...
+			'-----------', ...
 			'', ...
-			sprintf( 'range: [%.1f, %.1f]', (resp.range - trial.range(1)) * 1000 ), ...
+			sprintf( 'class: ''%s''', resp.label ), ...
+			'', ...
+			sprintf( 'activity: [%.1f, %.1f]', (resp.range - trial.range(1)) * 1000 ), ...
 			'', ...
 			sprintf( 'burst onset: %.1f', (resp.bo - trial.range(1)) * 1000 ), ...
 			sprintf( 'voice onset: %.1f', (resp.vo - trial.range(1)) * 1000 ), ...
-			'', ...
-			sprintf( 'class: ''%s''', resp.label ), ...
 			'', ...
 			sprintf( 'F0 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
 			sprintf( 'F1 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
 			sprintf( 'F2 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
 			sprintf( 'F3 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ) };
 
-		annotation( 'textbox', [0, 0, 1/3, 1/4], 'String', str );
+		annotation( 'textbox', [0, 0, 1/3, 1/4], 'String', s );
 
-		str = { ... % general help
-			'GENERAL KEYS', ...
+		s = { ... % general commands
+			'GENERAL COMMANDS', ...
+			'----------------', ...
 			'', ...
 			'SPACE: next unlabeled trial', ...
+			'PAGEDOWN/UP: +/- 1 trial' ...
+			'SHIFT+PAGEDOWN/UP: +/- 10 trials', ...
+			'CONTROL+PAGEDOWN/UP: +/- 100 trials', ...
+			'HOME/END: first/last trial', ...
 			'', ...
-			'ARROWS: browse trials', ...
-			'SHIFT+ARROWS: -/+ 10 trials', ...
-			'CTRL+ARROWS: -/+ 100 trials', ...
-			'HOME: first trial', ...
-			'END: last trial', ...
-			'', ...
-			'RETURN: play audio', ...
+			'RETURN: playback audio', ...
 			'', ...
 			'BACKSPACE: clear labels', ...
 			'', ...
 			'ESCAPE: quit' };
 
-		annotation( 'textbox', [1/3, 0, 1/3, 1/4], 'String', str );
+		annotation( 'textbox', [1/3, 0, 1/3, 1/4], 'String', s );
 
-		str = { ... % mode help
-			'MODE KEYS', ...
+		s = { ... % specific commands
+			'SPECIFIC COMMANDS', ...
+			'-----------------', ...
 			'', ...
-			'L: toggle logarithmic scale', ...
+			'K: set ''ka'' class', ...
+			'T: set ''ta'' class', ...
 			'', ...
-			'LEFT-BUTTON: set range start', ...
-			'RIGHT-BUTTON: set range stop' };
+			'LEFT-BUTTON: set activity start', ...
+			'RIGHT-BUTTON: set activity stop', ...
+			'', ...
+			'SHIFT+RETURN: playback activity' };
 
-		annotation( 'textbox', [2/3, 0, 1/3, 1/4], 'String', str );
+		annotation( 'textbox', [2/3, 0, 1/3, 1/4], 'String', s );
 
 			% wait for figure update
 		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change
