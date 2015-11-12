@@ -43,7 +43,7 @@ function [st, freqs] = stransf( ts, rate, lofreq, hifreq, nfreqs )
 		error( 'invalid argument: nfreqs' );
 	end
 
-	FACTOR = 3; % a value of 3 should give better frequency resolution (sometimes)
+	FACTOR = 5; % gaussian window width factor
 
 		% gaussian window function
 	function gw = gw( len, freq, FACTOR )
