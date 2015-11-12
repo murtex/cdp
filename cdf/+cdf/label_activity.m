@@ -196,7 +196,7 @@ function label_activity( run, cfg )
 	trials(~is_valid( trials )) = [];
 
 	ntrials = numel( trials );
-	itrial = next_unlabeled( trials, 0 );
+	itrial = max( 1, next_unlabeled( trials, 0 ) );
 
 	done = false; % init flags
 
@@ -240,6 +240,11 @@ function label_activity( run, cfg )
 
 			% plot
 		clf( fig );
+
+		set( fig, 'Color', figcol );
+		if ~is_labeled( trial )
+			set( fig, 'Color', style.color( 'signal', +2 ) );
+		end
 
 		subplot( 4, 2, [1, 2], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
 		title( sprintf( 'LABEL_ACTIVITY (trial: %d/%d)', itrial, ntrials ) );
@@ -300,9 +305,9 @@ function label_activity( run, cfg )
 			sprintf( 'voice onset: %.1f', (resp.vo - trial.range(1)) * 1000 ), ...
 			'', ...
 			sprintf( 'F0 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F1 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F2 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F3 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ) };
+			sprintf( 'F1 onset: [%.1f, %.1f]', (resp.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F2 onset: [%.1f, %.1f]', (resp.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F3 onset: [%.1f, %.1f]', (resp.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
 
 		annotation( 'textbox', [0, 0, 1/3, 1/4], 'String', s );
 
