@@ -196,6 +196,13 @@ function label_activity( run, cfg )
 	trials(~is_valid( trials )) = [];
 
 	ntrials = numel( trials );
+	logger.log( 'valid trials: %d', ntrials );
+	logger.log( 'unlabeled trials: %d', sum( ~is_labeled( trials ) ) );
+
+	if ntrials == 0
+		error( 'invalid value: ntrials' );
+	end
+
 	itrial = max( 1, next_unlabeled( trials, 0 ) );
 
 	done = false; % init flags
@@ -347,6 +354,9 @@ function label_activity( run, cfg )
 		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change
 
 	end
+
+		% logging
+	logger.log( 'unlabeled trials: %d', sum( ~is_labeled( trials ) ) );
 
 		% exit
 	if ishandle( fig )
