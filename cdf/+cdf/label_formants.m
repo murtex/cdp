@@ -32,7 +32,7 @@ function label_formants( run, cfg )
 	function f = is_valid( trials )
 		f = true( size( trials ) );
 		for i = 1:numel( trials )
-			if strcmp( trials(i).resplab.label, '' ) || any( isnan( trials(i).resplab.range ) )
+			if any( isnan( trials(i).resplab.range ) )
 				f(i) = false;
 			end
 		end

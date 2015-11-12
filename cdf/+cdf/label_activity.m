@@ -54,14 +54,27 @@ function label_activity( run, cfg )
 		end
 	end
 
-	function plot_activity( trial, yl )
-		if ~any( isnan( trial.resplab.range ) )
-			rectangle( 'Position', [ ...
-				(trial.resplab.range(1) - trial.range(1)) * 1000, yl(1), ...
-				diff( trial.resplab.range ) * 1000, diff( yl )], ...
-				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-				'FaceColor', style.color( 'warm', +2 ), 'EdgeColor', 'none' );
+	function i = nearest_zc( ts, t0, i )
+		if cfg.lab_activity_zcalign
+
+			zc = sign( ts ); % find zero crossings
+			zc(zc == 0) = 1;
+			zc = abs( diff( zc ) / 2 );
+			zc = find( zc == 1 );
+
+			if isempty( zc )
+				return;
+			end
+
+			is = dsp.sec2smp( i - t0, run.audiorate ) + 1; % choose nearest
+			d = zc - is;
+			d = d(find( abs( d ) == min( abs( d ) ) )) + 1;
+			i = dsp.smp2sec( is + d - 1, run.audiorate ) + t0;
+
 		end
+	end
+
+	function plot_activity( trial, yl )
 		plot( (trial.resplab.range(1) * [1, 1] - trial.range(1)) * 1000, yl, ...
 			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 			'Color', style.color( 'signal', +1 ) );
@@ -165,12 +178,12 @@ function label_activity( run, cfg )
 				switch get( fig, 'SelectionType' )
 					case 'normal'
 						if isnan( resp.range(2) ) || cp(1) < resp.range(2)
-							resp.range(1) = cp(1);
+							resp.range(1) = nearest_zc( ovrts, trial.range(1), cp(1) );
 							fig_update();
 						end
 					case 'alt'
 						if isnan( resp.range(1) ) || cp(1) > resp.range(1)
-							resp.range(2) = cp(1);
+							resp.range(2) = nearest_zc( ovrts, trial.range(1), cp(1) );
 							fig_update();
 						end
 				end
