@@ -116,6 +116,8 @@ function label_landmarks( run, cfg )
 					case 'return' % playback
 						if nmods == 0
 							sound( ovrts / max( abs( ovrts ) ), run.audiorate );
+						elseif nmods == 1 && strcmp( event.Modifier, 'shift' ) && fresp
+							sound( respts / max( abs( respts ) ), run.audiorate );
 						end
 
 					case 'backspace' % clearing
@@ -195,6 +197,9 @@ function label_landmarks( run, cfg )
 
 		ovrr = dsp.sec2smp( resp.range, run.audiorate ) + [1, 0]; % ranges
 
+		respr = dsp.sec2smp( [resp.bo, resp.range(2)], run.audiorate ) + [1, 0];
+		fresp = ~any( isnan( respr ) );
+
 		det1r = dsp.sec2smp( resp.bo + cfg.lab_landmarks_det1, run.audiorate ) + [1, 0];
 		det1r(det1r < 1) = 1;
 		det1r(det1r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
@@ -206,6 +211,11 @@ function label_landmarks( run, cfg )
 		fdet2 = ~any( isnan( det2r ) );
 
 		ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
+
+		respts = [];
+		if fresp
+			respts = run.audiodata(respr(1):respr(2), 1);
+		end
 
 		det1ts = [];
 		if fdet1
@@ -313,7 +323,9 @@ function label_landmarks( run, cfg )
 			'-----------------', ...
 			'', ...
 			'LEFT-BUTTON: set burst onset', ...
-			'RIGHT-BUTTON: set voice onset' };
+			'RIGHT-BUTTON: set voice onset', ...
+			'', ...
+			'SHIFT+RETURN: playback from burst' };
 
 		annotation( 'textbox', [2/3, 0, 1/3, 1/4], 'String', s );
 
