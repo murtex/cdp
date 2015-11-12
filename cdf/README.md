@@ -12,6 +12,9 @@ Cue-distractor framework
 ##### Functions
 
 - `cdf.sync` -- marker synchronization
+- `cdf.label_activity` -- activity labeling tool
+- `cdf.label_landmarks` -- landmarks labeling tool
+- `cdf.label_formants` -- formants labeling tool
 - `cdf.activity` -- voice activity detection
 - `cdf.landmarks` -- landmark detection
 - `cdf.formants` -- formant detection

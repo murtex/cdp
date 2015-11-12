@@ -7,7 +7,7 @@ function label( indir, outdir, ids, labmode, logfile )
 % indir : input directory (row char)
 % outdir : output directory (row char)
 % ids : subject identifiers (vector numeric)
-% labmode : labeling mode [activity | landmarks | formants | class] (row char)
+% labmode : labeling mode [activity | landmarks | formants] (row char)
 % logfile : logger filename (row char)
 
 		% safeguard
@@ -44,8 +44,12 @@ function label( indir, outdir, ids, labmode, logfile )
 	cfg.lab_activity_det1 = [-0.025, 0.05];
 	cfg.lab_activity_det2 = [-0.05, 0.025];
 
-	cfg.lab_landmarks_det1 = [-0.025, 0.05];
-	cfg.lab_landmarks_det2 = [-0.025, 0.05];
+	cfg.lab_landmarks_det1 = [-0.015, 0.03];
+	cfg.lab_landmarks_det2 = [-0.015, 0.03];
+
+	cfg.lab_formants_freqband = [0, 1500];
+	cfg.lab_formants_nfreqs = 100;
+	cfg.lab_formants_gamma = 3.0;
 
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'labeling tool...' );
@@ -77,8 +81,6 @@ function label( indir, outdir, ids, labmode, logfile )
 				cdf.label_landmarks( run, cfg );
 			case 'formants'
 				cdf.label_formants( run, cfg );
-			case 'class'
-				cdf.label_class( run, cfg );
 			otherwise
 				error( 'invalid argument: labmode' );
 		end
