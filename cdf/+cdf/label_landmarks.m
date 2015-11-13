@@ -68,7 +68,7 @@ function label_landmarks( run, cfg )
 
 			is = dsp.sec2smp( i - t0, run.audiorate ) + 1; % choose nearest
 			d = zc - is;
-			d = d(find( abs( d ) == min( abs( d ) ) )) + 1;
+			d = d(find( abs( d ) == min( abs( d ) ), 1 )) + 1;
 			i = dsp.smp2sec( is + d - 1, run.audiorate ) + t0;
 
 		end

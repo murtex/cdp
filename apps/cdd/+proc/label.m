@@ -49,9 +49,9 @@ function label( indir, outdir, ids, labmode, logfile )
 	cfg.lab_landmarks_det2 = [-0.015, 0.03];
 	cfg.lab_landmarks_zcalign = true;
 
-	cfg.lab_formants_freqband = [0, 1500];
+	cfg.lab_formants_freqband = [0, 1200];
 	cfg.lab_formants_nfreqs = 100;
-	cfg.lab_formants_gamma = 3.0;
+	cfg.lab_formants_gamma = 1.0;
 
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'labeling tool...' );
