@@ -6,7 +6,7 @@ OUTDIR="../../data/cdd/sync/"
 
 IDS1="[1:5]"
 IDS2="[6:10]"
-IDS3="setdiff( [11:15], 11 )" # 11: two recordings
+IDS3="[11:15]"
 IDS4="[16:20]"
 IDS5="[21:25]"
 IDS6="[26:30]"

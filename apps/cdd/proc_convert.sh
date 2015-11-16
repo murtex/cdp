@@ -4,7 +4,7 @@
 INDIR="../../data/cdd/raw/"
 OUTDIR="../../data/cdd/convert/"
 
-IDS="setdiff( [1:40], 11 )" # 11: two recordings
+IDS="[1:40]"
 
 	# workload
 MATLAB="matlab -nosplash -nodesktop -r"
