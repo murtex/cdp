@@ -95,6 +95,11 @@ function label( indir, outdir, ids, labmode, logfile )
 
 		save( cdffile, 'run' );
 
+		cfgfile = fullfile( outdir, sprintf( 'run_%d_cfg.mat', id ) ); % configuration
+		logger.log( 'write configuration (''%s'')...', cfgfile );
+
+		save( cfgfile, 'cfg' );
+
 			% clean up
 		delete( run );
 
