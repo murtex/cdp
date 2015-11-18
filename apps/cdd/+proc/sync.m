@@ -54,7 +54,7 @@ function sync( indir, outdir, ids, logfile )
 
 		load( cdffile, 'run' );
 
-		logger.log( 'sex: %s', run.sex );
+		logger.log( 'sex: ''%s''', run.sex );
 		logger.log( 'age: %d', run.age );
 		logger.log( 'trials: %d', numel( run.trials ) );
 

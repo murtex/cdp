@@ -67,7 +67,7 @@ function label( indir, outdir, ids, labmode, logfile )
 
 		load( cdffile, 'run' );
 
-		logger.log( 'sex: %s', run.sex );
+		logger.log( 'sex: ''%s''', run.sex );
 		logger.log( 'age: %d', run.age );
 		logger.log( 'trials: %d', numel( run.trials ) );
 
