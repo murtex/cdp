@@ -31,36 +31,20 @@ function audit_landmarks( run, cfg )
 	function f = is_valid( trials )
 		f = true( size( trials ) );
 		for i = 1:numel( trials )
-			if any( isnan( trials(i).resplab.range ) )
+			if any( isnan( trials(i).resplab.range ) & isnan( trials(i).respdet.range ) )
 				f(i) = false;
 			end
 		end
 	end
 
-	function i = nearest_zc( ts, t0, i )
-		if cfg.lab_activity_zcalign
-
-			zc = sign( ts ); % find zero crossings
-			zc(zc == 0) = 1;
-			zc = abs( diff( zc ) / 2 );
-			zc = find( zc == 1 );
-
-			if isempty( zc )
-				return;
-			end
-
-			is = dsp.sec2smp( i - t0, run.audiorate ) + 1; % choose nearest
-			d = zc - is;
-			d = d(find( abs( d ) == min( abs( d ) ), 1 )) + 1;
-			i = dsp.smp2sec( is + d - 1, run.audiorate ) + t0;
-
-		end
-	end
-
-	function plot_landmarks( trial, yl )
-		plot( (trial.resplab.bo * [1, 1] - trial.range(1)) * 1000, yl, ...
+	function plot_landmarks( trial, yl ) % TODO: different colors
+		plot( (trial.resplab.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % labeled
 			'Color', style.color( 'signal', +1 ) );
 		plot( (trial.resplab.vo * [1, 1] - trial.range(1)) * 1000, yl, ...
+			'Color', style.color( 'signal', +1 ) );
+		plot( (trial.respdet.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % detected
+			'Color', style.color( 'signal', +1 ) );
+		plot( (trial.respdet.vo * [1, 1] - trial.range(1)) * 1000, yl, ...
 			'Color', style.color( 'signal', +1 ) );
 	end
 
@@ -111,8 +95,6 @@ function audit_landmarks( run, cfg )
 					case 'return' % playback
 						if nmods == 0
 							sound( ovrts / max( abs( ovrts ) ), run.audiorate );
-						elseif nmods == 1 && strcmp( event.Modifier, 'shift' ) && fresp
-							sound( respts / max( abs( respts ) ), run.audiorate );
 						end
 
 					case 'escape' % quit
@@ -146,7 +128,6 @@ function audit_landmarks( run, cfg )
 	trials(~is_valid( trials )) = [];
 
 	ntrials = numel( trials );
-	logger.log( 'valid trials: %d', ntrials );
 
 	if ntrials == 0
 		error( 'invalid value: ntrials' );
@@ -160,29 +141,28 @@ function audit_landmarks( run, cfg )
 
 			% prepare data
 		trial = trials(itrial);
-		resp = trial.resplab;
+		resplab = trial.resplab;
+		respdet = trial.respdet;
 
-		ovrr = dsp.sec2smp( resp.range, run.audiorate ) + [1, 0]; % ranges
+		ovrr = dsp.sec2smp( [ ... % ranges
+			min( resplab.range(1), respdet.range(1) ), ...
+			max( resplab.range(2), respdet.range(2) )], run.audiorate ) + [1, 0];
 
-		respr = dsp.sec2smp( [resp.bo, resp.range(2)], run.audiorate ) + [1, 0];
-		fresp = ~any( isnan( respr ) );
-
-		det1r = dsp.sec2smp( resp.bo + cfg.lab_landmarks_det1, run.audiorate ) + [1, 0];
+		det1r = dsp.sec2smp( [ ...
+			min( resplab.bo, respdet.bo ) + cfg.lab_landmarks_det1(1), ...
+			max( resplab.bo, respdet.bo ) + cfg.lab_landmarks_det1(2)], run.audiorate ) + [1, 0];
 		det1r(det1r < 1) = 1;
 		det1r(det1r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet1 = ~any( isnan( det1r ) );
 
-		det2r = dsp.sec2smp( resp.vo + cfg.lab_landmarks_det2, run.audiorate ) + [1, 0];
+		det2r = dsp.sec2smp( [ ...
+			min( resplab.vo, respdet.vo ) + cfg.lab_landmarks_det2(1), ...
+			max( resplab.vo, respdet.vo ) + cfg.lab_landmarks_det2(2)], run.audiorate ) + [1, 0];
 		det2r(det2r < 1) = 1;
 		det2r(det2r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet2 = ~any( isnan( det2r ) );
 
 		ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
-
-		respts = [];
-		if fresp
-			respts = run.audiodata(respr(1):respr(2), 1);
-		end
 
 		det1ts = [];
 		if fdet1
@@ -198,11 +178,13 @@ function audit_landmarks( run, cfg )
 		clf( fig );
 
 		subplot( 4, 2, [1, 2] ); % overview
-		title( sprintf( 'LABEL_LANDMARKS (trial: %d/%d)', itrial, ntrials ) );
+		title( sprintf( 'AUDIT_LANDMARKS (trial: %d/%d)', itrial, ntrials ) );
 		xlabel( 'trial time in milliseconds' );
 		ylabel( 'response' );
 
-		xlim( (resp.range - trial.range(1)) * 1000 );
+		xlim( ([ ...
+			min( resplab.range(1), respdet.range(1) ), ...
+			max( resplab.range(2), respdet.range(2) )] - trial.range(1)) * 1000 );
 		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 		ylim( yl );
 
@@ -216,7 +198,7 @@ function audit_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'burst onset detail' );
 
-			xlim( (resp.bo + cfg.lab_landmarks_det1 - trial.range(1)) * 1000 );
+			xlim( (resplab.bo + cfg.lab_landmarks_det1 - trial.range(1)) * 1000 ); % TODO
 			yl = max( abs( det1ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
@@ -231,7 +213,7 @@ function audit_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'voice onset detail' );
 
-			xlim( (resp.vo + cfg.lab_landmarks_det2 - trial.range(1)) * 1000 );
+			xlim( (resplab.vo + cfg.lab_landmarks_det2 - trial.range(1)) * 1000 ); % TODO
 			yl = max( abs( det2ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
@@ -241,22 +223,39 @@ function audit_landmarks( run, cfg )
 				'Color', style.color( 'cold', -1 ) );
 		end
 
-		s = { ... % information
-			'INFORMATION', ...
+		s = { ... % labeled information
+			'LABELED', ...
 			'', ...
-			sprintf( 'class: ''%s''', resp.label ), ...
+			sprintf( 'class: ''%s''', resplab.label ), ...
 			'', ...
-			sprintf( 'activity: [%.1f, %.1f]', (resp.range - trial.range(1)) * 1000 ), ...
+			sprintf( 'activity: [%.1f, %.1f]', (resplab.range - trial.range(1)) * 1000 ), ...
 			'', ...
-			sprintf( 'burst onset: %.1f', (resp.bo - trial.range(1)) * 1000 ), ...
-			sprintf( 'voice onset: %.1f', (resp.vo - trial.range(1)) * 1000 ), ...
+			sprintf( 'burst onset: %.1f', (resplab.bo - trial.range(1)) * 1000 ), ...
+			sprintf( 'voice onset: %.1f', (resplab.vo - trial.range(1)) * 1000 ), ...
 			'', ...
-			sprintf( 'F0 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F1 onset: [%.1f, %.1f]', (resp.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F2 onset: [%.1f, %.1f]', (resp.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F3 onset: [%.1f, %.1f]', (resp.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
+			sprintf( 'F0 onset: [%.1f, %.1f]', (resplab.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F1 onset: [%.1f, %.1f]', (resplab.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F2 onset: [%.1f, %.1f]', (resplab.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F3 onset: [%.1f, %.1f]', (resplab.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
 
 		annotation( 'textbox', [0, 0, 1/3, 1/4], 'String', s );
+
+		s = { ... % detected information
+			'DETECTED', ...
+			'', ...
+			sprintf( 'class: ''%s''', respdet.label ), ...
+			'', ...
+			sprintf( 'activity: [%.1f, %.1f]', (respdet.range - trial.range(1)) * 1000 ), ...
+			'', ...
+			sprintf( 'burst onset: %.1f', (respdet.bo - trial.range(1)) * 1000 ), ...
+			sprintf( 'voice onset: %.1f', (respdet.vo - trial.range(1)) * 1000 ), ...
+			'', ...
+			sprintf( 'F0 onset: [%.1f, %.1f]', (respdet.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F1 onset: [%.1f, %.1f]', (respdet.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F2 onset: [%.1f, %.1f]', (respdet.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F3 onset: [%.1f, %.1f]', (respdet.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
+
+		annotation( 'textbox', [1/3, 0, 1/3, 1/4], 'String', s );
 
 		s = { ... % commands
 			'COMMANDS', ...
