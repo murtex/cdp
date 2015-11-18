@@ -64,7 +64,7 @@ function read_trials( run, trialfile )
 			trial.range(2) = dsp.smp2sec( size( run.audiodata, 1 ), run.audiorate );
 		end
 
-			% pre-allocate responses
+			% prepare (empty) responses
 		trial.resplab = cdf.hResponse();
 		trial.respdet = cdf.hResponse();
 
