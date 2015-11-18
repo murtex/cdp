@@ -22,6 +22,10 @@ classdef (Sealed = true) hConfig < handle
 		lab_formants_nfreqs = NaN; % spectrogram frequency resolution (scalar numeric)
 		lab_formants_gamma = NaN; % spectrogram gamma (scalar numeric)
 
+			% auditing
+		aud_landmarks_det1 = [NaN, NaN]; % (relative) landmarks detail #1 (burst onset) [start, stop] (row numeric)
+		aud_landmarks_det2 = [NaN, NaN]; % (relative) landmarks detail #2 (voice onset) [start, stop] (row numeric)
+
 	end
 
 end

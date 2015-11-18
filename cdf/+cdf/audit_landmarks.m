@@ -37,11 +37,11 @@ function audit_landmarks( run, cfg )
 		end
 	end
 
-	function plot_landmarks( trial, yl ) % TODO: different colors
-		plot( (trial.resplab.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % labeled
-			'Color', style.color( 'signal', +1 ) );
+	function plot_landmarks( trial, yl )
+		plot( (trial.resplab.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % labeled, TODO: untested!
+			'Color', style.color( 'warm', +1 ) );
 		plot( (trial.resplab.vo * [1, 1] - trial.range(1)) * 1000, yl, ...
-			'Color', style.color( 'signal', +1 ) );
+			'Color', style.color( 'warm', +1 ) );
 		plot( (trial.respdet.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % detected
 			'Color', style.color( 'signal', +1 ) );
 		plot( (trial.respdet.vo * [1, 1] - trial.range(1)) * 1000, yl, ...
@@ -149,15 +149,15 @@ function audit_landmarks( run, cfg )
 			max( resplab.range(2), respdet.range(2) )], run.audiorate ) + [1, 0];
 
 		det1r = dsp.sec2smp( [ ...
-			min( resplab.bo, respdet.bo ) + cfg.lab_landmarks_det1(1), ...
-			max( resplab.bo, respdet.bo ) + cfg.lab_landmarks_det1(2)], run.audiorate ) + [1, 0];
+			min( resplab.bo, respdet.bo ) + cfg.aud_landmarks_det1(1), ...
+			max( resplab.bo, respdet.bo ) + cfg.aud_landmarks_det1(2)], run.audiorate ) + [1, 0];
 		det1r(det1r < 1) = 1;
 		det1r(det1r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet1 = ~any( isnan( det1r ) );
 
 		det2r = dsp.sec2smp( [ ...
-			min( resplab.vo, respdet.vo ) + cfg.lab_landmarks_det2(1), ...
-			max( resplab.vo, respdet.vo ) + cfg.lab_landmarks_det2(2)], run.audiorate ) + [1, 0];
+			min( resplab.vo, respdet.vo ) + cfg.aud_landmarks_det2(1), ...
+			max( resplab.vo, respdet.vo ) + cfg.aud_landmarks_det2(2)], run.audiorate ) + [1, 0];
 		det2r(det2r < 1) = 1;
 		det2r(det2r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet2 = ~any( isnan( det2r ) );
@@ -198,7 +198,10 @@ function audit_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'burst onset detail' );
 
-			xlim( (resplab.bo + cfg.lab_landmarks_det1 - trial.range(1)) * 1000 ); % TODO
+			%xlim( (resplab.bo + cfg.aud_landmarks_det1 - trial.range(1)) * 1000 ); % TODO
+			xlim( ([ ...
+				min( resplab.bo, respdet.bo ) + cfg.aud_landmarks_det1(1)
+				max( resplab.bo, respdet.bo ) + cfg.aud_landmarks_det1(2)] - trial.range(1)) * 1000 );
 			yl = max( abs( det1ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
@@ -213,7 +216,10 @@ function audit_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'voice onset detail' );
 
-			xlim( (resplab.vo + cfg.lab_landmarks_det2 - trial.range(1)) * 1000 ); % TODO
+			%xlim( (resplab.vo + cfg.aud_landmarks_det2 - trial.range(1)) * 1000 ); % TODO
+			xlim( ([ ...
+				min( resplab.vo, respdet.vo ) + cfg.aud_landmarks_det2(1)
+				max( resplab.vo, respdet.vo ) + cfg.aud_landmarks_det2(2)] - trial.range(1)) * 1000 );
 			yl = max( abs( det2ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
@@ -223,8 +229,8 @@ function audit_landmarks( run, cfg )
 				'Color', style.color( 'cold', -1 ) );
 		end
 
-		s = { ... % labeled information
-			'LABELED', ...
+		s = { ... % labeled response
+			'LABELED RESPONSE', ...
 			'', ...
 			sprintf( 'class: ''%s''', resplab.label ), ...
 			'', ...
@@ -240,8 +246,8 @@ function audit_landmarks( run, cfg )
 
 		annotation( 'textbox', [0, 0, 1/3, 1/4], 'String', s );
 
-		s = { ... % detected information
-			'DETECTED', ...
+		s = { ... % detected response
+			'DETECTED RESPONSE', ...
 			'', ...
 			sprintf( 'class: ''%s''', respdet.label ), ...
 			'', ...
