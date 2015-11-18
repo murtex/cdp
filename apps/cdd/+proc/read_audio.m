@@ -6,9 +6,6 @@ function read_audio( run, audiofile )
 % INPUT
 % run : cue-distractor run (scalar object)
 % audiofile : wav audio filename (row char)
-%
-% SEE
-% https://stackoverflow.com/questions/5591278/high-pass-filtering-in-matlab
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )

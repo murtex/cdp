@@ -46,7 +46,7 @@ function read_trials( run, trialfile )
 	for i = ntrials:-1:1
 		trial = run.trials(i);
 
-			% set experimental features
+			% set experimental conditions
 		trial.soa = fdata{11}(i);
 		trial.vot = fdata{10}(i) / 1000;
 
@@ -71,7 +71,7 @@ function read_trials( run, trialfile )
 	end
 
 		% logging
-	logger.log( 'sex: %s', run.sex );
+	logger.log( 'sex: ''%s''', run.sex );
 	logger.log( 'age: %d', run.age );
 	logger.log( 'trials: %d', ntrials );
 
