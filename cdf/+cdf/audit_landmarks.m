@@ -38,7 +38,7 @@ function audit_landmarks( run, cfg )
 	end
 
 	function plot_landmarks( trial, yl )
-		plot( (trial.resplab.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % labeled, TODO: untested!
+		plot( (trial.resplab.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % labeled
 			'Color', style.color( 'warm', +1 ) );
 		plot( (trial.resplab.vo * [1, 1] - trial.range(1)) * 1000, yl, ...
 			'Color', style.color( 'warm', +1 ) );
@@ -198,7 +198,6 @@ function audit_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'burst onset detail' );
 
-			%xlim( (resplab.bo + cfg.aud_landmarks_det1 - trial.range(1)) * 1000 ); % TODO
 			xlim( ([ ...
 				min( resplab.bo, respdet.bo ) + cfg.aud_landmarks_det1(1)
 				max( resplab.bo, respdet.bo ) + cfg.aud_landmarks_det1(2)] - trial.range(1)) * 1000 );
@@ -216,7 +215,6 @@ function audit_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'voice onset detail' );
 
-			%xlim( (resplab.vo + cfg.aud_landmarks_det2 - trial.range(1)) * 1000 ); % TODO
 			xlim( ([ ...
 				min( resplab.vo, respdet.vo ) + cfg.aud_landmarks_det2(1)
 				max( resplab.vo, respdet.vo ) + cfg.aud_landmarks_det2(2)] - trial.range(1)) * 1000 );
