@@ -41,7 +41,7 @@ function label_activity( run, cfg )
 	function f = is_labeled( trials )
 		f = true( size( trials ) );
 		for i = 1:numel( trials )
-			if strcmp( trials(i).resplab.label, '' ) || any( isnan( trials(i).resplab.range ) )
+			if isempty( trials(i).resplab.label ) || any( isnan( trials(i).resplab.range ) )
 				f(i) = false;
 			end
 		end
@@ -54,7 +54,7 @@ function label_activity( run, cfg )
 		end
 	end
 
-	function i = nearest_zc( ts, t0, i, align )
+	function i = snap( ts, t0, i, align )
 		if align
 
 			zc = sign( ts ); % find zero crossings
@@ -164,9 +164,16 @@ function label_activity( run, cfg )
 						end
 
 					case 'backspace' % clearing
-						if nmods == 0
+						if nmods == 1 && strcmp( event.Modifier, 'shift' ) % clear trial
 							resp.label = '';
 							resp.range = [NaN, NaN];
+							fig_update();
+						elseif nmods == 2 && any( strcmp( event.Modifier, 'shift' ) ) && any( strcmp( event.Modifier, 'control' ) ) % clear run (valids only)
+							for i = 1:ntrials
+								trials(i).resplab.label = '';
+								trials(i).resplab.range = [NaN, NaN];
+							end
+							itrial = 1;
 							fig_update();
 						end
 
@@ -189,13 +196,13 @@ function label_activity( run, cfg )
 				cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000; % activity range setting
 				switch get( fig, 'SelectionType' )
 					case 'normal'
-						if isnan( resp.range(2) ) || cp(1) < resp.range(2)
-							resp.range(1) = nearest_zc( ovrts, trial.range(1), cp(1), cfg.lab_activity_zcalign & ~logscale );
+						if cp(1) >= trial.range(1) && cp(2) <= trial.range(2)
+							resp.range(1) = snap( ovrts, trial.range(1), cp(1), cfg.lab_activity_zcsnap & ~logscale );
 							fig_update();
 						end
 					case 'alt'
-						if isnan( resp.range(1) ) || cp(1) > resp.range(1)
-							resp.range(2) = nearest_zc( ovrts, trial.range(1), cp(1), cfg.lab_activity_zcalign & ~logscale );
+						if cp(1) >= trial.range(1) && cp(2) <= trial.range(2)
+							resp.range(2) = snap( ovrts, trial.range(1), cp(1), cfg.lab_activity_zcsnap & ~logscale );
 							fig_update();
 						end
 				end
@@ -217,7 +224,7 @@ function label_activity( run, cfg )
 	end
 
 		% interaction loop
-	trials = [run.trials]; % prepare trials
+	trials = [run.trials]; % prepare valid trials
 	trials(~is_valid( trials )) = [];
 
 	ntrials = numel( trials );
@@ -286,7 +293,7 @@ function label_activity( run, cfg )
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
-		subplot( 4, 2, [1, 2], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
+		hovr = subplot( 4, 2, [1, 2], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
 		title( sprintf( 'LABEL_ACTIVITY (trial: %d/%d)', itrial, ntrials ) );
 		xlabel( 'trial time in milliseconds' );
 		ylabel( 'response' );
@@ -300,8 +307,9 @@ function label_activity( run, cfg )
 			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 			'Color', style.color( 'cold', -1 ) );
 
-		if fdet1 % detail #1 (activity start)
-			subplot( 4, 2, [3, 5], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
+		hdet1 = NaN; % detail #1 (activity start)
+		if fdet1
+			hdet1 = subplot( 4, 2, [3, 5], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'activity start detail' );
 
@@ -315,8 +323,9 @@ function label_activity( run, cfg )
 				'Color', style.color( 'cold', -1 ) );
 		end
 
-		if fdet2 % detail #2 (activity stop)
-			subplot( 4, 2, [4, 6], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
+		hdet2 = NaN; % detail #2 (activity stop)
+		if fdet2
+			hdet2 = subplot( 4, 2, [4, 6], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'activity stop detail' );
 
@@ -334,11 +343,11 @@ function label_activity( run, cfg )
 			'LABEL INFORMATION', ...
 			'', ...
 			sprintf( 'class: ''%s''', resp.label ), ...
-			'', ...
 			sprintf( 'activity: [%.1f, %.1f]', (resp.range - trial.range(1)) * 1000 ), ...
 			'', ...
 			sprintf( 'burst onset: %.1f', (resp.bo - trial.range(1)) * 1000 ), ...
 			sprintf( 'voice onset: %.1f', (resp.vo - trial.range(1)) * 1000 ), ...
+			sprintf( 'voice release: %.1f', (resp.vr - trial.range(1)) * 1000 ), ...
 			'', ...
 			sprintf( 'F0 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
 			sprintf( 'F1 onset: [%.1f, %.1f]', (resp.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
@@ -358,7 +367,8 @@ function label_activity( run, cfg )
 			'', ...
 			'RETURN: playback audio', ...
 			'', ...
-			'BACKSPACE: clear labels', ...
+			'SHIFT+BACKSPACE: clear trial labels', ...
+			'SHIFT+CONTROL+BACKSPACE: clear run labels', ...
 			'', ...
 			'ESCAPE: save and quit' };
 
@@ -370,8 +380,8 @@ function label_activity( run, cfg )
 			'K: set ''ka'' class', ...
 			'T: set ''ta'' class', ...
 			'', ...
-			'LEFT-BUTTON: set activity start', ...
-			'RIGHT-BUTTON: set activity stop', ...
+			'LEFT: set activity start', ...
+			'RIGHT: set activity stop', ...
 			'', ...
 			'S: toggle log scale', ...
 			'', ...

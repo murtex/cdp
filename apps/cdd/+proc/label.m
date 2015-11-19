@@ -43,11 +43,12 @@ function label( indir, outdir, ids, labmode, logfile )
 
 	cfg.lab_activity_det1 = [-0.025, 0.05];
 	cfg.lab_activity_det2 = [-0.05, 0.025];
-	cfg.lab_activity_zcalign = true;
+	cfg.lab_activity_zcsnap = false;
 
-	cfg.lab_landmarks_det1 = [-0.005, 0.01];
-	cfg.lab_landmarks_det2 = [-0.015, 0.03];
-	cfg.lab_landmarks_zcalign = true;
+	cfg.lab_landmarks_det1 = [-0.003, 0.006];
+	cfg.lab_landmarks_det2 = [-0.015, 0.030];
+	cfg.lab_landmarks_det3 = [-0.030, 0.015];
+	cfg.lab_landmarks_zcsnap = [false, true, true];
 
 	cfg.lab_formants_freqband = [0, 1200];
 	cfg.lab_formants_nfreqs = 100;
