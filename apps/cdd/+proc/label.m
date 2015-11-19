@@ -45,7 +45,7 @@ function label( indir, outdir, ids, labmode, logfile )
 	cfg.lab_activity_det2 = [-0.05, 0.025];
 	cfg.lab_activity_zcalign = true;
 
-	cfg.lab_landmarks_det1 = [-0.015, 0.03];
+	cfg.lab_landmarks_det1 = [-0.005, 0.01];
 	cfg.lab_landmarks_det2 = [-0.015, 0.03];
 	cfg.lab_landmarks_zcalign = true;
 

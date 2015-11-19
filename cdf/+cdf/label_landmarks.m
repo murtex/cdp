@@ -54,8 +54,8 @@ function label_landmarks( run, cfg )
 		end
 	end
 
-	function i = nearest_zc( ts, t0, i )
-		if cfg.lab_activity_zcalign
+	function i = nearest_zc( ts, t0, i, align )
+		if align
 
 			zc = sign( ts ); % find zero crossings
 			zc(zc == 0) = 1;
@@ -71,6 +71,12 @@ function label_landmarks( run, cfg )
 			d = d(find( abs( d ) == min( abs( d ) ), 1 )) + 1;
 			i = dsp.smp2sec( is + d - 1, run.audiorate ) + t0;
 
+		end
+	end
+
+	function ts = scale( ts, logscale )
+		if logscale
+			ts = mag2db( abs( ts ) + eps );
 		end
 	end
 
@@ -133,6 +139,12 @@ function label_landmarks( run, cfg )
 							fig_update();
 						end
 
+					case 's' % log scale
+						if nmods == 0
+							logscale = ~logscale;
+							fig_update();
+						end
+
 					case 'return' % playback
 						if nmods == 0
 							sound( ovrts / max( abs( ovrts ) ), run.audiorate );
@@ -167,12 +179,12 @@ function label_landmarks( run, cfg )
 				switch get( fig, 'SelectionType' )
 					case 'normal'
 						if isnan( resp.range(2) ) || cp(1) < resp.range(2)
-							resp.bo = nearest_zc( ovrts, resp.range(1), cp(1) );
+							resp.bo = nearest_zc( ovrts, resp.range(1), cp(1), cfg.lab_landmarks_zcalign & ~logscale );
 							fig_update();
 						end
 					case 'alt'
 						if isnan( resp.range(1) ) || cp(1) > resp.range(1)
-							resp.vo = nearest_zc( ovrts, resp.range(1), cp(1) );
+							resp.vo = nearest_zc( ovrts, resp.range(1), cp(1), cfg.lab_landmarks_zcalign & ~logscale );
 							fig_update();
 						end
 				end
@@ -208,6 +220,7 @@ function label_landmarks( run, cfg )
 	itrial = max( 1, next_unlabeled( trials, 0 ) );
 
 	done = false; % init flags
+	logscale = false;
 
 	while ~done
 
@@ -247,6 +260,13 @@ function label_landmarks( run, cfg )
 			det2ts = run.audiodata(det2r(1):det2r(2), 1);
 		end
 
+		if ~logscale % axes
+			yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
+		else
+			yl = [min( scale( ovrts, logscale ) ), max( scale( ovrts, logscale ) )];
+			yl(2) = yl(1) + diff( yl ) * (1 + (style.scale( 1/2 ) - 1) / 2);
+		end
+
 			% plot
 		clf( fig );
 
@@ -255,55 +275,52 @@ function label_landmarks( run, cfg )
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
-		subplot( 4, 2, [1, 2], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
+		subplot( 4, 3, [1, 3], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
 		title( sprintf( 'LABEL_LANDMARKS (trial: %d/%d)', itrial, ntrials ) );
 		xlabel( 'trial time in milliseconds' );
 		ylabel( 'response' );
 
 		xlim( (resp.range - trial.range(1)) * 1000 );
-		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 		ylim( yl );
 
 		plot_landmarks( trial, yl ); % landmarks
 
-		plot( (dsp.smp2sec( (ovrr(1):ovrr(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, ovrts, ... % signal
+		plot( (dsp.smp2sec( (ovrr(1):ovrr(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( ovrts, logscale ), ... % signal
 			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 			'Color', style.color( 'cold', -1 ) );
 
 		if fdet1 % detail #1 (burst onset)
-			subplot( 4, 2, [3, 5], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
+			subplot( 4, 3, [4, 7], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'burst onset detail' );
 
 			xlim( (resp.bo + cfg.lab_landmarks_det1 - trial.range(1)) * 1000 );
-			yl = max( abs( det1ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
 			plot_landmarks( trial, yl ); % landmarks
 
-			plot( (dsp.smp2sec( (det1r(1):det1r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, det1ts, ... % signal
+			plot( (dsp.smp2sec( (det1r(1):det1r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( det1ts, logscale ), ... % signal
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
 
 		if fdet2 % detail #2 (voice onset)
-			subplot( 4, 2, [4, 6], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
+			subplot( 4, 3, [5, 8], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'voice onset detail' );
 
 			xlim( (resp.vo + cfg.lab_landmarks_det2 - trial.range(1)) * 1000 );
-			yl = max( abs( det2ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
 			plot_landmarks( trial, yl ); % landmarks
 
-			plot( (dsp.smp2sec( (det2r(1):det2r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, det2ts, ... % signal
+			plot( (dsp.smp2sec( (det2r(1):det2r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( det2ts, logscale ), ... % signal
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
 
 		s = { ... % information
-			'INFORMATION', ...
+			'LABEL INFORMATION', ...
 			'', ...
 			sprintf( 'class: ''%s''', resp.label ), ...
 			'', ...
@@ -341,6 +358,8 @@ function label_landmarks( run, cfg )
 			'', ...
 			'LEFT-BUTTON: set burst onset', ...
 			'RIGHT-BUTTON: set voice onset', ...
+			'', ...
+			'S: toggle log scale', ...
 			'', ...
 			'SHIFT+RETURN: playback from burst' };
 

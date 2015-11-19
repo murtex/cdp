@@ -54,8 +54,8 @@ function label_activity( run, cfg )
 		end
 	end
 
-	function i = nearest_zc( ts, t0, i )
-		if cfg.lab_activity_zcalign
+	function i = nearest_zc( ts, t0, i, align )
+		if align
 
 			zc = sign( ts ); % find zero crossings
 			zc(zc == 0) = 1;
@@ -71,6 +71,12 @@ function label_activity( run, cfg )
 			d = d(find( abs( d ) == min( abs( d ) ), 1 )) + 1;
 			i = dsp.smp2sec( is + d - 1, run.audiorate ) + t0;
 
+		end
+	end
+
+	function ts = scale( ts, logscale )
+		if logscale
+			ts = mag2db( abs( ts ) + eps );
 		end
 	end
 
@@ -133,6 +139,12 @@ function label_activity( run, cfg )
 							fig_update();
 						end
 
+					case 's' % log scale
+						if nmods == 0
+							logscale = ~logscale;
+							fig_update();
+						end
+
 					case 'return' % playback
 						if nmods == 0
 							sound( ovrts / max( abs( ovrts ) ), run.audiorate );
@@ -178,12 +190,12 @@ function label_activity( run, cfg )
 				switch get( fig, 'SelectionType' )
 					case 'normal'
 						if isnan( resp.range(2) ) || cp(1) < resp.range(2)
-							resp.range(1) = nearest_zc( ovrts, trial.range(1), cp(1) );
+							resp.range(1) = nearest_zc( ovrts, trial.range(1), cp(1), cfg.lab_activity_zcalign & ~logscale );
 							fig_update();
 						end
 					case 'alt'
 						if isnan( resp.range(1) ) || cp(1) > resp.range(1)
-							resp.range(2) = nearest_zc( ovrts, trial.range(1), cp(1) );
+							resp.range(2) = nearest_zc( ovrts, trial.range(1), cp(1), cfg.lab_activity_zcalign & ~logscale );
 							fig_update();
 						end
 				end
@@ -219,6 +231,7 @@ function label_activity( run, cfg )
 	itrial = max( 1, next_unlabeled( trials, 0 ) );
 
 	done = false; % init flags
+	logscale = false;
 
 	while ~done
 
@@ -258,6 +271,13 @@ function label_activity( run, cfg )
 			det2ts = run.audiodata(det2r(1):det2r(2), 1);
 		end
 
+		if ~logscale % axes
+			yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
+		else
+			yl = [min( scale( ovrts, logscale ) ), max( scale( ovrts, logscale ) )];
+			yl(2) = yl(1) + diff( yl ) * (1 + (style.scale( 1/2 ) - 1) / 2);
+		end
+
 			% plot
 		clf( fig );
 
@@ -272,12 +292,11 @@ function label_activity( run, cfg )
 		ylabel( 'response' );
 
 		xlim( (trial.range - trial.range(1)) * 1000 );
-		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 		ylim( yl );
 
 		plot_activity( trial, yl ); % activity range
 
-		plot( (dsp.smp2sec( (ovrr(1):ovrr(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, ovrts, ... % signal
+		plot( (dsp.smp2sec( (ovrr(1):ovrr(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( ovrts, logscale ), ... % signal
 			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 			'Color', style.color( 'cold', -1 ) );
 
@@ -287,12 +306,11 @@ function label_activity( run, cfg )
 			ylabel( 'activity start detail' );
 
 			xlim( (resp.range(1) + cfg.lab_activity_det1 - trial.range(1)) * 1000 );
-			yl = max( abs( det1ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
 			plot_activity( trial, yl ); % activity range
 
-			plot( (dsp.smp2sec( (det1r(1):det1r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, det1ts, ... % signal
+			plot( (dsp.smp2sec( (det1r(1):det1r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( det1ts, logscale ), ... % signal
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
@@ -303,18 +321,17 @@ function label_activity( run, cfg )
 			ylabel( 'activity stop detail' );
 
 			xlim( (resp.range(2) + cfg.lab_activity_det2 - trial.range(1)) * 1000 );
-			yl = max( abs( det2ts ) ) * [-1, 1] * style.scale( 1/2 );
 			ylim( yl );
 
 			plot_activity( trial, yl ); % activity range
 
-			plot( (dsp.smp2sec( (det2r(1):det2r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, det2ts, ... % signal
+			plot( (dsp.smp2sec( (det2r(1):det2r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( det2ts, logscale ), ... % signal
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
 
 		s = { ... % information
-			'INFORMATION', ...
+			'LABEL INFORMATION', ...
 			'', ...
 			sprintf( 'class: ''%s''', resp.label ), ...
 			'', ...
@@ -355,6 +372,8 @@ function label_activity( run, cfg )
 			'', ...
 			'LEFT-BUTTON: set activity start', ...
 			'RIGHT-BUTTON: set activity stop', ...
+			'', ...
+			'S: toggle log scale', ...
 			'', ...
 			'SHIFT+RETURN: playback activity' };
 
