@@ -55,10 +55,12 @@ function read_trials( run, trialdir )
 
 			% prepare/set responses
 		trial.resplab = cdf.hResponse();
-		trial.respdet = cdf.hResponse();
-
 		trial.resplab.range = trial.range;
 		trial.resplab.label = trial.cuelabel;
+
+		trial.respdet = cdf.hResponse();
+		trial.respdet.range = trial.range;
+		trial.respdet.label = trial.cuelabel;
 
 	end
 
