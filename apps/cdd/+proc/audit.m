@@ -32,18 +32,9 @@ function audit( indir, ids, audmode, logfile )
 
 	cfg = cdf.hConfig(); % configure framework
 
-	cfg.lab_activity_det1 = [-0.025, 0.05];
-	cfg.lab_activity_det2 = [-0.05, 0.025];
-	cfg.lab_activity_zcsnap = false;
-
-	cfg.lab_landmarks_det1 = [-0.003, 0.006];
-	cfg.lab_landmarks_det2 = [-0.015, 0.030];
-	cfg.lab_landmarks_det3 = [-0.030, 0.015];
-	cfg.lab_landmarks_zcsnap = [false, true, true];
-
-	cfg.lab_formants_freqband = [0, 1200];
-	cfg.lab_formants_nfreqs = 100;
-	cfg.lab_formants_gamma = 1.0;
+	cfg.aud_landmarks_det1 = [-0.003, 0.006];
+	cfg.aud_landmarks_det2 = [-0.015, 0.030];
+	cfg.aud_landmarks_det3 = [-0.030, 0.015];
 
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'auditing tool...' );
