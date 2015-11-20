@@ -32,8 +32,9 @@ function audit( indir, ids, audmode, logfile )
 
 	cfg = cdf.hConfig(); % configure framework
 
-	cfg.aud_landmarks_det1 = [-0.015, 0.03];
-	cfg.aud_landmarks_det2 = [-0.015, 0.03];
+	cfg.aud_landmarks_det1 = [-0.003, 0.006];
+	cfg.aud_landmarks_det2 = [-0.015, 0.030];
+	cfg.aud_landmarks_det3 = [-0.030, 0.015];
 
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'auditing tool...' );

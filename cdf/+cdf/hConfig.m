@@ -26,6 +26,7 @@ classdef (Sealed = true) hConfig < handle
 			% auditing
 		aud_landmarks_det1 = [NaN, NaN]; % (relative) landmarks detail #1 (burst onset) [start, stop] (row numeric)
 		aud_landmarks_det2 = [NaN, NaN]; % (relative) landmarks detail #2 (voice onset) [start, stop] (row numeric)
+		aud_landmarks_det3 = [NaN, NaN]; % (relative) landmarks detail #3 (voice release) [start, stop] (row numeric)
 
 	end
 
