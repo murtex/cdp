@@ -99,7 +99,7 @@ function label_activity( run, cfg )
 
 				switch event.Key
 
-					case 'space' % trial browsing
+					case 'space' % browsing
 						if nmods == 0
 							itrial = next_unlabeled( trials, itrial );
 							fig_update();
@@ -139,7 +139,7 @@ function label_activity( run, cfg )
 							fig_update();
 						end
 
-					case 's' % log scale
+					case 'd' % decibel scale
 						if nmods == 0
 							logscale = ~logscale;
 							fig_update();
@@ -165,8 +165,8 @@ function label_activity( run, cfg )
 
 					case 'backspace' % clearing
 						if nmods == 1 && strcmp( event.Modifier, 'shift' ) % clear trial
-							resp.label = '';
-							resp.range = [NaN, NaN];
+							resplab.label = '';
+							resplab.range = [NaN, NaN];
 							fig_update();
 						elseif nmods == 2 && any( strcmp( event.Modifier, 'shift' ) ) && any( strcmp( event.Modifier, 'control' ) ) % clear run (valids only)
 							for i = 1:ntrials
@@ -182,9 +182,6 @@ function label_activity( run, cfg )
 							done = true;
 							fig_update();
 						end
-
-					otherwise % DEBUG
-						logger.log( 'keypress: %s', event.Key );
 				end
 
 				% button presses
@@ -193,16 +190,16 @@ function label_activity( run, cfg )
 					src = get( src, 'Parent' );
 				end
 
-				cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000; % activity range setting
+				cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000; % activity setting
 				switch get( fig, 'SelectionType' )
 					case 'normal'
 						if cp(1) >= trial.range(1) && cp(2) <= trial.range(2)
-							resp.range(1) = snap( ovrts, trial.range(1), cp(1), cfg.lab_activity_zcsnap & ~logscale );
+							resplab.range(1) = snap( ovrts, trial.range(1), cp(1), cfg.lab_activity_zcsnap(1) );
 							fig_update();
 						end
 					case 'alt'
 						if cp(1) >= trial.range(1) && cp(2) <= trial.range(2)
-							resp.range(2) = snap( ovrts, trial.range(1), cp(1), cfg.lab_activity_zcsnap & ~logscale );
+							resplab.range(2) = snap( ovrts, trial.range(1), cp(1), cfg.lab_activity_zcsnap(2) );
 							fig_update();
 						end
 				end
@@ -225,7 +222,11 @@ function label_activity( run, cfg )
 
 		% interaction loop
 	trials = [run.trials]; % prepare valid trials
-	trials(~is_valid( trials )) = [];
+	itrials = 1:numel( trials );
+
+	invalids = ~is_valid( trials );
+	trials(invalids) = [];
+	itrials(invalids) = [];
 
 	ntrials = numel( trials );
 	logger.log( 'valid trials: %d', ntrials );
@@ -244,38 +245,40 @@ function label_activity( run, cfg )
 
 			% prepare data
 		trial = trials(itrial);
-		resp = trial.resplab;
+		resplab = trial.resplab;
 
 		ovrr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % ranges
 
-		respr = dsp.sec2smp( resp.range, run.audiorate ) + [1, 0];
+		respr = dsp.sec2smp( resplab.range, run.audiorate ) + [1, 0];
 		fresp = ~any( isnan( respr ) );
 
-		det1r = dsp.sec2smp( resp.range(1) + cfg.lab_activity_det1, run.audiorate ) + [1, 0];
+		det1r = dsp.sec2smp( resplab.range(1) + cfg.lab_activity_det1, run.audiorate ) + [1, 0];
 		det1r(det1r < 1) = 1;
 		det1r(det1r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet1 = ~any( isnan( det1r ) );
 
-		det2r = dsp.sec2smp( resp.range(2) + cfg.lab_activity_det2, run.audiorate ) + [1, 0];
+		det2r = dsp.sec2smp( resplab.range(2) + cfg.lab_activity_det2, run.audiorate ) + [1, 0];
 		det2r(det2r < 1) = 1;
 		det2r(det2r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet2 = ~any( isnan( det2r ) );
 
 		ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
+		dc = mean( ovrts );
+		ovrts = ovrts - dc;
 
 		respts = [];
 		if fresp
-			respts = run.audiodata(respr(1):respr(2), 1);
+			respts = run.audiodata(respr(1):respr(2), 1) - dc;
 		end
 
 		det1ts = [];
 		if fdet1
-			det1ts = run.audiodata(det1r(1):det1r(2), 1);
+			det1ts = run.audiodata(det1r(1):det1r(2), 1) - dc;
 		end
 
 		det2ts = [];
 		if fdet2
-			det2ts = run.audiodata(det2r(1):det2r(2), 1);
+			det2ts = run.audiodata(det2r(1):det2r(2), 1) - dc;
 		end
 
 		if ~logscale % axes
@@ -294,16 +297,18 @@ function label_activity( run, cfg )
 		end
 
 		hovr = subplot( 4, 2, [1, 2], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
-		title( sprintf( 'LABEL_ACTIVITY (trial: %d/%d)', itrial, ntrials ) );
+		title( sprintf( 'LABEL_ACTIVITY (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ) );
 		xlabel( 'trial time in milliseconds' );
-		ylabel( 'response' );
+		ylabel( 'activity' );
 
 		xlim( (trial.range - trial.range(1)) * 1000 );
 		ylim( yl );
 
-		plot_activity( trial, yl ); % activity range
+		plot_activity( trial, yl ); % activity
 
-		plot( (dsp.smp2sec( (ovrr(1):ovrr(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( ovrts, logscale ), ... % signal
+		stairs( ... % signal
+			(dsp.smp2sec( (ovrr(1):ovrr(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
+			scale( [ovrts; ovrts(end)], logscale ), ...
 			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 			'Color', style.color( 'cold', -1 ) );
 
@@ -311,14 +316,16 @@ function label_activity( run, cfg )
 		if fdet1
 			hdet1 = subplot( 4, 2, [3, 5], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
 			xlabel( 'trial time in milliseconds' );
-			ylabel( 'activity start detail' );
+			ylabel( 'start detail' );
 
-			xlim( (resp.range(1) + cfg.lab_activity_det1 - trial.range(1)) * 1000 );
+			xlim( (resplab.range(1) + cfg.lab_activity_det1 - trial.range(1)) * 1000 );
 			ylim( yl );
 
-			plot_activity( trial, yl ); % activity range
+			plot_activity( trial, yl ); % activity
 
-			plot( (dsp.smp2sec( (det1r(1):det1r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( det1ts, logscale ), ... % signal
+			stairs( ... % signal
+				(dsp.smp2sec( (det1r(1):det1r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
+				scale( [det1ts; det1ts(end)], logscale ), ...
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
@@ -327,34 +334,36 @@ function label_activity( run, cfg )
 		if fdet2
 			hdet2 = subplot( 4, 2, [4, 6], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
 			xlabel( 'trial time in milliseconds' );
-			ylabel( 'activity stop detail' );
+			ylabel( 'stop detail' );
 
-			xlim( (resp.range(2) + cfg.lab_activity_det2 - trial.range(1)) * 1000 );
+			xlim( (resplab.range(2) + cfg.lab_activity_det2 - trial.range(1)) * 1000 );
 			ylim( yl );
 
-			plot_activity( trial, yl ); % activity range
+			plot_activity( trial, yl ); % activity
 
-			plot( (dsp.smp2sec( (det2r(1):det2r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( det2ts, logscale ), ... % signal
+			stairs( ... % signal
+				(dsp.smp2sec( (det2r(1):det2r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
+				scale( [det2ts; det2ts(end)], logscale ), ...
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
 
-		s = { ... % information
-			'LABEL INFORMATION', ...
+		s = { ... % manual labels
+			'MANUAL LABELS', ...
 			'', ...
-			sprintf( 'class: ''%s''', resp.label ), ...
-			sprintf( 'activity: [%.1f, %.1f]', (resp.range - trial.range(1)) * 1000 ), ...
+			sprintf( 'class: ''%s''', resplab.label ), ...
+			sprintf( 'activity: [%.1f, %.1f]', (resplab.range - trial.range(1)) * 1000 ), ...
 			'', ...
-			sprintf( 'burst onset: %.1f', (resp.bo - trial.range(1)) * 1000 ), ...
-			sprintf( 'voice onset: %.1f', (resp.vo - trial.range(1)) * 1000 ), ...
-			sprintf( 'voice release: %.1f', (resp.vr - trial.range(1)) * 1000 ), ...
+			sprintf( 'burst onset: %.1f', (resplab.bo - trial.range(1)) * 1000 ), ...
+			sprintf( 'voice onset: %.1f', (resplab.vo - trial.range(1)) * 1000 ), ...
+			sprintf( 'voice release: %.1f', (resplab.vr - trial.range(1)) * 1000 ), ...
 			'', ...
-			sprintf( 'F0 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F1 onset: [%.1f, %.1f]', (resp.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F2 onset: [%.1f, %.1f]', (resp.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F3 onset: [%.1f, %.1f]', (resp.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
+			sprintf( 'F0 onset: [%.1f, %.1f]', (resplab.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F1 onset: [%.1f, %.1f]', (resplab.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F2 onset: [%.1f, %.1f]', (resplab.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F3 onset: [%.1f, %.1f]', (resplab.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
 
-		annotation( 'textbox', [0, 0, 1/3, 1/4], 'String', s );
+		annotation( 'textbox', [0/3, 0, 1/3, 1/4], 'String', s );
 
 		s = { ... % general commands
 			'GENERAL COMMANDS', ...
@@ -367,23 +376,23 @@ function label_activity( run, cfg )
 			'', ...
 			'RETURN: playback audio', ...
 			'', ...
-			'SHIFT+BACKSPACE: clear trial labels', ...
-			'SHIFT+CONTROL+BACKSPACE: clear run labels', ...
+			'D: toggle decibel scale', ...
+			'', ...
+			'SHIFT+BACKSPACE: clear trial mode labels', ...
+			'SHIFT+CONTROL+BACKSPACE: clear run mode labels', ...
 			'', ...
 			'ESCAPE: save and quit' };
 
 		annotation( 'textbox', [1/3, 0, 1/3, 1/4], 'String', s );
 
-		s = { ... % specific commands
-			'SPECIFIC COMMANDS', ...
+		s = { ... % mode commands
+			'MODE COMMANDS', ...
 			'', ...
 			'K: set ''ka'' class', ...
 			'T: set ''ta'' class', ...
 			'', ...
 			'LEFT: set activity start', ...
 			'RIGHT: set activity stop', ...
-			'', ...
-			'S: toggle log scale', ...
 			'', ...
 			'SHIFT+RETURN: playback activity' };
 

@@ -102,7 +102,7 @@ function label_landmarks( run, cfg )
 
 				switch event.Key
 
-					case 'space' % trial browsing
+					case 'space' % browsing
 						if nmods == 0
 							itrial = next_unlabeled( trials, itrial );
 							fig_update();
@@ -142,7 +142,7 @@ function label_landmarks( run, cfg )
 							fig_update();
 						end
 
-					case 's' % log scale
+					case 'd' % decibel scale
 						if nmods == 0
 							logscale = ~logscale;
 							fig_update();
@@ -153,14 +153,14 @@ function label_landmarks( run, cfg )
 							[x, ~] = ginput( 3 );
 							x = trial.range(1) + x / 1000;
 
-							if numel( x ) > 0 && x(1) >= resp.range(1) && x(1) <= resp.range(2)
-								resp.bo = x(1);
+							if numel( x ) > 0 && x(1) >= resplab.range(1) && x(1) <= resplab.range(2)
+								resplab.bo = x(1);
 							end
-							if numel( x ) > 1 && x(2) >= resp.range(1) && x(2) <= resp.range(2)
-								resp.vo = x(2);
+							if numel( x ) > 1 && x(2) >= resplab.range(1) && x(2) <= resplab.range(2)
+								resplab.vo = x(2);
 							end
-							if numel( x ) > 2 && x(3) >= resp.range(1) && x(3) <= resp.range(2)
-								resp.vr = x(3);
+							if numel( x ) > 2 && x(3) >= resplab.range(1) && x(3) <= resplab.range(2)
+								resplab.vr = x(3);
 							end
 
 							fig_update();
@@ -170,8 +170,8 @@ function label_landmarks( run, cfg )
 							[x, ~] = ginput( 1 );
 							x = trial.range(1) + x / 1000;
 
-							if numel( x ) > 0 && x(1) >= resp.range(1) && x(1) <= resp.range(2)
-								resp.bo = x(1);
+							if numel( x ) > 0 && x(1) >= resplab.range(1) && x(1) <= resplab.range(2)
+								resplab.bo = x(1);
 							end
 
 							fig_update();
@@ -181,8 +181,8 @@ function label_landmarks( run, cfg )
 							[x, ~] = ginput( 1 );
 							x = trial.range(1) + x / 1000;
 
-							if numel( x ) > 0 && x(1) >= resp.range(1) && x(1) <= resp.range(2)
-								resp.vo = x(1);
+							if numel( x ) > 0 && x(1) >= resplab.range(1) && x(1) <= resplab.range(2)
+								resplab.vo = x(1);
 							end
 
 							fig_update();
@@ -192,8 +192,8 @@ function label_landmarks( run, cfg )
 							[x, ~] = ginput( 1 );
 							x = trial.range(1) + x / 1000;
 
-							if numel( x ) > 0 && x(1) >= resp.range(1) && x(1) <= resp.range(2)
-								resp.vr = x(1);
+							if numel( x ) > 0 && x(1) >= resplab.range(1) && x(1) <= resplab.range(2)
+								resplab.vr = x(1);
 							end
 
 							fig_update();
@@ -208,9 +208,9 @@ function label_landmarks( run, cfg )
 
 					case 'backspace' % clearing
 						if nmods == 1 && strcmp( event.Modifier, 'shift' ) % clear trial
-							resp.bo = NaN;
-							resp.vo = NaN;
-							resp.vr = NaN;
+							resplab.bo = NaN;
+							resplab.vo = NaN;
+							resplab.vr = NaN;
 							fig_update();
 						elseif nmods == 2 && any( strcmp( event.Modifier, 'shift' ) ) && any( strcmp( event.Modifier, 'control' ) ) % clear run (valids only)
 							for i = 1:ntrials
@@ -227,9 +227,6 @@ function label_landmarks( run, cfg )
 							done = true;
 							fig_update();
 						end
-
-					otherwise % DEBUG
-						logger.log( 'keypress: %s', event.Key );
 				end
 
 				% button presses
@@ -244,18 +241,18 @@ function label_landmarks( run, cfg )
 
 						switch src
 							case hdet1
-								if cp(1) >= resp.range(1) && cp(2) <= resp.range(2)
-									resp.bo = snap( ovrts, resp.range(1), cp(1), cfg.lab_landmarks_zcsnap(1) & ~logscale );
+								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
+									resplab.bo = snap( ovrts, resplab.range(1), cp(1), cfg.lab_landmarks_zcsnap(1) );
 									fig_update();
 								end
 							case hdet2
-								if cp(1) >= resp.range(1) && cp(2) <= resp.range(2)
-									resp.vo = snap( ovrts, resp.range(1), cp(1), cfg.lab_landmarks_zcsnap(2) & ~logscale );
+								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
+									resplab.vo = snap( ovrts, resplab.range(1), cp(1), cfg.lab_landmarks_zcsnap(2) );
 									fig_update();
 								end
 							case hdet3
-								if cp(1) >= resp.range(1) && cp(2) <= resp.range(2)
-									resp.vr = snap( ovrts, resp.range(1), cp(1), cfg.lab_landmarks_zcsnap(3) & ~logscale );
+								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
+									resplab.vr = snap( ovrts, resplab.range(1), cp(1), cfg.lab_landmarks_zcsnap(3) );
 									fig_update();
 								end
 						end
@@ -279,7 +276,11 @@ function label_landmarks( run, cfg )
 
 		% interaction loop
 	trials = [run.trials]; % prepare valid trials
-	trials(~is_valid( trials )) = [];
+	itrials = 1:numel( trials );
+
+	invalids = ~is_valid( trials );
+	trials(invalids) = [];
+	itrials(invalids) = [];
 
 	ntrials = numel( trials );
 	logger.log( 'valid trials: %d', ntrials );
@@ -298,48 +299,50 @@ function label_landmarks( run, cfg )
 
 			% prepare data
 		trial = trials(itrial);
-		resp = trial.resplab;
+		resplab = trial.resplab;
 
-		ovrr = dsp.sec2smp( resp.range, run.audiorate ) + [1, 0]; % ranges
+		ovrr = dsp.sec2smp( resplab.range, run.audiorate ) + [1, 0]; % ranges
 
-		respr = dsp.sec2smp( [resp.bo, resp.range(2)], run.audiorate ) + [1, 0];
+		respr = dsp.sec2smp( [resplab.bo, resplab.range(2)], run.audiorate ) + [1, 0];
 		fresp = ~any( isnan( respr ) );
 
-		det1r = dsp.sec2smp( resp.bo + cfg.lab_landmarks_det1, run.audiorate ) + [1, 0];
+		det1r = dsp.sec2smp( resplab.bo + cfg.lab_landmarks_det1, run.audiorate ) + [1, 0];
 		det1r(det1r < 1) = 1;
 		det1r(det1r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet1 = ~any( isnan( det1r ) );
 
-		det2r = dsp.sec2smp( resp.vo + cfg.lab_landmarks_det2, run.audiorate ) + [1, 0];
+		det2r = dsp.sec2smp( resplab.vo + cfg.lab_landmarks_det2, run.audiorate ) + [1, 0];
 		det2r(det2r < 1) = 1;
 		det2r(det2r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet2 = ~any( isnan( det2r ) );
 
-		det3r = dsp.sec2smp( resp.vr + cfg.lab_landmarks_det3, run.audiorate ) + [1, 0];
+		det3r = dsp.sec2smp( resplab.vr + cfg.lab_landmarks_det3, run.audiorate ) + [1, 0];
 		det3r(det3r < 1) = 1;
 		det3r(det3r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet3 = ~any( isnan( det3r ) );
 
 		ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
+		dc = mean( ovrts );
+		ovrts = ovrts - dc;
 
 		respts = [];
 		if fresp
-			respts = run.audiodata(respr(1):respr(2), 1);
+			respts = run.audiodata(respr(1):respr(2), 1) - dc;
 		end
 
 		det1ts = [];
 		if fdet1
-			det1ts = run.audiodata(det1r(1):det1r(2), 1);
+			det1ts = run.audiodata(det1r(1):det1r(2), 1) - dc;
 		end
 
 		det2ts = [];
 		if fdet2
-			det2ts = run.audiodata(det2r(1):det2r(2), 1);
+			det2ts = run.audiodata(det2r(1):det2r(2), 1) - dc;
 		end
 
 		det3ts = [];
 		if fdet3
-			det3ts = run.audiodata(det3r(1):det3r(2), 1);
+			det3ts = run.audiodata(det3r(1):det3r(2), 1) - dc;
 		end
 
 		if ~logscale % axes
@@ -358,16 +361,18 @@ function label_landmarks( run, cfg )
 		end
 
 		hovr = subplot( 4, 3, [1, 3], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
-		title( sprintf( 'LABEL_LANDMARKS (trial: %d/%d)', itrial, ntrials ) );
+		title( sprintf( 'LABEL_LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ) );
 		xlabel( 'trial time in milliseconds' );
-		ylabel( 'response' );
+		ylabel( 'landmarks' );
 
-		xlim( (resp.range - trial.range(1)) * 1000 );
+		xlim( (resplab.range - trial.range(1)) * 1000 );
 		ylim( yl );
 
 		plot_landmarks( trial, yl ); % landmarks
 
-		plot( (dsp.smp2sec( (ovrr(1):ovrr(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( ovrts, logscale ), ... % signal
+		stairs( ... % signal
+			(dsp.smp2sec( (ovrr(1):ovrr(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
+			scale( [ovrts; ovrts(end)], logscale ), ...
 			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 			'Color', style.color( 'cold', -1 ) );
 
@@ -377,12 +382,14 @@ function label_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'burst onset detail' );
 
-			xlim( (resp.bo + cfg.lab_landmarks_det1 - trial.range(1)) * 1000 );
+			xlim( (resplab.bo + cfg.lab_landmarks_det1 - trial.range(1)) * 1000 );
 			ylim( yl );
 
 			plot_landmarks( trial, yl ); % landmarks
 
-			plot( (dsp.smp2sec( (det1r(1):det1r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( det1ts, logscale ), ... % signal
+			stairs( ... % signal
+				(dsp.smp2sec( (det1r(1):det1r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
+				scale( [det1ts; det1ts(end)], logscale ), ...
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
@@ -393,12 +400,14 @@ function label_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'voice onset detail' );
 
-			xlim( (resp.vo + cfg.lab_landmarks_det2 - trial.range(1)) * 1000 );
+			xlim( (resplab.vo + cfg.lab_landmarks_det2 - trial.range(1)) * 1000 );
 			ylim( yl );
 
 			plot_landmarks( trial, yl ); % landmarks
 
-			plot( (dsp.smp2sec( (det2r(1):det2r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( det2ts, logscale ), ... % signal
+			stairs( ... % signal
+				(dsp.smp2sec( (det2r(1):det2r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
+				scale( [det2ts; det2ts(end)], logscale ), ...
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
@@ -409,32 +418,34 @@ function label_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'voice release detail' );
 
-			xlim( (resp.vr + cfg.lab_landmarks_det3 - trial.range(1)) * 1000 );
+			xlim( (resplab.vr + cfg.lab_landmarks_det3 - trial.range(1)) * 1000 );
 			ylim( yl );
 
 			plot_landmarks( trial, yl ); % landmarks
 
-			plot( (dsp.smp2sec( (det3r(1):det3r(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( det3ts, logscale ), ... % signal
+			stairs( ... % signal
+				(dsp.smp2sec( (det3r(1):det3r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
+				scale( [det3ts; det3ts(end)], logscale ), ...
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
 
-		s = { ... % information
-			'LABEL INFORMATION', ...
+		s = { ... % manual labels
+			'MANUAL LABELS', ...
 			'', ...
-			sprintf( 'class: ''%s''', resp.label ), ...
-			sprintf( 'activity: [%.1f, %.1f]', (resp.range - trial.range(1)) * 1000 ), ...
+			sprintf( 'class: ''%s''', resplab.label ), ...
+			sprintf( 'activity: [%.1f, %.1f]', (resplab.range - trial.range(1)) * 1000 ), ...
 			'', ...
-			sprintf( 'burst onset: %.1f', (resp.bo - trial.range(1)) * 1000 ), ...
-			sprintf( 'voice onset: %.1f', (resp.vo - trial.range(1)) * 1000 ), ...
-			sprintf( 'voice release: %.1f', (resp.vr - trial.range(1)) * 1000 ), ...
+			sprintf( 'burst onset: %.1f', (resplab.bo - trial.range(1)) * 1000 ), ...
+			sprintf( 'voice onset: %.1f', (resplab.vo - trial.range(1)) * 1000 ), ...
+			sprintf( 'voice release: %.1f', (resplab.vr - trial.range(1)) * 1000 ), ...
 			'', ...
-			sprintf( 'F0 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F1 onset: [%.1f, %.1f]', (resp.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F2 onset: [%.1f, %.1f]', (resp.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F3 onset: [%.1f, %.1f]', (resp.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
+			sprintf( 'F0 onset: [%.1f, %.1f]', (resplab.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F1 onset: [%.1f, %.1f]', (resplab.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F2 onset: [%.1f, %.1f]', (resplab.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F3 onset: [%.1f, %.1f]', (resplab.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
 
-		annotation( 'textbox', [0, 0, 1/3, 1/4], 'String', s );
+		annotation( 'textbox', [0/3, 0, 1/3, 1/4], 'String', s );
 
 		s = { ... % general commands
 			'GENERAL COMMANDS', ...
@@ -447,25 +458,25 @@ function label_landmarks( run, cfg )
 			'', ...
 			'RETURN: playback audio', ...
 			'', ...
-			'SHIFT+BACKSPACE: clear trial labels', ...
-			'SHIFT+CONTROL+BACKSPACE: clear run labels', ...
+			'D: toggle decibel scale', ...
+			'', ...
+			'SHIFT+BACKSPACE: clear trial mode labels', ...
+			'SHIFT+CONTROL+BACKSPACE: clear run mode labels', ...
 			'', ...
 			'ESCAPE: save and quit' };
 
 		annotation( 'textbox', [1/3, 0, 1/3, 1/4], 'String', s );
 
-		s = { ... % specific commands
-			'SPECIFIC COMMANDS', ...
+		s = { ... % mode commands
+			'MODE COMMANDS', ...
 			'', ...
-			'L: set landmarks (RETURN cancels)', ...
+			'L: set landmarks (3 clicks, RETURN cancels)', ...
 			'', ...
-			'B: set burst onset (RETURN cancels)', ...
-			'V: set voice onset (RETURN cancels)', ...
-			'R: set voice release (RETURN cancels)', ...
+			'B: set burst onset (1 click, RETURN cancels)', ...
+			'V: set voice onset (1 click, RETURN cancels)', ...
+			'R: set voice release (1 click, RETURN cancels)', ...
 			'', ...
 			'LEFT: detail landmark', ...
-			'', ...
-			'S: toggle log scale', ...
 			'', ...
 			'SHIFT+RETURN: playback from burst' };
 

@@ -74,8 +74,6 @@ function label( indir, outdir, ids, labmode, logfile )
 
 		logger.untab();
 
-		proc.read_audio( run, run.audiofile ); % audio data
-
 			% labeling
 		switch labmode
 			case 'activity'
@@ -91,8 +89,6 @@ function label( indir, outdir, ids, labmode, logfile )
 			% write data
 		cdffile = fullfile( outdir, sprintf( 'run_%d.mat', id ) ); % cdf data
 		logger.log( 'write cdf data (''%s'')...', cdffile );
-
-		run.audiodata = []; % do not write redundant audio data
 
 		save( cdffile, 'run' );
 

@@ -6,7 +6,7 @@ function audit( indir, ids, audmode, logfile )
 % INPUT
 % indir : input directory (row char)
 % ids : subject identifiers (vector numeric)
-% audmode : auditing mode [landmarks] (row char)
+% audmode : auditing mode [activity | landmarks] (row char)
 % logfile : logger filename (row char)
 
 		% safeguard
@@ -31,6 +31,9 @@ function audit( indir, ids, audmode, logfile )
 	addpath( '../../cdf/' ); % include framework
 
 	cfg = cdf.hConfig(); % configure framework
+
+	cfg.aud_activity_det1 = [-0.025, 0.05];
+	cfg.aud_activity_det2 = [-0.05, 0.025];
 
 	cfg.aud_landmarks_det1 = [-0.003, 0.006];
 	cfg.aud_landmarks_det2 = [-0.015, 0.030];
@@ -58,6 +61,8 @@ function audit( indir, ids, audmode, logfile )
 
 			% auditing
 		switch audmode
+			case 'activity'
+				cdf.audit_activity( run, cfg );
 			case 'landmarks'
 				cdf.audit_landmarks( run, cfg );
 			otherwise

@@ -9,10 +9,10 @@ classdef (Sealed = true) hConfig < handle
 		sync_smooth = NaN; % sample smoothing [approx. marker length] (scalar numeric)
 		sync_thresh = NaN; % mahalanobis threshold [sigmas] (scalar numeric)
 
-			% manual labeling
+			% labeling
 		lab_activity_det1 = [NaN, NaN]; % (relative) activity detail #1 (start) [start, stop] (row numeric)
 		lab_activity_det2 = [NaN, NaN]; % (relative) activity detail #2 (stop) [start, stop] (row numeric)
-		lab_activity_zcsnap = false; % zero-crossings alignment (logical scalar)
+		lab_activity_zcsnap = [false, false]; % zero-crossings alignment [det1, det2] (logical scalar)
 
 		lab_landmarks_det1 = [NaN, NaN]; % (relative) landmarks detail #1 (burst onset) [start, stop] (row numeric)
 		lab_landmarks_det2 = [NaN, NaN]; % (relative) landmarks detail #2 (voice onset) [start, stop] (row numeric)
@@ -24,6 +24,9 @@ classdef (Sealed = true) hConfig < handle
 		lab_formants_gamma = NaN; % spectrogram gamma (scalar numeric)
 
 			% auditing
+		aud_activity_det1 = [NaN, NaN]; % (relative) activity detail #1 (start) [start, stop] (row numeric)
+		aud_activity_det2 = [NaN, NaN]; % (relative) activity detail #2 (stop) [start, stop] (row numeric)
+
 		aud_landmarks_det1 = [NaN, NaN]; % (relative) landmarks detail #1 (burst onset) [start, stop] (row numeric)
 		aud_landmarks_det2 = [NaN, NaN]; % (relative) landmarks detail #2 (voice onset) [start, stop] (row numeric)
 		aud_landmarks_det3 = [NaN, NaN]; % (relative) landmarks detail #3 (voice release) [start, stop] (row numeric)

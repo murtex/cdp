@@ -65,7 +65,7 @@ function label_formants( run, cfg )
 
 				switch event.Key
 
-					case 'space' % trial browsing
+					case 'space' % browsing
 						if nmods == 0
 							itrial = next_unlabeled( trials, itrial );
 							fig_update( true );
@@ -109,20 +109,20 @@ function label_formants( run, cfg )
 						if nmods == 0
 							[x, y] = ginput( 4 );
 							if numel( y ) > 0 && y(1) >= min( ovrfreqs(ovrfreqs > 0) ) && y(1) <= max( ovrfreqs )
-								resp.f0(1) = trial.range(1) + x(1) / 1000;
-								resp.f0(2) = y(1);
+								resplab.f0(1) = trial.range(1) + x(1) / 1000;
+								resplab.f0(2) = y(1);
 							end
 							if numel( y ) > 1 && y(2) >= min( ovrfreqs(ovrfreqs > 0) ) && y(2) <= max( ovrfreqs )
-								resp.f1(1) = trial.range(1) + x(2) / 1000;
-								resp.f1(2) = y(2);
+								resplab.f1(1) = trial.range(1) + x(2) / 1000;
+								resplab.f1(2) = y(2);
 							end
 							if numel( y ) > 2 && y(3) >= min( ovrfreqs(ovrfreqs > 0) ) && y(3) <= max( ovrfreqs )
-								resp.f2(1) = trial.range(1) + x(3) / 1000;
-								resp.f2(2) = y(3);
+								resplab.f2(1) = trial.range(1) + x(3) / 1000;
+								resplab.f2(2) = y(3);
 							end
 							if numel( y ) > 3 && y(4) >= min( ovrfreqs(ovrfreqs > 0) ) && y(4) <= max( ovrfreqs )
-								resp.f3(1) = trial.range(1) + x(4) / 1000;
-								resp.f3(2) = y(4);
+								resplab.f3(1) = trial.range(1) + x(4) / 1000;
+								resplab.f3(2) = y(4);
 							end
 							fig_update( false );
 						end
@@ -130,8 +130,8 @@ function label_formants( run, cfg )
 						if nmods == 0
 							[x, y] = ginput( 1 );
 							if numel( y ) > 0 && y(1) >= min( ovrfreqs(ovrfreqs > 0) ) && y(1) <= max( ovrfreqs )
-								resp.f0(1) = trial.range(1) + x(1) / 1000;
-								resp.f0(2) = y(1);
+								resplab.f0(1) = trial.range(1) + x(1) / 1000;
+								resplab.f0(2) = y(1);
 							end
 							fig_update( false );
 						end
@@ -139,8 +139,8 @@ function label_formants( run, cfg )
 						if nmods == 0
 							[x, y] = ginput( 1 );
 							if numel( y ) > 0 && y(1) >= min( ovrfreqs(ovrfreqs > 0) ) && y(1) <= max( ovrfreqs )
-								resp.f1(1) = trial.range(1) + x(1) / 1000;
-								resp.f1(2) = y(1);
+								resplab.f1(1) = trial.range(1) + x(1) / 1000;
+								resplab.f1(2) = y(1);
 							end
 							fig_update( false );
 						end
@@ -148,8 +148,8 @@ function label_formants( run, cfg )
 						if nmods == 0
 							[x, y] = ginput( 1 );
 							if numel( y ) > 0 && y(1) >= min( ovrfreqs(ovrfreqs > 0) ) && y(1) <= max( ovrfreqs )
-								resp.f2(1) = trial.range(1) + x(1) / 1000;
-								resp.f2(2) = y(1);
+								resplab.f2(1) = trial.range(1) + x(1) / 1000;
+								resplab.f2(2) = y(1);
 							end
 							fig_update( false );
 						end
@@ -157,8 +157,8 @@ function label_formants( run, cfg )
 						if nmods == 0
 							[x, y] = ginput( 1 );
 							if numel( y ) > 0 && y(1) >= min( ovrfreqs(ovrfreqs > 0) ) && y(1) <= max( ovrfreqs )
-								resp.f3(1) = trial.range(1) + x(1) / 1000;
-								resp.f3(2) = y(1);
+								resplab.f3(1) = trial.range(1) + x(1) / 1000;
+								resplab.f3(2) = y(1);
 							end
 							fig_update( false );
 						end
@@ -170,10 +170,10 @@ function label_formants( run, cfg )
 
 					case 'backspace' % clearing
 						if nmods == 1 && strcmp( event.Modifier, 'shift' ) % clear trial
-							resp.f0 = [NaN, NaN];
-							resp.f1 = [NaN, NaN];
-							resp.f2 = [NaN, NaN];
-							resp.f3 = [NaN, NaN];
+							resplab.f0 = [NaN, NaN];
+							resplab.f1 = [NaN, NaN];
+							resplab.f2 = [NaN, NaN];
+							resplab.f3 = [NaN, NaN];
 							fig_update( false );
 						elseif nmods == 2 && any( strcmp( event.Modifier, 'shift' ) ) && any( strcmp( event.Modifier, 'control' ) ) % clear run (valids only)
 							for i = 1:ntrials
@@ -191,9 +191,6 @@ function label_formants( run, cfg )
 							done = true;
 							fig_update( false );
 						end
-
-					otherwise % DEBUG
-						logger.log( 'keypress: %s', event.Key );
 				end
 
 				% figure closing
@@ -216,7 +213,11 @@ function label_formants( run, cfg )
 
 		% interaction loop
 	trials = [run.trials]; % prepare valid trials
-	trials(~is_valid( trials )) = [];
+	itrials = 1:numel( trials );
+
+	invalids = ~is_valid( trials );
+	trials(invalids) = [];
+	itrials(invalids) = [];
 
 	ntrials = numel( trials );
 	logger.log( 'valid trials: %d', ntrials );
@@ -235,13 +236,15 @@ function label_formants( run, cfg )
 
 			% prepare data
 		trial = trials(itrial);
-		resp = trial.resplab;
+		resplab = trial.resplab;
 
-		ovrr = dsp.sec2smp( resp.range, run.audiorate ) + [1, 0]; % ranges
+		ovrr = dsp.sec2smp( resplab.range, run.audiorate ) + [1, 0]; % ranges
 
 		ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
+		dc = mean( ovrts );
+		ovrts = ovrts - dc;
 
-		if recompute
+		if recompute % transforms
 			[ovrst, ovrfreqs] = dsp.stransf( ovrts, run.audiorate, cfg.lab_formants_freqband(1), cfg.lab_formants_freqband(2), cfg.lab_formants_nfreqs );
 		end
 
@@ -254,11 +257,11 @@ function label_formants( run, cfg )
 		end
 
 		subplot( 4, 1, 1 ); % overview
-		title( sprintf( 'LABEL_FORMANTS (trial: %d/%d)', itrial, ntrials ) );
+		title( sprintf( 'LABEL_FORMANTS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ) );
 		xlabel( 'trial time in milliseconds' );
 		ylabel( 'response' );
 
-		xlim( (resp.range - trial.range(1)) * 1000 );
+		xlim( (resplab.range - trial.range(1)) * 1000 );
 		yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 		ylim( yl );
 
@@ -269,38 +272,38 @@ function label_formants( run, cfg )
 		xlabel( 'trial time in milliseconds' );
 		ylabel( 'frequency in hertz' );
 
-		xlim( (resp.range - trial.range(1)) * 1000 );
+		xlim( (resplab.range - trial.range(1)) * 1000 );
 		ylim( [min( ovrfreqs(ovrfreqs > 0) ), max( ovrfreqs )] );
 
 		colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) ); % signal
 		imagesc( (dsp.smp2sec( (ovrr(1):ovrr(2)) - 1, run.audiorate ) - trial.range(1)) * 1000, ovrfreqs, ...
 			log( (ovrst .* conj( ovrst )) .^ cfg.lab_formants_gamma + eps ) );
 
-		scatter( (resp.f0(1) - trial.range(1)) * 1000, resp.f0(2), ... % onsets
+		scatter( (resplab.f0(1) - trial.range(1)) * 1000, resplab.f0(2), ... % onsets
 			'MarkerEdgeColor', style.color( 'signal', +1 ), 'MarkerFaceColor', style.color( 'signal', +2 ) );
-		scatter( (resp.f1(1) - trial.range(1)) * 1000, resp.f1(2), ...
+		scatter( (resplab.f1(1) - trial.range(1)) * 1000, resplab.f1(2), ...
 			'MarkerEdgeColor', style.color( 'signal', +1 ), 'MarkerFaceColor', style.color( 'signal', +2 ) );
-		scatter( (resp.f2(1) - trial.range(1)) * 1000, resp.f2(2), ...
+		scatter( (resplab.f2(1) - trial.range(1)) * 1000, resplab.f2(2), ...
 			'MarkerEdgeColor', style.color( 'signal', +1 ), 'MarkerFaceColor', style.color( 'signal', +2 ) );
-		scatter( (resp.f3(1) - trial.range(1)) * 1000, resp.f3(2), ...
+		scatter( (resplab.f3(1) - trial.range(1)) * 1000, resplab.f3(2), ...
 			'MarkerEdgeColor', style.color( 'signal', +1 ), 'MarkerFaceColor', style.color( 'signal', +2 ) );
 
-		s = { ... % information
-			'LABEL INFORMATION', ...
+		s = { ... % manual labels
+			'MANUAL LABELS', ...
 			'', ...
-			sprintf( 'class: ''%s''', resp.label ), ...
-			sprintf( 'activity: [%.1f, %.1f]', (resp.range - trial.range(1)) * 1000 ), ...
+			sprintf( 'class: ''%s''', resplab.label ), ...
+			sprintf( 'activity: [%.1f, %.1f]', (resplab.range - trial.range(1)) * 1000 ), ...
 			'', ...
-			sprintf( 'burst onset: %.1f', (resp.bo - trial.range(1)) * 1000 ), ...
-			sprintf( 'voice onset: %.1f', (resp.vo - trial.range(1)) * 1000 ), ...
-			sprintf( 'voice release: %.1f', (resp.vr - trial.range(1)) * 1000 ), ...
+			sprintf( 'burst onset: %.1f', (resplab.bo - trial.range(1)) * 1000 ), ...
+			sprintf( 'voice onset: %.1f', (resplab.vo - trial.range(1)) * 1000 ), ...
+			sprintf( 'voice release: %.1f', (resplab.vr - trial.range(1)) * 1000 ), ...
 			'', ...
-			sprintf( 'F0 onset: [%.1f, %.1f]', (resp.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F1 onset: [%.1f, %.1f]', (resp.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F2 onset: [%.1f, %.1f]', (resp.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
-			sprintf( 'F3 onset: [%.1f, %.1f]', (resp.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
+			sprintf( 'F0 onset: [%.1f, %.1f]', (resplab.f0 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F1 onset: [%.1f, %.1f]', (resplab.f1 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F2 onset: [%.1f, %.1f]', (resplab.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
+			sprintf( 'F3 onset: [%.1f, %.1f]', (resplab.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
 
-		annotation( 'textbox', [0, 0, 1/3, 1/4], 'String', s );
+		annotation( 'textbox', [0/3, 0, 1/3, 1/4], 'String', s );
 
 		s = { ... % general commands
 			'GENERAL COMMANDS', ...
@@ -313,22 +316,22 @@ function label_formants( run, cfg )
 			'', ...
 			'RETURN: playback audio', ...
 			'', ...
-			'SHIFT+BACKSPACE: clear trial labels', ...
-			'SHIFT+CONTROL+BACKSPACE: clear run labels', ...
+			'SHIFT+BACKSPACE: clear trial mode labels', ...
+			'SHIFT+CONTROL+BACKSPACE: clear run mode labels', ...
 			'', ...
 			'ESCAPE: save and quit' };
 
 		annotation( 'textbox', [1/3, 0, 1/3, 1/4], 'String', s );
 
-		s = { ... % specific commands
-			'SPECIFIC COMMANDS', ...
+		s = { ... % mode commands
+			'MODE COMMANDS', ...
 			'', ...
-			'F: set formant onsets (RETURN cancels)', ...
+			'F: set formant onsets (4 clicks, RETURN cancels)', ...
 			'', ...
-			'0: set F0 onset (RETURN cancels)', ...
-			'1: set F1 onset (RETURN cancels)', ...
-			'2: set F2 onset (RETURN cancels)', ...
-			'3: set F3 onset (RETURN cancels)' };
+			'0: set F0 onset (1 click, RETURN cancels)', ...
+			'1: set F1 onset (1 click, RETURN cancels)', ...
+			'2: set F2 onset (1 click, RETURN cancels)', ...
+			'3: set F3 onset (1 click, RETURN cancels)' };
 
 		annotation( 'textbox', [2/3, 0, 1/3, 1/4], 'String', s );
 
