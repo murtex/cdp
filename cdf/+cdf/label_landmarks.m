@@ -201,9 +201,9 @@ function label_landmarks( run, cfg )
 
 					case 'return' % playback
 						if nmods == 0
-							sound( ovrts / max( abs( ovrts ) ), run.audiorate );
+							soundsc( ovrts, run.audiorate );
 						elseif nmods == 1 && strcmp( event.Modifier, 'shift' ) && fresp
-							sound( respts / max( abs( respts ) ), run.audiorate );
+							soundsc( respts, run.audiorate );
 						end
 
 					case 'backspace' % clearing

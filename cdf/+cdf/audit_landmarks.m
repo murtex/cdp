@@ -117,7 +117,7 @@ function audit_landmarks( run, cfg )
 
 					case 'return' % playback
 						if nmods == 0
-							sound( ovrts / max( abs( ovrts ) ), run.audiorate );
+							soundsc( ovrts, run.audiorate );
 						end
 
 					case 'escape' % quit
