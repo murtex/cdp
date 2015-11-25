@@ -167,12 +167,16 @@ function audit_activity( run, cfg )
 
 		ovrr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % ranges
 
-		det1r = dsp.sec2smp( resplab.range(1) + cfg.aud_activity_det1, run.audiorate ) + [1, 0]; % TODO: respdet!
+		det1r = dsp.sec2smp( [...
+			min( resplab.range(1), respdet.range(1) ) + cfg.aud_activity_det1(1), ...
+			max( resplab.range(1), respdet.range(1) ) + cfg.aud_activity_det1(2)], run.audiorate ) + [1, 0];
 		det1r(det1r < 1) = 1;
 		det1r(det1r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet1 = ~any( isnan( det1r ) );
 
-		det2r = dsp.sec2smp( resplab.range(2) + cfg.aud_activity_det2, run.audiorate ) + [1, 0]; % TODO: respdet!
+		det2r = dsp.sec2smp( [...
+			min( resplab.range(2), respdet.range(2) ) + cfg.aud_activity_det2(1), ...
+			max( resplab.range(2), respdet.range(2) ) + cfg.aud_activity_det2(2)], run.audiorate ) + [1, 0];
 		det2r(det2r < 1) = 1;
 		det2r(det2r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet2 = ~any( isnan( det2r ) );
@@ -220,7 +224,9 @@ function audit_activity( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'start detail' );
 
-			xlim( (resplab.range(1) + cfg.aud_activity_det1 - trial.range(1)) * 1000 ); % TODO: respdet!
+			xlim( ([...
+				min( resplab.range(1), respdet.range(1) ) + cfg.aud_activity_det1(1), ...
+				max( resplab.range(1), respdet.range(1) ) + cfg.aud_activity_det1(2)] - trial.range(1)) * 1000 );
 			ylim( yl );
 
 			plot_activity( trial, yl, false ); % activity
@@ -237,7 +243,9 @@ function audit_activity( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'stop detail' );
 
-			xlim( (resplab.range(2) + cfg.aud_activity_det2 - trial.range(1)) * 1000 ); % TODO: respdet!
+			xlim( ([...
+				min( resplab.range(2), respdet.range(2) ) + cfg.aud_activity_det2(1), ...
+				max( resplab.range(2), respdet.range(2) ) + cfg.aud_activity_det2(2)] - trial.range(1)) * 1000 );
 			ylim( yl );
 
 			plot_activity( trial, yl, false ); % activity

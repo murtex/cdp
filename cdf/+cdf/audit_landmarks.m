@@ -28,11 +28,12 @@ function audit_landmarks( run, cfg )
 	set( fig, 'CloseRequestFcn', {@fig_dispatch, 'close'} );
 
 		% helper functions
-	function f = is_valid( trials )
-		f = true( size( trials ) );
+	function f = is_valid( trials ) % TODO: respdet!
+		f = false( size( trials ) );
 		for i = 1:numel( trials )
-			if isempty( trials(i).resplab.label ) || any( isnan( trials(i).resplab.range ) )
-				f(i) = false;
+			if (~isempty( trials(i).resplab.label ) && ~any( isnan( trials(i).resplab.range ) )) ...
+					|| (~isempty( trials(i).respdet.label ) && ~any( isnan( trials(i).respdet.range ) ))
+				f(i) = true;
 			end
 		end
 	end
@@ -169,19 +170,27 @@ function audit_landmarks( run, cfg )
 		resplab = trial.resplab;
 		respdet = trial.respdet;
 
-		ovrr = dsp.sec2smp( resplab.range, run.audiorate ) + [1, 0]; % ranges
+		ovrr = dsp.sec2smp( [ ... % ranges
+			min( resplab.range(1), respdet.range(1) ), ...
+			max( resplab.range(2), respdet.range(2) )], run.audiorate ) + [1, 0];
 
-		det1r = dsp.sec2smp( resplab.bo + cfg.aud_landmarks_det1, run.audiorate ) + [1, 0]; % TODO: respdet!
+		det1r = dsp.sec2smp( [...
+			min( resplab.bo, respdet.bo ) + cfg.aud_landmarks_det1(1), ...
+			max( resplab.bo, respdet.bo ) + cfg.aud_landmarks_det1(2)], run.audiorate ) + [1, 0];
 		det1r(det1r < 1) = 1;
 		det1r(det1r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet1 = ~any( isnan( det1r ) );
 
-		det2r = dsp.sec2smp( resplab.vo + cfg.aud_landmarks_det2, run.audiorate ) + [1, 0]; % TODO: respdet!
+		det2r = dsp.sec2smp( [...
+			min( resplab.vo, respdet.vo ) + cfg.aud_landmarks_det2(1), ...
+			max( resplab.vo, respdet.vo ) + cfg.aud_landmarks_det2(2)], run.audiorate ) + [1, 0];
 		det2r(det2r < 1) = 1;
 		det2r(det2r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet2 = ~any( isnan( det2r ) );
 
-		det3r = dsp.sec2smp( resplab.vr + cfg.aud_landmarks_det3, run.audiorate ) + [1, 0]; % TODO: respdet!
+		det3r = dsp.sec2smp( [...
+			min( resplab.vr, respdet.vr ) + cfg.aud_landmarks_det3(1), ...
+			max( resplab.vr, respdet.vr ) + cfg.aud_landmarks_det3(2)], run.audiorate ) + [1, 0];
 		det3r(det3r < 1) = 1;
 		det3r(det3r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 		fdet3 = ~any( isnan( det3r ) );
@@ -218,7 +227,9 @@ function audit_landmarks( run, cfg )
 		xlabel( 'trial time in milliseconds' );
 		ylabel( 'landmarks' );
 
-		xlim( (resplab.range - trial.range(1)) * 1000 );
+		xlim( ([...
+			min( resplab.range(1), respdet.range(1) ), ...
+			max( resplab.range(2), respdet.range(2) )] - trial.range(1)) * 1000 );
 		ylim( yl );
 
 		plot_landmarks( trial, yl, true ); % landmarks
@@ -234,7 +245,9 @@ function audit_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'burst onset detail' );
 
-			xlim( (resplab.bo + cfg.aud_landmarks_det1 - trial.range(1)) * 1000 ); % TODO: respdet!
+			xlim( ([...
+				min( resplab.bo, respdet.bo ) + cfg.aud_landmarks_det1(1), ...
+				max( resplab.bo, respdet.bo ) + cfg.aud_landmarks_det1(2)] - trial.range(1)) * 1000 );
 			ylim( yl );
 
 			plot_landmarks( trial, yl, false ); % landmarks
@@ -251,7 +264,9 @@ function audit_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'voice onset detail' );
 
-			xlim( (resplab.vo + cfg.aud_landmarks_det2 - trial.range(1)) * 1000 ); % TODO: respdet!
+			xlim( ([...
+				min( resplab.vo, respdet.vo ) + cfg.aud_landmarks_det2(1), ...
+				max( resplab.vo, respdet.vo ) + cfg.aud_landmarks_det2(2)] - trial.range(1)) * 1000 );
 			ylim( yl );
 
 			plot_landmarks( trial, yl, false ); % landmarks
@@ -268,7 +283,9 @@ function audit_landmarks( run, cfg )
 			xlabel( 'trial time in milliseconds' );
 			ylabel( 'voice release detail' );
 
-			xlim( (resplab.vr + cfg.aud_landmarks_det3 - trial.range(1)) * 1000 ); % TODO: respdet!
+			xlim( ([...
+				min( resplab.vr, respdet.vr ) + cfg.aud_landmarks_det3(1), ...
+				max( resplab.vr, respdet.vr ) + cfg.aud_landmarks_det3(2)] - trial.range(1)) * 1000 );
 			ylim( yl );
 
 			plot_landmarks( trial, yl, false ); % landmarks

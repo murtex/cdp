@@ -30,10 +30,10 @@ function label_landmarks( run, cfg )
 
 		% helper functions
 	function f = is_valid( trials )
-		f = true( size( trials ) );
+		f = false( size( trials ) );
 		for i = 1:numel( trials )
-			if isempty( trials(i).resplab.label ) || any( isnan( trials(i).resplab.range ) )
-				f(i) = false;
+			if ~isempty( trials(i).resplab.label ) && ~any( isnan( trials(i).resplab.range ) )
+				f(i) = true;
 			end
 		end
 	end
