@@ -1,5 +1,5 @@
 function read_trials( run, trialfile )
-% read raw trials data
+% read raw trial data
 %
 % READ_TRIALS( run, trialfile )
 %

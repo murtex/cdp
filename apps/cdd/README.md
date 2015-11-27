@@ -13,6 +13,8 @@ Preprocessing
 Labeling
 --------
 
+###### Manual
+
 - `proc.label` -- labeling tool
 
 Testing
