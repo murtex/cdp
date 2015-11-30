@@ -13,7 +13,7 @@ classdef (Sealed = true) hTrial < handle
 		cuelabel = ''; % cue label (row char)
 		distlabel = ''; % distractor label (row char)
 
-			% experimental conditions
+			% conditions
 		soa = NaN; % stimulus-onset asynchrony (scalar numeric)
 		vot = NaN; % distractor voice-onset time (scalar numeric)
 

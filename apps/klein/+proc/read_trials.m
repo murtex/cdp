@@ -83,7 +83,7 @@ function read_trials( run, trialfile )
 	for i = ntrials:-1:1
 		trial = run.trials(i);
 
-			% set experimental conditions
+			% set conditions
 		trial.soa = fdata{14}(i);
 		trial.vot = distvot( fdata{13}{i} );
 
