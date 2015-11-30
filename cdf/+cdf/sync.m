@@ -143,8 +143,6 @@ function [sync0, synchints, syncs] = sync( run, cfg )
 		trial.cue = trial.cue + sync0 + syncs(i);
 		trial.dist = trial.dist + sync0 + syncs(i);
 
-			% responses, TODO
-
 	end
 
 		% exit
