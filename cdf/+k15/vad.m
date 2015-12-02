@@ -34,12 +34,12 @@ function vad( ts, rate, freqband, window, range )
 		error( 'invalid argument: range' );
 	end
 
-		% short-time fourier transform
+		% get short-time fourier transform
 	[stft, times, freqs] = dsp.stftransf( ts, rate, freqband, window );
 
 	stft = stft .* conj( stft );
 
-		% long-term spectral flatness measure
+		% set long-term spectral flatness measure
 	nsegs = size( stft, 2 );
 
 	lsfm = zeros( nsegs, 1 ); % pre-allocation
@@ -75,7 +75,7 @@ function vad( ts, rate, freqband, window, range )
 
 	xlim( dsp.smp2msec( [1, numel( ts )] - 1, rate ) );
 
-	stairs( times * 1000, lsfm, ...
+	stairs( times * 1000, lsfm, ... % measure
 		'Color', style.color( 'cold', -1 ) );
 
 	error( 'DEBUG' );
