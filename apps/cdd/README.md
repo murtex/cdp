@@ -26,3 +26,11 @@ Auditing
 
 - `test.audit` -- auditing tool
 
+Example
+-------
+
+```matlab
+proc.convert( '../../data/cdd/raw/', '../../data/cdd/convert/', 'convert.log' );
+proc.sync( '../../data/cdd/convert/', '../../data/cdd/sync/', 1, 'sync.log' );
+
+```
