@@ -50,12 +50,12 @@ function label( indir, outdir, ids, labmode, logfile )
 	cfg.lab_landmarks_det3 = [-0.030, 0.015];
 	cfg.lab_landmarks_zcsnap = [false, true, true];
 
-	cfg.lab_formants_f0_window = {@gausswin, 0.075, 9/10};
+	cfg.lab_formants_f0_window = {@hamming, 0.075, 95/100};
 	cfg.lab_formants_f0_freqband = [0, 500, 100];
-	cfg.lab_formants_f0_gamma = 0.2;
-	cfg.lab_formants_fx_window = {@gausswin, 0.005, 9/10};
+	cfg.lab_formants_f0_gamma = 0.15;
+	cfg.lab_formants_fx_window = {@hamming, 0.005, 95/100};
 	cfg.lab_formants_fx_freqband = [0, 5000, 100];
-	cfg.lab_formants_fx_gamma = 0.2;
+	cfg.lab_formants_fx_gamma = 0.15;
 
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'labeling tool...' );
