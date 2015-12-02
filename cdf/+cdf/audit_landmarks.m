@@ -28,7 +28,7 @@ function audit_landmarks( run, cfg )
 	set( fig, 'CloseRequestFcn', {@fig_dispatch, 'close'} );
 
 		% helper functions
-	function f = is_valid( trials ) % TODO: respdet!
+	function f = is_valid( trials )
 		f = false( size( trials ) );
 		for i = 1:numel( trials )
 			if (~isempty( trials(i).resplab.label ) && ~any( isnan( trials(i).resplab.range ) )) ...
