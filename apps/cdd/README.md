@@ -16,8 +16,8 @@ Preprocessing
 - `test.sync` -- marker synchronization statistics
 - `test.sync_samples` -- marker synchronization samples
 
-Labeling
---------
+Manual labeling
+---------------
 
 - `proc.label` -- labeling tool
 
@@ -35,7 +35,9 @@ Example
 proc.convert( '../../data/cdd/raw/', '../../data/cdd/convert/', 1, 'convert.log' );
 proc.sync( '../../data/cdd/convert/', '../../data/cdd/sync/', 1, 'sync.log' );
 
-	% labeling
+	% manual labeling
+copyfile( '../../data/cdd/sync/', '../../data/cdd/label/' );
+
 proc.label( '../../data/cdd/label/', '../../data/cdd/label/', 1, 'activity', 'label.log' );
 proc.label( '../../data/cdd/label/', '../../data/cdd/label/', 1, 'landmarks', 'label.log' );
 proc.label( '../../data/cdd/label/', '../../data/cdd/label/', 1, 'formants', 'label.log' );
