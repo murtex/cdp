@@ -38,8 +38,8 @@ function audit_landmarks( run, cfg )
 		end
 	end
 
-	function ts = scale( ts, logscale )
-		if logscale
+	function ts = scale( ts, flog )
+		if flog
 			ts = mag2db( abs( ts ) + eps );
 		end
 	end
@@ -109,27 +109,27 @@ function audit_landmarks( run, cfg )
 							fig_update();
 						end
 
-					case 'd' % decibel scale
-						if nmods == 0
-							logscale = ~logscale;
-							fig_update();
-						end
-
 					case 'return' % playback
 						if nmods == 0
 							soundsc( ovrts, run.audiorate );
 						end
 
+					case 'd' % decibel scale
+						if nmods == 0
+							flog = ~flog;
+							fig_update();
+						end
+
 					case 'escape' % quit
 						if nmods == 0
-							done = true;
+							fdone = true;
 							fig_update();
 						end
 				end
 
 				% figure closing
 			case 'close'
-				done = true;
+				fdone = true;
 				delete( fig );
 		end
 	end
@@ -160,10 +160,10 @@ function audit_landmarks( run, cfg )
 
 	itrial = 1;
 
-	done = false; % init flags
-	logscale = false;
+	fdone = false; % init flags
+	flog = false;
 
-	while ~done
+	while ~fdone
 
 			% prepare data
 		trial = trials(itrial);
@@ -212,10 +212,10 @@ function audit_landmarks( run, cfg )
 			det3ts = run.audiodata(det3r(1):det3r(2), 1);
 		end
 
-		if ~logscale % axes
+		if ~flog % axes
 			yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 		else
-			yl = [min( scale( ovrts, logscale ) ), max( scale( ovrts, logscale ) )];
+			yl = [min( scale( ovrts, flog ) ), max( scale( ovrts, flog ) )];
 			yl(2) = yl(1) + diff( yl ) * (1 + (style.scale( 1/2 ) - 1) / 2);
 		end
 
@@ -236,7 +236,7 @@ function audit_landmarks( run, cfg )
 
 		stairs( ... % signal
 			(dsp.smp2sec( (ovrr(1):ovrr(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-			scale( [ovrts; ovrts(end)], logscale ), ...
+			scale( [ovrts; ovrts(end)], flog ), ...
 			'Color', style.color( 'cold', -1 ) );
 
 		hdet1 = NaN; % detail #1 (burst onset)
@@ -254,7 +254,7 @@ function audit_landmarks( run, cfg )
 
 			stairs( ... % signal
 				(dsp.smp2sec( (det1r(1):det1r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-				scale( [det1ts; det1ts(end)], logscale ), ...
+				scale( [det1ts; det1ts(end)], flog ), ...
 				'Color', style.color( 'cold', -1 ) );
 		end
 
@@ -273,7 +273,7 @@ function audit_landmarks( run, cfg )
 
 			stairs( ... % signal
 				(dsp.smp2sec( (det2r(1):det2r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-				scale( [det2ts; det2ts(end)], logscale ), ...
+				scale( [det2ts; det2ts(end)], flog ), ...
 				'Color', style.color( 'cold', -1 ) );
 		end
 
@@ -292,7 +292,7 @@ function audit_landmarks( run, cfg )
 
 			stairs( ... % signal
 				(dsp.smp2sec( (det3r(1):det3r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-				scale( [det3ts; det3ts(end)], logscale ), ...
+				scale( [det3ts; det3ts(end)], flog ), ...
 				'Color', style.color( 'cold', -1 ) );
 		end
 
@@ -330,8 +330,8 @@ function audit_landmarks( run, cfg )
 
 		annotation( 'textbox', [1/3, 0, 1/3, 1/4], 'String', s );
 
-		s = { ... % general commands
-			'GENERAL COMMANDS', ...
+		s = { ... % commands
+			'COMMANDS', ...
 			'', ...
 			'PAGEDOWN/UP: +/- 1 trial' ...
 			'SHIFT+PAGEDOWN/UP: +/- 10 trials', ...

@@ -74,8 +74,8 @@ function label_landmarks( run, cfg )
 		end
 	end
 
-	function ts = scale( ts, logscale )
-		if logscale
+	function ts = scale( ts, flog )
+		if flog
 			ts = mag2db( abs( ts ) + eps );
 		end
 	end
@@ -151,12 +151,6 @@ function label_landmarks( run, cfg )
 							fig_update();
 						end
 
-					case 'd' % decibel scale
-						if nmods == 0
-							logscale = ~logscale;
-							fig_update();
-						end
-
 					case 'l' % landmarks setting
 						if nmods == 0
 							[x, ~] = ginput( 3 );
@@ -215,13 +209,20 @@ function label_landmarks( run, cfg )
 							soundsc( respts, run.audiorate );
 						end
 
+					case 'd' % decibel scale
+						if nmods == 0
+							flog = ~flog;
+							fig_update();
+						end
+
 					case 'backspace' % clearing
-						if nmods == 1 && strcmp( event.Modifier, 'shift' ) % clear trial
+						if nmods == 1 && strcmp( event.Modifier, 'control' ) % clear trial
 							resplab.bo = NaN;
 							resplab.vo = NaN;
 							resplab.vr = NaN;
 							fig_update();
-						elseif nmods == 2 && any( strcmp( event.Modifier, 'shift' ) ) && any( strcmp( event.Modifier, 'control' ) ) % clear run (valids only)
+						elseif nmods == 3 && any( strcmp( event.Modifier, 'shift' ) ) ... % clear run (valids only)
+								&& any( strcmp( event.Modifier, 'control' ) )  && any( strcmp( event.Modifier, 'alt' ) )
 							for i = 1:ntrials
 								trials(i).resplab.bo = NaN;
 								trials(i).resplab.vo = NaN;
@@ -233,7 +234,7 @@ function label_landmarks( run, cfg )
 
 					case 'escape' % quit
 						if nmods == 0
-							done = true;
+							fdone = true;
 							fig_update();
 						end
 				end
@@ -269,7 +270,7 @@ function label_landmarks( run, cfg )
 
 				% figure closing
 			case 'close'
-				done = true;
+				fdone = true;
 				delete( fig );
 		end
 	end
@@ -301,10 +302,10 @@ function label_landmarks( run, cfg )
 
 	itrial = max( 1, next_unlabeled( trials, 0 ) );
 
-	done = false; % init flags
-	logscale = false;
+	fdone = false; % init flags
+	flog = false;
 
-	while ~done
+	while ~fdone
 
 			% prepare data
 		trial = trials(itrial);
@@ -354,10 +355,10 @@ function label_landmarks( run, cfg )
 			det3ts = run.audiodata(det3r(1):det3r(2), 1) - dc;
 		end
 
-		if ~logscale % axes
+		if ~flog % axes
 			yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 		else
-			yl = [min( scale( ovrts, logscale ) ), max( scale( ovrts, logscale ) )];
+			yl = [min( scale( ovrts, flog ) ), max( scale( ovrts, flog ) )];
 			yl(2) = yl(1) + diff( yl ) * (1 + (style.scale( 1/2 ) - 1) / 2);
 		end
 
@@ -381,7 +382,7 @@ function label_landmarks( run, cfg )
 
 		stairs( ... % signal
 			(dsp.smp2sec( (ovrr(1):ovrr(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-			scale( [ovrts; ovrts(end)], logscale ), ...
+			scale( [ovrts; ovrts(end)], flog ), ...
 			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 			'Color', style.color( 'cold', -1 ) );
 
@@ -398,7 +399,7 @@ function label_landmarks( run, cfg )
 
 			stairs( ... % signal
 				(dsp.smp2sec( (det1r(1):det1r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-				scale( [det1ts; det1ts(end)], logscale ), ...
+				scale( [det1ts; det1ts(end)], flog ), ...
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
@@ -416,7 +417,7 @@ function label_landmarks( run, cfg )
 
 			stairs( ... % signal
 				(dsp.smp2sec( (det2r(1):det2r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-				scale( [det2ts; det2ts(end)], logscale ), ...
+				scale( [det2ts; det2ts(end)], flog ), ...
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
@@ -434,7 +435,7 @@ function label_landmarks( run, cfg )
 
 			stairs( ... % signal
 				(dsp.smp2sec( (det3r(1):det3r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-				scale( [det3ts; det3ts(end)], logscale ), ...
+				scale( [det3ts; det3ts(end)], flog ), ...
 				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
 				'Color', style.color( 'cold', -1 ) );
 		end
@@ -469,8 +470,8 @@ function label_landmarks( run, cfg )
 			'', ...
 			'D: toggle decibel scale', ...
 			'', ...
-			'SHIFT+BACKSPACE: clear trial mode labels', ...
-			'SHIFT+CONTROL+BACKSPACE: clear run mode labels', ...
+			'CONTROL+BACKSPACE: clear trial mode labels', ...
+			'SHIFT+CONTROL+ALT+BACKSPACE: clear run mode labels', ...
 			'', ...
 			'ESCAPE: save and quit' };
 
