@@ -13,11 +13,9 @@ Cue-distractor framework
 
 - `cdf.sync` -- marker synchronization
 <br>
-
 - `cdf.audit_activity` -- activity auditing tool
 - `cdf.audit_landmarks` -- landmarks auditing tool
 <br>
-
 - `cdf.label_activity` -- activity labeling tool
 - `cdf.label_landmarks` -- landmarks labeling tool
 - `cdf.label_formants` -- formants labeling tool
