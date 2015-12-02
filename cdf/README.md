@@ -45,3 +45,8 @@ Convenience classes
 - `xis.hLogger` -- hierachic logging
 - `xis.hStyle` -- uniform styling
 
+Detection system
+----------------
+
+- `k15.vad` -- voice avtivity detection
+

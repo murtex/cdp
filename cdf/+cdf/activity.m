@@ -48,6 +48,13 @@ function activity( run, cfg )
 
 			% prepare data
 		trial = trials(i);
+		respdet = trial.respdet;
+
+		tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % ranges
+
+		tts = run.audiodata(tr(1):tr(2), 1); % signals
+
+			% detect activity
 
 		logger.progress( i, ntrials );
 	end
