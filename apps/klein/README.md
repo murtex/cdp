@@ -9,28 +9,27 @@ Preprocessing
 -------------
 
 - `proc.convert` -- raw conversion
-- `proc.sync` -- marker synchronization
-
-Labeling
---------
-
-###### Manual
-
-- `proc.label` -- labeling tool
-
-Testing
--------
-
-###### Statistics
-
 - `test.convert` -- raw conversion statistics
+
+<!-- -->
+
+- `proc.sync` -- marker synchronization
 - `test.sync` -- marker synchronization statistics
-
-###### Samples
-
 - `test.sync_samples` -- marker synchronization samples
 
-###### Auditing
+Auditing
+--------
 
 - `test.audit` -- auditing tool
+
+Example
+-------
+
+```matlab
+
+	% preprocessing
+proc.convert( '../../data/cdd/raw/', '../../data/cdd/convert/', 1, 'convert.log' );
+proc.sync( '../../data/cdd/convert/', '../../data/cdd/sync/', 1, 'sync.log' );
+
+```
 
