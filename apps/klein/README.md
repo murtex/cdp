@@ -38,6 +38,11 @@ Example
 proc.convert( '../../data/klein/raw/', '../../data/klein/convert/', 1, 'convert.log' );
 proc.sync( '../../data/klein/convert/', '../../data/klein/sync/', 1, 'sync.log' );
 
+	% label detection
+proc.activity( '../../data/klein/sync/', '../../data/klein/activity/', 1, 'activity.log' );
+proc.landmarks( '../../data/klein/sync/', '../../data/klein/landmarks/', 1, 'landmarks.log' );
+proc.formants( '../../data/klein/sync/', '../../data/klein/formants/', 1, 'formants.log' );
+
 ```
 
 Server batch processing
