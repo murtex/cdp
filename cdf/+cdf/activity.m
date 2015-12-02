@@ -30,6 +30,28 @@ function activity( run, cfg )
 		end
 	end
 
+		% proceed (valid) trials
+	trials = [run.trials]; % prepare valid trials
+	
+	invalids = ~is_valid( trials );
+	trials(invalids) = [];
+
+	ntrials = numel( trials );
+	logger.log( 'valid trials: %d', ntrials );
+
+	if ntrials == 0
+		error( 'invalid value: ntrials' );
+	end
+
+	logger.progress();
+	for i = 1:ntrials
+
+			% prepare data
+		trial = trials(i);
+
+		logger.progress( i, ntrials );
+	end
+
 		% exit
 	logger.untab(); % stop logging
 
