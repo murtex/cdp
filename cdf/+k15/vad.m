@@ -1,7 +1,7 @@
-function vad( ts, rate, freqband, window, range )
+function [starts, stops] = vad( ts, rate, freqband, window, range )
 % voice activity detection
 %
-% VAD( ts, rate, freqband, window, range )
+% [starts, stops] = VAD( ts, rate, freqband, window, range )
 %
 % INPUT
 % ts : time series (column numeric)
@@ -9,6 +9,10 @@ function vad( ts, rate, freqband, window, range )
 % freqband : frequency band [lower, upper, count] (row numeric)
 % window : short-time window [function, length, overlap] (vector cell)
 % range : long-term range [start, stop] (row numeric)
+%
+% OUTPUT
+% starts : activity starts (column numeric)
+% stops : activity stops (column numeric)
 %
 % SEE
 % Y. Ma, A. Nishihara : Efficient voice activity detection algorithm using long-term spectral flatness measure (2013)
@@ -48,11 +52,17 @@ function vad( ts, rate, freqband, window, range )
 		startseg = max( 1, i + range(1) );
 		stopseg = min( nsegs, i + range(2) );
 
+		times(stopseg)-times(startseg) % DEBUG
+
 		gm = geomean( stft(:, startseg:stopseg), 2 );
 		am = mean( stft(:, startseg:stopseg), 2 );
 
 		lsfm(i) = sum( log10( gm ./ am ) );
 	end
+
+		% DEBUG
+	starts = [];
+	stops = [];
 
 		% DEBUG
 	style = xis.hStyle.instance();
