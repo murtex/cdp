@@ -6,7 +6,7 @@ function audit( indir, ids, audmode, logfile )
 % INPUT
 % indir : input directory (row char)
 % ids : subject identifiers (vector numeric)
-% audmode : auditing mode [activity | landmarks] (row char)
+% audmode : auditing mode [activity | landmarks | formants] (row char)
 % logfile : logger filename (row char)
 
 		% safeguard
@@ -39,6 +39,13 @@ function audit( indir, ids, audmode, logfile )
 	cfg.aud_landmarks_det2 = [-0.015, 0.030];
 	cfg.aud_landmarks_det3 = [-0.030, 0.015];
 
+	cfg.aud_formants_f0_window = {@gausswin, 0.075, 9/10};
+	cfg.aud_formants_f0_freqband = [0, 500, 100];
+	cfg.aud_formants_f0_gamma = 0.2;
+	cfg.aud_formants_fx_window = {@gausswin, 0.005, 9/10};
+	cfg.aud_formants_fx_freqband = [0, 5000, 100];
+	cfg.aud_formants_fx_gamma = 0.2;
+
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'auditing tool...' );
 
@@ -67,6 +74,8 @@ function audit( indir, ids, audmode, logfile )
 				cdf.audit_activity( run, cfg );
 			case 'landmarks'
 				cdf.audit_landmarks( run, cfg );
+			case 'formants'
+				cdf.audit_formants( run, cfg );
 			otherwise
 				error( 'invalid argument: audmode' );
 		end
