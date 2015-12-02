@@ -12,25 +12,19 @@ Cue-distractor framework
 ##### Functions
 
 - `cdf.sync` -- marker synchronization
+
+- `cdf.audit_activity` -- activity auditing tool
+- `cdf.audit_landmarks` -- landmarks auditing tool
+
 - `cdf.label_activity` -- activity labeling tool
 - `cdf.label_landmarks` -- landmarks labeling tool
 - `cdf.label_formants` -- formants labeling tool
-- `cdf.activity` -- voice activity detection
-- `cdf.landmarks` -- landmark detection
-- `cdf.formants` -- formant detection
-- `cdf.features` -- feature extraction
-- `cdf.train` -- training
-- `cdf.cassify` -- classification
 
 Digital signal processing
 -------------------------
 
+- `dsp.stftransf` -- short-time fourier transform
 - `dsp.stransf` -- stockwell transform
-
-Detection functions
--------------------
-
-- `k15.vad` -- voice activity detection
 
 Convenience classes
 -------------------
