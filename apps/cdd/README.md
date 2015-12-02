@@ -8,28 +8,21 @@ Preprocessing
 -------------
 
 - `proc.convert` -- raw conversion
+- `test.convert` -- raw conversion statistics
+
+<!-- -->
+
 - `proc.sync` -- marker synchronization
+- `test.sync` -- marker synchronization statistics
+- `test.sync_samples` -- marker synchronization samples
 
 Labeling
 --------
 
-###### Manual
-
 - `proc.label` -- labeling tool
 
-Testing
--------
-
-###### Statistics
-
-- `test.convert` -- raw conversion statistics
-- `test.sync` -- marker synchronization statistics
-
-###### Samples
-
-- `test.sync_samples` -- marker synchronization samples
-
-###### Auditing
+Auditing
+--------
 
 - `test.audit` -- auditing tool
 

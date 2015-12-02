@@ -4,6 +4,9 @@ Cue-distractor framework
 ##### Structures
 
 - `cdf.hConfig` -- framework configuration
+
+<!-- -->
+
 - `cdf.hRun` -- experimental run
 - `cdf.hTrial` -- experimental trial
 - `cdf.hResponse` -- subject response
