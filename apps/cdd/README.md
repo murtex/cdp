@@ -31,7 +31,7 @@ Example
 
 ```matlab
 
-	% pre-processing
+	% preprocessing
 proc.convert( '../../data/cdd/raw/', '../../data/cdd/convert/', 1, 'convert.log' );
 proc.sync( '../../data/cdd/convert/', '../../data/cdd/sync/', 1, 'sync.log' );
 
