@@ -54,7 +54,8 @@ function activity( run, cfg )
 
 		tts = run.audiodata(tr(1):tr(2), 1); % signals
 
-			% detect activity
+			% detect activity, TODO
+		k15.vad( tts, run.audiorate );
 
 		logger.progress( i, ntrials );
 	end

@@ -39,14 +39,14 @@ Digital signal processing
 - `dsp.stftransf` -- short-time fourier transform
 - `dsp.stransf` -- stockwell transform
 
+Detection system
+----------------
+
+- `k15.vad` -- voice avtivity detection
+
 Convenience classes
 -------------------
 
 - `xis.hLogger` -- hierachic logging
 - `xis.hStyle` -- uniform styling
-
-Detection system
-----------------
-
-- `k15.vad` -- voice avtivity detection
 
