@@ -17,6 +17,13 @@ Preprocessing
 - `test.sync` -- marker synchronization statistics
 - `test.sync_samples` -- marker synchronization samples
 
+Label detection
+---------------
+
+`proc.activity` -- activity detection
+`proc.landmarks` -- landmarks detection
+`proc.formants` -- formants detection
+
 Auditing
 --------
 
@@ -32,4 +39,15 @@ proc.convert( '../../data/cdd/raw/', '../../data/cdd/convert/', 1, 'convert.log'
 proc.sync( '../../data/cdd/convert/', '../../data/cdd/sync/', 1, 'sync.log' );
 
 ```
+
+Server batch processing
+-----------------------
+
+- `proc_convert.sh` -- raw conversion
+- `test_convert.sh` -- raw conversion statistics
+
+<!-- -->
+
+- `proc_sync.sh` -- marker synchronization
+- `test_sync.sh` -- marker synchronization statistics
 
