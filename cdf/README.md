@@ -30,6 +30,12 @@ Cue-distractor framework
 Digital signal processing
 -------------------------
 
+- `dsp.sec2smp` -- unit conversion
+- `dsp.smp2msec` -- unit conversion
+- `dsp.smp2sec` -- unit conversion
+
+<!-- -->
+
 - `dsp.stftransf` -- short-time fourier transform
 - `dsp.stransf` -- stockwell transform
 
