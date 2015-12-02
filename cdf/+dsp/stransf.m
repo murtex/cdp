@@ -1,17 +1,16 @@
-function [st, freqs] = stransf( ts, rate, lofreq, hifreq, nfreqs )
+function [st, times, freqs] = stransf( ts, rate, freqband )
 % stockwell transform
 %
-% [st, freqs] = STRANFS( ts, rate, lofreq, hifreq, nfreqs )
+% [st, times, freqs] = STRANFS( ts, rate, freqband )
 %
 % INPUT
 % ts : signal/time series (column numeric)
 % rate : sampling rate (scalar numeric)
-% lofreq : lower frequency limit (scalar numeric)
-% hifreq : upper frequency limit (scalar numeric)
-% nfreqs : frequency resolution (scalar numeric)
+% freqband : frequency band [lower, upper, count] (vector numeric)
 %
 % OUTPUT
 % st : stockwell transform (matrix numeric)
+% times : time values (column numeric)
 % freqs : frequencies (column numeric)
 % 
 % SEE
@@ -31,16 +30,8 @@ function [st, freqs] = stransf( ts, rate, lofreq, hifreq, nfreqs )
 		error( 'invalid argument: rate' );
 	end
 
-	if nargin < 3 || ~isscalar( lofreq ) || ~isnumeric( lofreq )
-		error( 'invalid argument: lofreq' );
-	end
-	
-	if nargin < 4 || ~isscalar( hifreq ) || ~isnumeric( hifreq )
-		error( 'invalid argument: hifreq' );
-	end
-
-	if nargin < 5 || ~isscalar( nfreqs ) || ~isnumeric( nfreqs )
-		error( 'invalid argument: nfreqs' );
+	if nargin < 3 || ~isvector( freqband ) || ~isnumeric( freqband )
+		error( 'invalid argument: freqband' );
 	end
 
 	FACTOR = 5; % gaussian window width factor
@@ -82,8 +73,10 @@ function [st, freqs] = stransf( ts, rate, lofreq, hifreq, nfreqs )
 	ftfreqs = ftfreqs / (tslen/2) * (rate/2);
 
 		% compute stockwell transform
+	nfreqs = freqband(3);
+
 	st = zeros( nfreqs, tslen ); % pre-allocation
-	freqs = transpose( linspace( lofreq, hifreq, nfreqs ) );
+	freqs = transpose( linspace( freqband(1), freqband(2), nfreqs ) );
 
 	for i = 1:nfreqs
 
@@ -102,6 +95,9 @@ function [st, freqs] = stransf( ts, rate, lofreq, hifreq, nfreqs )
 
 		% undo zero-padding
 	st = st(:, 1:tslenorig);
+
+		% set time values
+	times = dsp.smp2sec( 0:tslenorig-1, rate );
 
 end
 
