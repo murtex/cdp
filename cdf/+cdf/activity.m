@@ -19,6 +19,16 @@ function activity( run, cfg )
 		% init
 	logger = xis.hLogger.instance(); % start logging
 	logger.tab( 'activity detection...' );
+	
+		% helper functions
+	function f = is_valid( trials )
+		f = true( size( trials ) );
+		for i = 1:numel( trials )
+			if any( isnan( trials(i).range ) )
+				f(i) = false;
+			end
+		end
+	end
 
 		% exit
 	logger.untab(); % stop logging
