@@ -44,14 +44,3 @@ proc.label( '../../data/cdd/label/', '../../data/cdd/label/', 1, 'formants', 'la
 
 ```
 
-Server batch processing
------------------------
-
-- `proc_convert.sh` -- raw conversion
-- `test_convert.sh` -- raw conversion statistics
-
-<!-- -->
-
-- `proc_sync.sh` -- marker synchronization
-- `test_sync.sh` -- marker synchronization statistics
-
