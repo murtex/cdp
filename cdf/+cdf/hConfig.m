@@ -29,7 +29,7 @@ classdef (Sealed = true) hConfig < handle
 			% label detection
 		det_vad_freqband = [NaN, NaN, NaN]; % voice activity frequency band [lower, upper, count] (row numeric)
 		det_vad_window = {@rectwin, NaN, NaN}; % short-time window [function, length, overlap] (row cell)
-		det_vad_range = [NaN, NaN]; % (relative) long-term range [start, stop] (scalar numeric)
+		det_vad_ltm = [NaN, NaN, NaN, NaN]; % long-term setting [R, M, head, lambda] (scalar numeric)
 
 			% auditing
 		aud_activity_det1 = [NaN, NaN]; % (relative) activity detail #1 (start) range [start, stop] (row numeric)

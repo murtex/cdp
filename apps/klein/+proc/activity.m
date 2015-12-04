@@ -38,7 +38,7 @@ function activity( indir, outdir, ids, logfile )
 
 	cfg.det_vad_freqband = [500, 4000, 100];
 	cfg.det_vad_window = {@hann, 0.020, 50/100};
-	cfg.det_vad_range = [-30, 0];
+	cfg.det_vad_ltm = [30, 10, 50, 0.55];
 
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'activity detection...' );
