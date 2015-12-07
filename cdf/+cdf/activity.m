@@ -52,16 +52,10 @@ function activity( run, cfg )
 
 		tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % ranges
 
-		wlen = dsp.sec2smp( cfg.det_vad_window{2}, run.audiorate );
-		wovl = dsp.sec2smp( cfg.det_vad_window{2} * cfg.det_vad_window{3}, run.audiorate );
-		wstr = wlen - wovl;
-
-		tr(1) = tr(1) - cfg.det_vad_ltm(3)*wstr; % TODO: check range?!
-
 		tts = run.audiodata(tr(1):tr(2), 1); % signals
 
 			% detect activity, TODO
-		k15.vad( tts, run.audiorate, cfg.det_vad_freqband, cfg.det_vad_window, cfg.det_vad_ltm );
+		k15.vad( tts, run.audiorate, cfg.det_vad_freqband, cfg.det_vad_window );
 
 		logger.progress( i, ntrials );
 	end
