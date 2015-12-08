@@ -1,7 +1,7 @@
-function plot_cmds()
+function plot_commands()
 % plot commands
 %
-% PLOT_CMDS()
+% PLOT_COMMANDS()
 
 		% plot commands
 	s = { ...

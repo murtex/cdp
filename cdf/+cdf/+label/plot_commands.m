@@ -1,7 +1,7 @@
-function plot_cmds( labmode )
+function plot_commands( labmode )
 % plot commands
 %
-% PLOT_CMDS( labmode )
+% PLOT_COMMANDS( labmode )
 %
 % INPUT
 % labmode : labeling mode [activity | landmarks | formants] (row char)
