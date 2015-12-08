@@ -82,11 +82,11 @@ function label( indir, outdir, ids, labmode, logfile )
 			% labeling
 		switch labmode
 			case 'activity'
-				cdf.label_activity( run, cfg );
+				cdf.label.activity( run, cfg );
 			case 'landmarks'
-				cdf.label_landmarks( run, cfg );
+				cdf.label.landmarks( run, cfg );
 			case 'formants'
-				cdf.label_formants( run, cfg );
+				cdf.label.formants( run, cfg );
 			otherwise
 				error( 'invalid argument: labmode' );
 		end

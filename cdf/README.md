@@ -18,9 +18,9 @@ Cue-distractor framework
 
 ##### Manual labeling
 
-- `cdf.label_activity` -- activity labeling tool
-- `cdf.label_landmarks` -- landmarks labeling tool
-- `cdf.label_formants` -- formants labeling tool
+- `cdf.label.activity` -- activity labeling tool
+- `cdf.label.landmarks` -- landmarks labeling tool
+- `cdf.label.formants` -- formants labeling tool
 
 ##### Auditing
 
