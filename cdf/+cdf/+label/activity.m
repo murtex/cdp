@@ -188,7 +188,6 @@ function label_activity( run, cfg )
 			% prepare data
 		trial = trials(itrial);
 		resplab = trial.resplab;
-		respdet = trial.respdet;
 
 		respr = dsp.sec2smp( resplab.range, run.audiorate ) + [1, 0]; % ranges
 		fresp = ~any( isnan( respr ) );

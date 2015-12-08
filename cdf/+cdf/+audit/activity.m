@@ -74,8 +74,6 @@ function audit_activity( run, cfg )
 
 			% prepare data
 		trial = trials(itrial);
-		resplab = trial.resplab;
-		respdet = trial.respdet;
 
 			% plot
 		clf( fig );

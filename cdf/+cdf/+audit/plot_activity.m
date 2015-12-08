@@ -39,13 +39,13 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 		% helpers
 	style = xis.hStyle.instance();
 
-	function ts = scale( ts )
+	function ts = scale( ts ) % log scale
 		if flags(1)
 			ts = mag2db( abs( ts ) + eps );
 		end
 	end
 
-	function plot_range( yl )
+	function plot_marks( yl, flegend ) % activity range
 		h1 = plot( (resplab.range(1) * [1, 1] - trial.range(1)) * 1000, yl, ... % manual
 			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'warm', +1 ), ...
@@ -66,7 +66,7 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 	end
 
-	function plot_signal( r, ts )
+	function plot_signal( r, ts ) % signal
 		stairs( ...
 			(dsp.smp2sec( (r(1):r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( [ts; ts(end)] ), ...
 			'ButtonDownFcn', callback, ...
@@ -104,17 +104,17 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 	end
 
 	if ~flags(1) % linear axes
-		ovryl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 ); % overview
+		ovryl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 
-		if ~isempty( det1ts ) || ~isempty( det2ts ) % details
+		if ~isempty( det1ts ) || ~isempty( det2ts )
 			detyl = max( abs( cat( 1, det1ts, det2ts ) ) ) * [-1, 1] * style.scale( 1/2 );
 		end
 
 	else % log axes
-		ovryl = [min( scale( ovrts ) ), max( scale( ovrts ) )]; % overview
+		ovryl = [min( scale( ovrts ) ), max( scale( ovrts ) )];
 		ovryl(2) = ovryl(1) + diff( ovryl ) * (1 + (style.scale( 1/2 ) - 1) / 2);
 
-		if ~isempty( det1ts ) || ~isempty( det2ts ) % details
+		if ~isempty( det1ts ) || ~isempty( det2ts )
 			detyl = [min( scale( cat( 1, det1ts, det2ts ) ) ), max( scale( cat( 1, det1ts, det2ts ) ) )];
 			detyl(2) = detyl(1) + diff( detyl ) * (1 + (style.scale( 1/2 ) - 1) / 2);
 		end
@@ -130,7 +130,7 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 	xlim( (trial.range - trial.range(1)) * 1000 );
 	ylim( ovryl );
 
-	plot_range( ovryl );
+	plot_marks( ovryl );
 	plot_signal( ovrr, ovrts );
 
 		% plot detail #1 (activity start)
@@ -146,7 +146,7 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 			max( resplab.range(1), respdet.range(1) ) + cfg.activity_det1(2)] - trial.range(1)) * 1000 );
 		ylim( detyl );
 
-		plot_range( detyl );
+		plot_marks( detyl );
 		plot_signal( det1r, det1ts );
 	end
 
@@ -163,7 +163,7 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 			max( resplab.range(2), respdet.range(2) ) + cfg.activity_det2(2)] - trial.range(1)) * 1000 );
 		ylim( detyl );
 
-		plot_range( detyl );
+		plot_marks( detyl );
 		plot_signal( det2r, det2ts );
 	end
 
