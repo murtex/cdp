@@ -62,7 +62,7 @@ function activity( indir, outdir, ids, logfile )
 		proc.read_audio( run, run.audiofile ); % audio data
 
 			% detect activity, TODO
-		cdf.activity( run, cfg );
+		cdf.detect.activity( run, cfg );
 
 			% write data
 		cdffile = fullfile( outdir, sprintf( 'run_%d.mat', id ) ); % cdf data

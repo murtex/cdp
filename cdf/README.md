@@ -22,6 +22,12 @@ Cue-distractor framework
 - `cdf.label.landmarks` -- landmarks labeling tool
 - `cdf.label.formants` -- formants labeling tool
 
+##### Label detection
+
+- `cdf.detect.activity` -- activity detection
+- `cdf.detect.landmarks` -- landmarks detection
+- `cdf.detect.formants` -- formants detection
+
 ##### Auditing
 
 - `cdf.audit.activity` -- activity auditing tool
