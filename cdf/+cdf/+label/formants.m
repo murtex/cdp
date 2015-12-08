@@ -365,7 +365,7 @@ function label_formants( run, cfg )
 		plot_formants( trial ); % formants
 
 		cdf.audit.plot_info( trial, false ); % label info and commands
-		cdf.label.plot_cmds( 'formants' );
+		cdf.label.plot_commands( 'formants' );
 
 			% wait for figure update
 		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change

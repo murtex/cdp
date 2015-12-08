@@ -350,7 +350,7 @@ function label_activity( run, cfg )
 		end
 
 		cdf.audit.plot_info( trial, false ); % label info and commands
-		cdf.label.plot_cmds( 'activity' );
+		cdf.label.plot_commands( 'activity' );
 
 			% wait for figure update
 		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change

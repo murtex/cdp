@@ -258,7 +258,7 @@ function audit_activity( run, cfg )
 		end
 
 		cdf.audit.plot_info( trial, true ); % label info and commands
-		cdf.audit.plot_cmds();
+		cdf.audit.plot_commands();
 
 			% wait for figure update
 		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change

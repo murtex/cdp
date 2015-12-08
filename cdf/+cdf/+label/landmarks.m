@@ -441,7 +441,7 @@ function label_landmarks( run, cfg )
 		end
 
 		cdf.audit.plot_info( trial, false ); % label info and commands
-		cdf.label.plot_cmds( 'landmarks' );
+		cdf.label.plot_commands( 'landmarks' );
 
 			% wait for figure update
 		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change
