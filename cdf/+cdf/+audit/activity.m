@@ -115,6 +115,10 @@ function audit_activity( run, cfg )
 							fig_update();
 						end
 
+					case 'tab' % detection view
+						fdet = ~fdet;
+						fig_update();
+
 					case 'escape' % quit
 						if nmods == 0
 							fdone = true;
@@ -126,6 +130,7 @@ function audit_activity( run, cfg )
 			case 'close'
 				fdone = true;
 				delete( fig );
+
 		end
 	end
 
@@ -157,6 +162,7 @@ function audit_activity( run, cfg )
 
 	fdone = false; % init flags
 	flog = false;
+	fdet = false;
 
 	while ~fdone
 
@@ -301,6 +307,8 @@ function audit_activity( run, cfg )
 			'RETURN: playback audio', ...
 			'', ...
 			'D: toggle decibel scale', ...
+			'', ...
+			'TAB: toggle detection view', ...
 			'', ...
 			'ESCAPE: quit' };
 

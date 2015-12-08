@@ -71,11 +71,11 @@ function audit( indir, ids, audmode, logfile )
 			% auditing
 		switch audmode
 			case 'activity'
-				cdf.audit_activity( run, cfg );
+				cdf.audit.activity( run, cfg );
 			case 'landmarks'
-				cdf.audit_landmarks( run, cfg );
+				cdf.audit.landmarks( run, cfg );
 			case 'formants'
-				cdf.audit_formants( run, cfg );
+				cdf.audit.formants( run, cfg );
 			otherwise
 				error( 'invalid argument: audmode' );
 		end
