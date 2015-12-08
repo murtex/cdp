@@ -17,6 +17,8 @@ function plot_info( trial, fdet )
 	end
 
 		% plot label information
+	style = xis.hStyle.instance();
+
 	s = { ...
 		'MANUAL LABELS', ...
 		'', ...
@@ -32,7 +34,8 @@ function plot_info( trial, fdet )
 		sprintf( 'F2 onset: [%.1f, %.1f]', (trial.resplab.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
 		sprintf( 'F3 onset: [%.1f, %.1f]', (trial.resplab.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
 
-	annotation( 'textbox', [0/3, 0, 1/3, 1/4], 'String', s );
+	annotation( 'textbox', [0/3, 0, 1/3, 1/4], 'String', s, ...
+		'BackgroundColor', style.color( 'grey', style.scale( -1/9 ) ) );
 
 	if fdet % detected labels
 		s = { ...
@@ -50,7 +53,8 @@ function plot_info( trial, fdet )
 			sprintf( 'F2 onset: [%.1f, %.1f]', (trial.respdet.f2 - [trial.range(1), 0]) .* [1000, 1] ), ...
 			sprintf( 'F3 onset: [%.1f, %.1f]', (trial.respdet.f3 - [trial.range(1), 0]) .* [1000, 1] ) };
 
-		annotation( 'textbox', [1/3, 0, 1/3, 1/4], 'String', s );
+		annotation( 'textbox', [1/3, 0, 1/3, 1/4], 'String', s, ...
+			'BackgroundColor', style.color( 'grey', style.scale( -1/9 ) ) );
 	end
 
 end

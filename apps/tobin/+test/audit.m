@@ -32,19 +32,19 @@ function audit( indir, ids, audmode, logfile )
 
 	cfg = cdf.hConfig(); % configure framework
 
-	cfg.aud_activity_det1 = [-0.025, 0.05];
-	cfg.aud_activity_det2 = [-0.05, 0.025];
+	cfg.activity_det1 = [-0.025, 0.05];
+	cfg.activity_det2 = [-0.05, 0.025];
 
-	cfg.aud_landmarks_det1 = [-0.003, 0.006];
-	cfg.aud_landmarks_det2 = [-0.015, 0.030];
-	cfg.aud_landmarks_det3 = [-0.030, 0.015];
+	cfg.landmarks_det1 = [-0.003, 0.006];
+	cfg.landmarks_det2 = [-0.015, 0.030];
+	cfg.landmarks_det3 = [-0.030, 0.015];
 
-	cfg.aud_formants_f0_window = {@hamming, 0.075, 95/100};
-	cfg.aud_formants_f0_freqband = [0, 500, 100];
-	cfg.aud_formants_f0_gamma = 0.15;
-	cfg.aud_formants_fx_window = {@hamming, 0.005, 95/100};
-	cfg.aud_formants_fx_freqband = [0, 5000, 100];
-	cfg.aud_formants_fx_gamma = 0.15;
+	cfg.formants_f0_window = {@hamming, 0.075, 95/100};
+	cfg.formants_f0_freqband = [0, 500, 100];
+	cfg.formants_f0_gamma = 0.15;
+	cfg.formants_fx_window = {@hamming, 0.005, 95/100};
+	cfg.formants_fx_freqband = [0, 5000, 100];
+	cfg.formants_fx_gamma = 0.15;
 
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'auditing tool...' );

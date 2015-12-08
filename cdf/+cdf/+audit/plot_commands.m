@@ -1,11 +1,21 @@
-function plot_commands()
-% plot commands
+function plot_commands( fdet )
+% plot general commands
 %
-% PLOT_COMMANDS()
+% PLOT_COMMANDS( fdet )
+%
+% INPUT
+% fdet : detected labels flag (scalar logical)
 
-		% plot commands
+		% safeguard
+	if nargin < 1 || ~isscalar( fdet ) || ~islogical( fdet )
+		error( 'invalid argument: fdet' );
+	end
+
+		% plot general commands
+	style = xis.hStyle.instance();
+
 	s = { ...
-		'COMMANDS', ...
+		'GENERAL COMMANDS', ...
 		'', ...
 		'PAGEDOWN/UP: +/- 1 trial' ...
 		'SHIFT+PAGEDOWN/UP: +/- 10 trials', ...
@@ -14,11 +24,17 @@ function plot_commands()
 		'', ...
 		'RETURN: playback audio', ...
 		'', ...
-		'D: toggle decibel scale', ...
+		'S: toggle decibel scale', ...
 		'', ...
 		'ESCAPE: quit' };
 
-	annotation( 'textbox', [2/3, 0, 1/3, 1/4], 'String', s );
+	pos = 1/3;
+	if fdet
+		pos = 2/3;
+	end
+
+	annotation( 'textbox', [pos, 0, 1/3, 1/4], 'String', s, ...
+		'BackgroundColor', style.color( 'grey', style.scale( -1/9 ) ) );
 
 end
 
