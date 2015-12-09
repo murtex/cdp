@@ -155,15 +155,15 @@ function label_formants( run, cfg )
 					case 'f' % formants setting
 						if nmods == 0
 							[x, y] = ginput( 3 );
-							if numel( y ) > 0 && y(1) >= cfg.lab_formants_fx_freqband(1) && y(1) <= cfg.lab_formants_fx_freqband(2)
+							if numel( y ) > 0 && y(1) >= cfg.formants_fx_freqband(1) && y(1) <= cfg.formants_fx_freqband(2)
 								resplab.f1(1) = trial.range(1) + x(1) / 1000;
 								resplab.f1(2) = y(1);
 							end
-							if numel( y ) > 1 && y(2) >= cfg.lab_formants_fx_freqband(1) && y(2) <= cfg.lab_formants_fx_freqband(2)
+							if numel( y ) > 1 && y(2) >= cfg.formants_fx_freqband(1) && y(2) <= cfg.formants_fx_freqband(2)
 								resplab.f2(1) = trial.range(1) + x(2) / 1000;
 								resplab.f2(2) = y(2);
 							end
-							if numel( y ) > 2 && y(3) >= cfg.lab_formants_fx_freqband(1) && y(3) <= cfg.lab_formants_fx_freqband(2)
+							if numel( y ) > 2 && y(3) >= cfg.formants_fx_freqband(1) && y(3) <= cfg.formants_fx_freqband(2)
 								resplab.f3(1) = trial.range(1) + x(3) / 1000;
 								resplab.f3(2) = y(3);
 							end
@@ -172,7 +172,7 @@ function label_formants( run, cfg )
 					case '1'
 						if nmods == 0
 							[x, y] = ginput( 1 );
-							if numel( y ) > 0 && y(1) >= cfg.lab_formants_fx_freqband(1) && y(1) <= cfg.lab_formants_fx_freqband(2)
+							if numel( y ) > 0 && y(1) >= cfg.formants_fx_freqband(1) && y(1) <= cfg.formants_fx_freqband(2)
 								resplab.f1(1) = trial.range(1) + x(1) / 1000;
 								resplab.f1(2) = y(1);
 							end
@@ -181,7 +181,7 @@ function label_formants( run, cfg )
 					case '2'
 						if nmods == 0
 							[x, y] = ginput( 1 );
-							if numel( y ) > 0 && y(1) >= cfg.lab_formants_fx_freqband(1) && y(1) <= cfg.lab_formants_fx_freqband(2)
+							if numel( y ) > 0 && y(1) >= cfg.formants_fx_freqband(1) && y(1) <= cfg.formants_fx_freqband(2)
 								resplab.f2(1) = trial.range(1) + x(1) / 1000;
 								resplab.f2(2) = y(1);
 							end
@@ -190,7 +190,7 @@ function label_formants( run, cfg )
 					case '3'
 						if nmods == 0
 							[x, y] = ginput( 1 );
-							if numel( y ) > 0 && y(1) >= cfg.lab_formants_fx_freqband(1) && y(1) <= cfg.lab_formants_fx_freqband(2)
+							if numel( y ) > 0 && y(1) >= cfg.formants_fx_freqband(1) && y(1) <= cfg.formants_fx_freqband(2)
 								resplab.f3(1) = trial.range(1) + x(1) / 1000;
 								resplab.f3(2) = y(1);
 							end
@@ -249,7 +249,7 @@ function label_formants( run, cfg )
 				switch get( fig, 'SelectionType' )
 					case 'normal' % f0 setting
 						cp = get( src, 'CurrentPoint' );
-						if cp(3) >= cfg.lab_formants_f0_freqband(1) && cp(3) <= cfg.lab_formants_f0_freqband(2)
+						if cp(3) >= cfg.formants_f0_freqband(1) && cp(3) <= cfg.formants_f0_freqband(2)
 							resplab.f0(1) = trial.range(1) + cp(1) / 1000;
 							resplab.f0(2) = cp(3);
 							fig_update( false );
@@ -312,19 +312,19 @@ function label_formants( run, cfg )
 		if frecomp % transforms
 
 			[ovr_stft1, ovr_stft1_times, ovr_stft1_freqs] = dsp.stftransf( ovrts, run.audiorate, ... % f1..f3
-				cfg.lab_formants_fx_freqband, cfg.lab_formants_fx_window );
+				cfg.formants_fx_freqband, cfg.formants_fx_window );
 			ovr_stft1 = ovr_stft1 .* conj( ovr_stft1 );
 			ovr_stft1_times = (resplab.range(1) + ovr_stft1_times - trial.range(1)) * 1000;
 
 			[ovr_stft2, ovr_stft2_times, ovr_stft2_freqs] = dsp.stftransf( ovrts, run.audiorate, ... % f0
-				cfg.lab_formants_f0_freqband, cfg.lab_formants_f0_window );
+				cfg.formants_f0_freqband, cfg.formants_f0_window );
 			ovr_stft2 = ovr_stft2 .* conj( ovr_stft2 );
 			ovr_stft2_times = (resplab.range(1) + ovr_stft2_times - trial.range(1)) * 1000;
 
 			if fblend
-				[ovr_stft1, ovr_stft1_times] = blend( ovr_stft1, ovrts, run.audiorate, cfg.lab_formants_fx_window ); % f1..f3
+				[ovr_stft1, ovr_stft1_times] = blend( ovr_stft1, ovrts, run.audiorate, cfg.formants_fx_window ); % f1..f3
 				ovr_stft1_times = (resplab.range(1) + ovr_stft1_times - trial.range(1)) * 1000;
-				[ovr_stft2, ovr_stft2_times] = blend( ovr_stft2, ovrts, run.audiorate, cfg.lab_formants_f0_window ); % f0
+				[ovr_stft2, ovr_stft2_times] = blend( ovr_stft2, ovrts, run.audiorate, cfg.formants_f0_window ); % f0
 				ovr_stft2_times = (resplab.range(1) + ovr_stft2_times - trial.range(1)) * 1000;
 			end
 		end
@@ -343,10 +343,10 @@ function label_formants( run, cfg )
 		ylabel( 'frequency in hertz' );
 
 		xlim( (resplab.range - trial.range(1)) * 1000 );
-		ylim( cfg.lab_formants_fx_freqband(1:2) );
+		ylim( cfg.formants_fx_freqband(1:2) );
 
 		colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) ); % signal
-		imagesc( ovr_stft1_times, ovr_stft1_freqs, scale( ovr_stft1 .^ cfg.lab_formants_fx_gamma, flog ), ...
+		imagesc( ovr_stft1_times, ovr_stft1_freqs, scale( ovr_stft1 .^ cfg.formants_fx_gamma, flog ), ...
 			'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
 
 		plot_formants( trial ); % formants
@@ -356,16 +356,16 @@ function label_formants( run, cfg )
 		ylabel( 'frequency in hertz' );
 
 		xlim( (resplab.range - trial.range(1)) * 1000 );
-		ylim( cfg.lab_formants_f0_freqband(1:2) );
+		ylim( cfg.formants_f0_freqband(1:2) );
 
 		colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) ); % signal
-		imagesc( ovr_stft2_times, ovr_stft2_freqs, scale( ovr_stft2 .^ cfg.lab_formants_f0_gamma, flog ), ...
+		imagesc( ovr_stft2_times, ovr_stft2_freqs, scale( ovr_stft2 .^ cfg.formants_f0_gamma, flog ), ...
 			'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
 
 		plot_formants( trial ); % formants
 
-		cdf.audit.plot_info( trial, false ); % label info and commands
-		cdf.label.plot_commands( 'formants' );
+		cdf.audit.plot_info( trial, false ); % info and commands
+		cdf.audit.plot_commands( false );
 
 			% wait for figure update
 		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change

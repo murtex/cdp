@@ -71,8 +71,6 @@ function audit_activity( run, cfg )
 	flog = false;
 
 	while ~fdone
-
-			% prepare data
 		trial = trials(itrial);
 
 			% plot

@@ -1,4 +1,4 @@
-function plot_activity( run, cfg, trial, flags, stitle, callback )
+function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 % plot activity
 %
 % PLOT_ACTIVITY( run, cfg, trial, flags, stitle, callback )
@@ -10,6 +10,9 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 % flags : flags [log] (vector logical)
 % stitle : title string (row char)
 % callback : button down event dispatcher [function, argument] (vector cell)
+%
+% OUTPUT
+% ovrts : overview signal (column numeric)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
@@ -45,7 +48,7 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 		end
 	end
 
-	function plot_marks( yl, flegend ) % activity range
+	function plot_marker( yl, flegend ) % activity range
 		h1 = plot( (resplab.range(1) * [1, 1] - trial.range(1)) * 1000, yl, ... % manual
 			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'warm', +1 ), ...
@@ -62,8 +65,10 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'signal', +1 ) );
 
-		hl = legend( [h1, h2], 'Location', 'southeast' ); % legend
-		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
+		if flegend % legend
+			hl = legend( [h1, h2], 'Location', 'southeast' );
+			set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
+		end
 	end
 
 	function plot_signal( r, ts ) % signal
@@ -130,7 +135,7 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 	xlim( (trial.range - trial.range(1)) * 1000 );
 	ylim( ovryl );
 
-	plot_marks( ovryl );
+	plot_marker( ovryl, true );
 	plot_signal( ovrr, ovrts );
 
 		% plot detail #1 (activity start)
@@ -146,7 +151,7 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 			max( resplab.range(1), respdet.range(1) ) + cfg.activity_det1(2)] - trial.range(1)) * 1000 );
 		ylim( detyl );
 
-		plot_marks( detyl );
+		plot_marker( detyl, false );
 		plot_signal( det1r, det1ts );
 	end
 
@@ -163,7 +168,7 @@ function plot_activity( run, cfg, trial, flags, stitle, callback )
 			max( resplab.range(2), respdet.range(2) ) + cfg.activity_det2(2)] - trial.range(1)) * 1000 );
 		ylim( detyl );
 
-		plot_marks( detyl );
+		plot_marker( detyl, false );
 		plot_signal( det2r, det2ts );
 	end
 

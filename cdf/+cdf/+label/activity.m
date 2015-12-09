@@ -103,8 +103,11 @@ function label_activity( run, cfg )
 						end
 
 					case 'return' % playback
-						if nmods == 1 && strcmp( event.Modifier, 'shift' ) && fresp
-							soundsc( respts, run.audiorate );
+						if nmods == 1 && strcmp( event.Modifier, 'shift' )
+							respr = dsp.sec2smp( resplab.range, run.audiorate ) + [1, 0];
+							if ~any( isnan( respr ) )
+								soundsc( run.audiodata(respr(1):respr(2), 1), run.audiorate );
+							end
 						end
 
 					case 'k' % class setting
@@ -141,19 +144,15 @@ function label_activity( run, cfg )
 					src = get( src, 'Parent' );
 				end
 
-				cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000; % activity setting
+				cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000; % activity adjustment
 				switch get( fig, 'SelectionType' )
 					case 'normal'
 						if cp(1) >= trial.range(1) && cp(2) <= trial.range(2)
-							ovrr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0];
-							ovrts = run.audiodata(ovrr(1):ovrr(2), 1);
 							resplab.range(1) = snap( ovrts, trial.range(1), cp(1), cfg.activity_zcsnap(1) );
 							cdf.audit.disp_update( fig );
 						end
 					case 'alt'
 						if cp(1) >= trial.range(1) && cp(2) <= trial.range(2)
-							ovrr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0];
-							ovrts = run.audiodata(ovrr(1):ovrr(2), 1);
 							resplab.range(2) = snap( ovrts, trial.range(1), cp(1), cfg.activity_zcsnap(2) );
 							cdf.audit.disp_update( fig );
 						end
@@ -184,18 +183,8 @@ function label_activity( run, cfg )
 	flog = false;
 
 	while ~fdone
-
-			% prepare data
 		trial = trials(itrial);
 		resplab = trial.resplab;
-
-		respr = dsp.sec2smp( resplab.range, run.audiorate ) + [1, 0]; % ranges
-		fresp = ~any( isnan( respr ) );
-
-		respts = []; % signals
-		if fresp
-			respts = run.audiodata(respr(1):respr(2), 1);
-		end
 
 			% plot
 		clf( fig );
@@ -205,7 +194,7 @@ function label_activity( run, cfg )
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
-		cdf.audit.plot_activity( ... % overview and details
+		ovrts = cdf.audit.plot_activity( ... % overview and details
 			run, cfg, trial, [flog], ...
 			sprintf( 'LABEL_ACTIVITY (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );

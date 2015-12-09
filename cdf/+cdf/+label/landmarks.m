@@ -25,10 +25,10 @@ function label_landmarks( run, cfg )
 	fig = style.figure( 'Visible', 'on' );
 	figcol = get( fig, 'Color' );
 
-	set( fig, 'WindowKeyPressFcn', {@fig_dispatch, 'keypress'} );
-	set( fig, 'CloseRequestFcn', {@fig_dispatch, 'close'} );
+	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
+	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
 
-		% helper functions
+		% helpers
 	function f = is_valid( trials )
 		f = false( size( trials ) );
 		for i = 1:numel( trials )
@@ -56,7 +56,6 @@ function label_landmarks( run, cfg )
 
 	function i = snap( ts, t0, i, align )
 		if align
-
 			zc = sign( ts ); % find zero crossings
 			zc(zc == 0) = 1;
 			zc = abs( diff( zc ) / 2 );
@@ -70,39 +69,25 @@ function label_landmarks( run, cfg )
 			d = zc - is;
 			d = d(find( abs( d ) == min( abs( d ) ), 1 )) + 1;
 			i = dsp.smp2sec( is + d - 1, run.audiorate ) + t0;
-
 		end
 	end
 
-	function ts = scale( ts, flog )
-		if flog
-			ts = mag2db( abs( ts ) + eps );
+		% event dispatcher
+	function disp_commands( src, event, type )
+
+			% default callback
+		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
+			run, cfg, trial, [false, fdone, flog], ...
+			itrial, ntrials );
+
+		fdone = flags(2);
+		flog = flags(3);
+
+		if flags(1) % processed
+			return;
 		end
-	end
 
-	function plot_landmarks( trial, yl )
-		plot( (trial.resplab.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % manual
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-			'Color', style.color( 'signal', +1 ) );
-		plot( (trial.resplab.vo * [1, 1] - trial.range(1)) * 1000, yl, ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-			'Color', style.color( 'signal', +1 ) );
-		plot( (trial.resplab.vr * [1, 1] - trial.range(1)) * 1000, yl, ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-			'Color', style.color( 'signal', +1 ) );
-		plot( (trial.respdet.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % automatic, TODO: remove later!
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-			'Color', style.color( 'warm', +1 ) );
-		plot( (trial.respdet.vo * [1, 1] - trial.range(1)) * 1000, yl, ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-			'Color', style.color( 'warm', +1 ) );
-		plot( (trial.respdet.vr * [1, 1] - trial.range(1)) * 1000, yl, ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-			'Color', style.color( 'warm', +1 ) );
-	end
-
-		% event dispatching
-	function fig_dispatch( src, event, type )
+			% mode callback
 		switch type
 
 				% key presses
@@ -111,44 +96,18 @@ function label_landmarks( run, cfg )
 
 				switch event.Key
 
-					case 'space' % browsing
+					case 'space' % trial browsing
 						if nmods == 0
 							itrial = next_unlabeled( trials, itrial );
-							fig_update();
+							cdf.audit.disp_update( fig );
 						end
 
-					case 'pagedown'
-						if nmods < 2 && itrial ~= ntrials
-							step = 1;
-							if strcmp( event.Modifier, 'shift' )
-								step = 10;
-							elseif strcmp( event.Modifier, 'control' )
-								step = 100;
+					case 'return' % playback
+						if nmods == 1 && strcmp( event.Modifier, 'shift' )
+							respr = dsp.sec2smp( [resplab.bo, resplab.range(2)], run.audiorate ) + [1, 0];
+							if ~any( isnan( respr ) )
+								soundsc( run.audiodata(respr(1):respr(2), 1), run.audiorate );
 							end
-							itrial = min( itrial + step, ntrials );
-							fig_update();
-						end
-					case 'pageup'
-						if nmods < 2 && itrial ~= 1
-							step = 1;
-							if strcmp( event.Modifier, 'shift' )
-								step = 10;
-							elseif strcmp( event.Modifier, 'control' )
-								step = 100;
-							end
-							itrial = max( itrial - step, 1 );
-							fig_update();
-						end
-
-					case 'home'
-						if nmods == 0 && itrial ~= 1
-							itrial = 1;
-							fig_update();
-						end
-					case 'end'
-						if nmods == 0 && itrial ~= ntrials
-							itrial = ntrials;
-							fig_update();
 						end
 
 					case 'l' % landmarks setting
@@ -166,7 +125,7 @@ function label_landmarks( run, cfg )
 								resplab.vr = x(3);
 							end
 
-							fig_update();
+							cdf.audit.disp_update( fig );
 						end
 					case 'b'
 						if nmods == 0
@@ -177,7 +136,7 @@ function label_landmarks( run, cfg )
 								resplab.bo = x(1);
 							end
 
-							fig_update();
+							cdf.audit.disp_update( fig );
 						end
 					case 'v'
 						if nmods == 0
@@ -188,7 +147,7 @@ function label_landmarks( run, cfg )
 								resplab.vo = x(1);
 							end
 
-							fig_update();
+							cdf.audit.disp_update( fig );
 						end
 					case 'r'
 						if nmods == 0
@@ -199,20 +158,7 @@ function label_landmarks( run, cfg )
 								resplab.vr = x(1);
 							end
 
-							fig_update();
-						end
-
-					case 'return' % playback
-						if nmods == 0
-							soundsc( ovrts, run.audiorate );
-						elseif nmods == 1 && strcmp( event.Modifier, 'shift' ) && fresp
-							soundsc( respts, run.audiorate );
-						end
-
-					case 'd' % decibel scale
-						if nmods == 0
-							flog = ~flog;
-							fig_update();
+							cdf.audit.disp_update( fig );
 						end
 
 					case 'backspace' % clearing
@@ -220,7 +166,7 @@ function label_landmarks( run, cfg )
 							resplab.bo = NaN;
 							resplab.vo = NaN;
 							resplab.vr = NaN;
-							fig_update();
+							cdf.audit.disp_update( fig );
 						elseif nmods == 3 && any( strcmp( event.Modifier, 'shift' ) ) ... % clear run (valids only)
 								&& any( strcmp( event.Modifier, 'control' ) )  && any( strcmp( event.Modifier, 'alt' ) )
 							for i = 1:ntrials
@@ -229,14 +175,9 @@ function label_landmarks( run, cfg )
 								trials(i).resplab.vr = NaN;
 							end
 							itrial = 1;
-							fig_update();
+							cdf.audit.disp_update( fig );
 						end
 
-					case 'escape' % quit
-						if nmods == 0
-							fdone = true;
-							fig_update();
-						end
 				end
 
 				% button presses
@@ -245,42 +186,28 @@ function label_landmarks( run, cfg )
 					src = get( src, 'Parent' );
 				end
 
+				cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000;
 				switch get( fig, 'SelectionType' ) % landmarks adjustment
 					case 'normal'
-						cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000;
-
 						switch src
 							case hdet1
 								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
-									resplab.bo = snap( ovrts, resplab.range(1), cp(1), cfg.lab_landmarks_zcsnap(1) );
-									fig_update();
+									resplab.bo = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(1) );
+									cdf.audit.disp_update( fig );
 								end
 							case hdet2
 								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
-									resplab.vo = snap( ovrts, resplab.range(1), cp(1), cfg.lab_landmarks_zcsnap(2) );
-									fig_update();
+									resplab.vo = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(2) );
+									cdf.audit.disp_update( fig );
 								end
 							case hdet3
 								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
-									resplab.vr = snap( ovrts, resplab.range(1), cp(1), cfg.lab_landmarks_zcsnap(3) );
-									fig_update();
+									resplab.vr = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(3) );
+									cdf.audit.disp_update( fig );
 								end
 						end
 				end
 
-				% figure closing
-			case 'close'
-				fdone = true;
-				delete( fig );
-		end
-	end
-
-	function fig_update()
-		switch get( fig, 'Clipping' ) % flip (unused) clipping property
-			case 'on'
-				set( fig, 'Clipping', 'off' );
-			case 'off'
-				set( fig, 'Clipping', 'on' );
 		end
 	end
 
@@ -306,61 +233,8 @@ function label_landmarks( run, cfg )
 	flog = false;
 
 	while ~fdone
-
-			% prepare data
 		trial = trials(itrial);
 		resplab = trial.resplab;
-
-		ovrr = dsp.sec2smp( resplab.range, run.audiorate ) + [1, 0]; % ranges
-
-		respr = dsp.sec2smp( [resplab.bo, resplab.range(2)], run.audiorate ) + [1, 0];
-		fresp = ~any( isnan( respr ) );
-
-		det1r = dsp.sec2smp( resplab.bo + cfg.lab_landmarks_det1, run.audiorate ) + [1, 0];
-		det1r(det1r < 1) = 1;
-		det1r(det1r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
-		fdet1 = ~any( isnan( det1r ) );
-
-		det2r = dsp.sec2smp( resplab.vo + cfg.lab_landmarks_det2, run.audiorate ) + [1, 0];
-		det2r(det2r < 1) = 1;
-		det2r(det2r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
-		fdet2 = ~any( isnan( det2r ) );
-
-		det3r = dsp.sec2smp( resplab.vr + cfg.lab_landmarks_det3, run.audiorate ) + [1, 0];
-		det3r(det3r < 1) = 1;
-		det3r(det3r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
-		fdet3 = ~any( isnan( det3r ) );
-
-		ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
-		dc = mean( ovrts );
-		ovrts = ovrts - dc;
-
-		respts = [];
-		if fresp
-			respts = run.audiodata(respr(1):respr(2), 1) - dc;
-		end
-
-		det1ts = [];
-		if fdet1
-			det1ts = run.audiodata(det1r(1):det1r(2), 1) - dc;
-		end
-
-		det2ts = [];
-		if fdet2
-			det2ts = run.audiodata(det2r(1):det2r(2), 1) - dc;
-		end
-
-		det3ts = [];
-		if fdet3
-			det3ts = run.audiodata(det3r(1):det3r(2), 1) - dc;
-		end
-
-		if ~flog % axes
-			yl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
-		else
-			yl = [min( scale( ovrts, flog ) ), max( scale( ovrts, flog ) )];
-			yl(2) = yl(1) + diff( yl ) * (1 + (style.scale( 1/2 ) - 1) / 2);
-		end
 
 			% plot
 		clf( fig );
@@ -370,77 +244,13 @@ function label_landmarks( run, cfg )
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
-		hovr = subplot( 4, 3, [1, 3], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % overview
-		title( sprintf( 'LABEL_LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ) );
-		xlabel( 'trial time in milliseconds' );
-		ylabel( 'landmarks' );
+		[ovrts, hdet1, hdet2, hdet3] = cdf.audit.plot_landmarks( ... % overview and details
+			run, cfg, trial, [flog], ...
+			sprintf( 'LABEL_LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
+			{@disp_commands, 'buttondown'} );
 
-		xlim( (resplab.range - trial.range(1)) * 1000 );
-		ylim( yl );
-
-		plot_landmarks( trial, yl ); % landmarks
-
-		stairs( ... % signal
-			(dsp.smp2sec( (ovrr(1):ovrr(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-			scale( [ovrts; ovrts(end)], flog ), ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-			'Color', style.color( 'cold', -1 ) );
-
-		hdet1 = NaN; % detail #1 (burst onset)
-		if fdet1
-			hdet1 = subplot( 4, 3, [4, 7], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-			xlabel( 'trial time in milliseconds' );
-			ylabel( 'burst onset detail' );
-
-			xlim( (resplab.bo + cfg.lab_landmarks_det1 - trial.range(1)) * 1000 );
-			ylim( yl );
-
-			plot_landmarks( trial, yl ); % landmarks
-
-			stairs( ... % signal
-				(dsp.smp2sec( (det1r(1):det1r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-				scale( [det1ts; det1ts(end)], flog ), ...
-				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-				'Color', style.color( 'cold', -1 ) );
-		end
-
-		hdet2 = NaN; % detail #2 (voice onset)
-		if fdet2
-			hdet2 = subplot( 4, 3, [5, 8], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-			xlabel( 'trial time in milliseconds' );
-			ylabel( 'voice onset detail' );
-
-			xlim( (resplab.vo + cfg.lab_landmarks_det2 - trial.range(1)) * 1000 );
-			ylim( yl );
-
-			plot_landmarks( trial, yl ); % landmarks
-
-			stairs( ... % signal
-				(dsp.smp2sec( (det2r(1):det2r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-				scale( [det2ts; det2ts(end)], flog ), ...
-				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-				'Color', style.color( 'cold', -1 ) );
-		end
-
-		hdet3 = NaN; % detail #3 (voice release)
-		if fdet3
-			hdet3 = subplot( 4, 3, [6, 9], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-			xlabel( 'trial time in milliseconds' );
-			ylabel( 'voice release detail' );
-
-			xlim( (resplab.vr + cfg.lab_landmarks_det3 - trial.range(1)) * 1000 );
-			ylim( yl );
-
-			plot_landmarks( trial, yl ); % landmarks
-
-			stairs( ... % signal
-				(dsp.smp2sec( (det3r(1):det3r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, ...
-				scale( [det3ts; det3ts(end)], flog ), ...
-				'ButtonDownFcn', {@fig_dispatch, 'buttondown'}, ...
-				'Color', style.color( 'cold', -1 ) );
-		end
-
-		cdf.audit.plot_info( trial, false ); % label info and commands
+		cdf.audit.plot_info( trial, false ); % info and commands
+		cdf.audit.plot_commands( false );
 		cdf.label.plot_commands( 'landmarks' );
 
 			% wait for figure update
