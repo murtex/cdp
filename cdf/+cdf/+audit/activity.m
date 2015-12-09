@@ -85,8 +85,10 @@ function activity( run, cfg )
 			sprintf( 'ACTIVITY (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );
 
-		cdf.audit.plot_info( trial, true ); % info and commands
-		cdf.audit.plot_commands( true );
+		if ~fdet % info and commands
+			cdf.audit.plot_info( trial, true );
+			cdf.audit.plot_commands( true );
+		end
 
 			% wait for figure update
 		waitfor( fig, 'Clipping' ); % (unused) clipping property change

@@ -42,6 +42,11 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 		error( 'invalid argument: callback' );
 	end
 
+		% return with detection view
+	if flags(2)
+		return;
+	end
+
 		% helpers
 	style = xis.hStyle.instance();
 

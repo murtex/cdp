@@ -253,9 +253,11 @@ function landmarks( run, cfg )
 			sprintf( 'LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );
 
-		cdf.audit.plot_info( trial, false ); % info and commands
-		cdf.audit.plot_commands( false );
-		cdf.label.plot_commands( 'landmarks' );
+		if ~fdet % info and commands
+			cdf.audit.plot_info( trial, false );
+			cdf.audit.plot_commands( false );
+			cdf.label.plot_commands( 'landmarks' );
+		end
 
 			% wait for figure update
 		waitfor( fig, 'Clipping' ); % (unused) clipping property change

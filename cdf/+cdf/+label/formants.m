@@ -213,9 +213,11 @@ function formants( run, cfg )
 			sprintf( 'FORMANTS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );
 			
-		cdf.audit.plot_info( trial, false ); % info and commands
-		cdf.audit.plot_commands( false );
-		cdf.label.plot_commands( 'formants' );
+		if ~fdet % info and commands
+			cdf.audit.plot_info( trial, false );
+			cdf.audit.plot_commands( false );
+			cdf.label.plot_commands( 'formants' );
+		end
 
 			% wait for figure update
 		waitfor( fig, 'Clipping' ); % (unused) clipping property change

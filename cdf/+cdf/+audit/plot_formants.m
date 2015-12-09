@@ -36,6 +36,11 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 		error( 'invalid argument: callback' );
 	end
 
+		% return with detection view
+	if flags(2)
+		return;
+	end
+
 		% helpers
 	style = xis.hStyle.instance();
 
