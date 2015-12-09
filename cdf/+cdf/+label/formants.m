@@ -1,7 +1,7 @@
-function label_formants( run, cfg )
+function formants( run, cfg )
 % formants labeling tool
 %
-% LABEL_FORMANTS( run, cfg )
+% FORMANTS( run, cfg )
 % 
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -25,8 +25,8 @@ function label_formants( run, cfg )
 	fig = style.figure( 'Visible', 'on' );
 	figcol = get( fig, 'Color' );
 
-	set( fig, 'WindowKeyPressFcn', {@fig_dispatch, 'keypress'} );
-	set( fig, 'CloseRequestFcn', {@fig_dispatch, 'close'} );
+	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
+	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
 
 		% helper functions
 	function f = is_valid( trials )
@@ -55,55 +55,24 @@ function label_formants( run, cfg )
 		end
 	end
 
-	function [stft, times] = blend( stft, ts, rate, window )
-		wlen = dsp.sec2smp( window{2}, rate );
-		wovl = dsp.sec2smp( window{2} * window{3}, rate );
-		wstr = wlen - wovl;
+		% event dispatcher
+	function disp_commands( src, event, type )
 
-		stftp = stft;
-		stft = zeros( size( stft, 1 ), numel( ts ) );
-		hits = zeros( numel( ts ), 1 );
+			% default callback
+		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
+			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
+			itrial, ntrials );
 
-		nsegs = size( stftp, 2 );
-		for i = 1:nsegs
-			segstart = max( 1, (i-1)*wstr + 1 );
-			segstop = min( numel( ts ), (i-1)*wstr + wlen );
+		fdone = flags(2);
+		fredo = flags(3);
+		fdet = flags(4);
+		flog = flags(5);
 
-			stft(:, segstart:segstop) = stft(:, segstart:segstop) + repmat( stftp(:, i), 1, segstop-segstart+1 );
-			hits(segstart:segstop) = hits(segstart:segstop) + 1;
-			%hits(segstart:segstop) = hits(segstart:segstop) + triang( segstop-segstart+1 );
+		if flags(1) % fproc
+			return;
 		end
 
-		for i = 1:numel( ts )
-			stft(:, i) = stft(:, i) / hits(i);
-		end
-
-		times = dsp.smp2sec( 0:numel( ts )-1, rate );
-	end
-
-	function stft = scale( stft, flog )
-		if flog
-			stft = pow2db( stft + eps );
-		end
-	end
-
-	function plot_formants( trial )
-		scatter( (trial.resplab.f0(1) - trial.range(1)) * 1000, trial.resplab.f0(2), ...
-			'LineWidth', 2, 'MarkerEdgeColor', style.color( 'signal', +2 ), 'MarkerFaceColor', 'none', ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-		scatter( (trial.resplab.f1(1) - trial.range(1)) * 1000, trial.resplab.f1(2), ...
-			'MarkerEdgeColor', style.color( 'signal', +1 ), 'MarkerFaceColor', style.color( 'signal', +2 ), ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-		scatter( (trial.resplab.f2(1) - trial.range(1)) * 1000, trial.resplab.f2(2), ...
-			'MarkerEdgeColor', style.color( 'signal', +1 ), 'MarkerFaceColor', style.color( 'signal', +2 ), ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-		scatter( (trial.resplab.f3(1) - trial.range(1)) * 1000, trial.resplab.f3(2), ...
-			'MarkerEdgeColor', style.color( 'signal', +1 ), 'MarkerFaceColor', style.color( 'signal', +2 ), ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-	end
-
-		% event dispatching
-	function fig_dispatch( src, event, type )
+			% mode callback
 		switch type
 
 				% key presses
@@ -112,44 +81,10 @@ function label_formants( run, cfg )
 
 				switch event.Key
 
-					case 'space' % browsing
+					case 'space' % trial browsing
 						if nmods == 0
 							itrial = next_unlabeled( trials, itrial );
-							fig_update( true );
-						end
-
-					case 'pagedown'
-						if nmods < 2 && itrial ~= ntrials
-							step = 1;
-							if strcmp( event.Modifier, 'shift' )
-								step = 10;
-							elseif strcmp( event.Modifier, 'control' )
-								step = 100;
-							end
-							itrial = min( itrial + step, ntrials );
-							fig_update( true );
-						end
-					case 'pageup'
-						if nmods < 2 && itrial ~= 1
-							step = 1;
-							if strcmp( event.Modifier, 'shift' )
-								step = 10;
-							elseif strcmp( event.Modifier, 'control' )
-								step = 100;
-							end
-							itrial = max( itrial - step, 1 );
-							fig_update( true );
-						end
-
-					case 'home'
-						if nmods == 0 && itrial ~= 1
-							itrial = 1;
-							fig_update( true );
-						end
-					case 'end'
-						if nmods == 0 && itrial ~= ntrials
-							itrial = ntrials;
-							fig_update( true );
+							fredo = cdf.audit.disp_update( fig, true );
 						end
 
 					case 'f' % formants setting
@@ -167,7 +102,7 @@ function label_formants( run, cfg )
 								resplab.f3(1) = trial.range(1) + x(3) / 1000;
 								resplab.f3(2) = y(3);
 							end
-							fig_update( false );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 					case '1'
 						if nmods == 0
@@ -176,7 +111,7 @@ function label_formants( run, cfg )
 								resplab.f1(1) = trial.range(1) + x(1) / 1000;
 								resplab.f1(2) = y(1);
 							end
-							fig_update( false );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 					case '2'
 						if nmods == 0
@@ -185,7 +120,7 @@ function label_formants( run, cfg )
 								resplab.f2(1) = trial.range(1) + x(1) / 1000;
 								resplab.f2(2) = y(1);
 							end
-							fig_update( false );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 					case '3'
 						if nmods == 0
@@ -194,24 +129,7 @@ function label_formants( run, cfg )
 								resplab.f3(1) = trial.range(1) + x(1) / 1000;
 								resplab.f3(2) = y(1);
 							end
-							fig_update( false );
-						end
-
-					case 'b' % blending
-						if nmods == 0
-							fblend = ~fblend;
-							fig_update( true );
-						end
-
-					case 'd' % decibel scale
-						if nmods == 0
-							flog = ~flog;
-							fig_update( false );
-						end
-
-					case 'return' % playback
-						if nmods == 0
-							soundsc( ovrts, run.audiorate );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 
 					case 'backspace' % clearing
@@ -220,7 +138,7 @@ function label_formants( run, cfg )
 							resplab.f1 = [NaN, NaN];
 							resplab.f2 = [NaN, NaN];
 							resplab.f3 = [NaN, NaN];
-							fig_update( false );
+							fredo = cdf.audit.disp_update( fig, false );
 						elseif nmods == 3 && any( strcmp( event.Modifier, 'shift' ) ) ... % clear run (valids only)
 								&& any( strcmp( event.Modifier, 'control' ) )  && any( strcmp( event.Modifier, 'alt' ) )
 							for i = 1:ntrials
@@ -230,14 +148,9 @@ function label_formants( run, cfg )
 								trials(i).resplab.f3 = [NaN, NaN];
 							end
 							itrial = 1;
-							fig_update( true );
+							fredo = cdf.audit.disp_update( fig, true );
 						end
 
-					case 'escape' % quit
-						if nmods == 0
-							fdone = true;
-							fig_update( false );
-						end
 				end
 
 				% button presses
@@ -252,25 +165,10 @@ function label_formants( run, cfg )
 						if cp(3) >= cfg.formants_f0_freqband(1) && cp(3) <= cfg.formants_f0_freqband(2)
 							resplab.f0(1) = trial.range(1) + cp(1) / 1000;
 							resplab.f0(2) = cp(3);
-							fig_update( false );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 				end
 
-				% figure closing
-			case 'close'
-				fdone = true;
-				delete( fig );
-		end
-	end
-
-	function fig_update( recomp )
-		frecomp = recomp; % set recomputation flag
-
-		switch get( fig, 'Clipping' ) % flip (unused) clipping property
-			case 'on'
-				set( fig, 'Clipping', 'off' );
-			case 'off'
-				set( fig, 'Clipping', 'on' );
 		end
 	end
 
@@ -293,41 +191,14 @@ function label_formants( run, cfg )
 	itrial = max( 1, next_unlabeled( trials, 0 ) );
 
 	fdone = false; % init flags
-	frecomp = true;
-	fblend = false;
+	fredo = true;
+	fdet = false;
 	flog = false;
+	fblend = false;
 
 	while ~fdone
-
-			% prepare data
 		trial = trials(itrial);
 		resplab = trial.resplab;
-
-		ovrr = dsp.sec2smp( resplab.range, run.audiorate ) + [1, 0]; % ranges
-
-		ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
-		dc = mean( ovrts );
-		ovrts = ovrts - dc;
-
-		if frecomp % transforms
-
-			[ovr_stft1, ovr_stft1_times, ovr_stft1_freqs] = dsp.stftransf( ovrts, run.audiorate, ... % f1..f3
-				cfg.formants_fx_freqband, cfg.formants_fx_window );
-			ovr_stft1 = ovr_stft1 .* conj( ovr_stft1 );
-			ovr_stft1_times = (resplab.range(1) + ovr_stft1_times - trial.range(1)) * 1000;
-
-			[ovr_stft2, ovr_stft2_times, ovr_stft2_freqs] = dsp.stftransf( ovrts, run.audiorate, ... % f0
-				cfg.formants_f0_freqband, cfg.formants_f0_window );
-			ovr_stft2 = ovr_stft2 .* conj( ovr_stft2 );
-			ovr_stft2_times = (resplab.range(1) + ovr_stft2_times - trial.range(1)) * 1000;
-
-			if fblend
-				[ovr_stft1, ovr_stft1_times] = blend( ovr_stft1, ovrts, run.audiorate, cfg.formants_fx_window ); % f1..f3
-				ovr_stft1_times = (resplab.range(1) + ovr_stft1_times - trial.range(1)) * 1000;
-				[ovr_stft2, ovr_stft2_times] = blend( ovr_stft2, ovrts, run.audiorate, cfg.formants_f0_window ); % f0
-				ovr_stft2_times = (resplab.range(1) + ovr_stft2_times - trial.range(1)) * 1000;
-			end
-		end
 
 			% plot
 		clf( fig );
@@ -337,38 +208,17 @@ function label_formants( run, cfg )
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
-		subplot( 4, 1, [1, 2], 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % f1..f3 spectrogram
-		title( sprintf( 'LABEL_FORMANTS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ) );
-		xlabel( 'trial time in milliseconds' );
-		ylabel( 'frequency in hertz' );
-
-		xlim( (resplab.range - trial.range(1)) * 1000 );
-		ylim( cfg.formants_fx_freqband(1:2) );
-
-		colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) ); % signal
-		imagesc( ovr_stft1_times, ovr_stft1_freqs, scale( ovr_stft1 .^ cfg.formants_fx_gamma, flog ), ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-
-		plot_formants( trial ); % formants
-
-		subplot( 4, 1, 3, 'ButtonDownFcn', {@fig_dispatch, 'buttondown'} ); % f0 spectrogram
-		xlabel( 'trial time in milliseconds' );
-		ylabel( 'frequency in hertz' );
-
-		xlim( (resplab.range - trial.range(1)) * 1000 );
-		ylim( cfg.formants_f0_freqband(1:2) );
-
-		colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) ); % signal
-		imagesc( ovr_stft2_times, ovr_stft2_freqs, scale( ovr_stft2 .^ cfg.formants_f0_gamma, flog ), ...
-			'ButtonDownFcn', {@fig_dispatch, 'buttondown'} );
-
-		plot_formants( trial ); % formants
-
+		cdf.audit.plot_formants( ... % spectrograms
+			run, cfg, trial, [fredo, fdet, flog, fblend], ...
+			sprintf( 'FORMANTS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
+			{@disp_commands, 'buttondown'} );
+			
 		cdf.audit.plot_info( trial, false ); % info and commands
 		cdf.audit.plot_commands( false );
+		cdf.label.plot_commands( 'formants' );
 
 			% wait for figure update
-		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change
+		waitfor( fig, 'Clipping' ); % (unused) clipping property change
 
 	end
 

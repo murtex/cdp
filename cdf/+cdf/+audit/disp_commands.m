@@ -10,12 +10,12 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 % run : cue-distractor run (scalar object)
 % cfg : framework configuration (scalar object)
 % trial : cue-distractor trial (scalar object)
-% flags : flags [proc, done, log] (vector logical)
+% flags : flags [proc, done, redo, det, log] (vector logical)
 % itrial : trial number (scalar numeric)
 % ntrials : number of trials (scalar numeric)
 %
 % OUTPUT
-% flags : flags [done, log] (vector logical)
+% flags : flags [proc, done, redo, det, log] (vector logical)
 % itrial : trial number (scalar numeric)
 
 		% safeguard
@@ -43,7 +43,7 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 		error( 'invalid argument: trial' );
 	end
 
-	if nargin < 7 || ~isvector( flags ) || numel( flags ) ~= 3 || ~islogical( flags )
+	if nargin < 7 || ~isvector( flags ) || numel( flags ) ~= 5 || ~islogical( flags )
 		error( 'invalid argument: flags' );
 	end
 
@@ -67,7 +67,7 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 				case 'pagedown' % trial browsing
 					if nmods == 0 || (nmods == 1 && ...
 							(any( strcmp( event.Modifier, 'shift' ) ) || any( strcmp( event.Modifier, 'control' ) )))
-						flags(1) = true; % processed
+						flags(1) = true; % fproc
 
 						step = 1; % step size
 						if strcmp( event.Modifier, 'shift' )
@@ -79,13 +79,13 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 						iptrial = min( itrial + step, ntrials ); % update trial number
 						if iptrial ~= itrial
 							itrial = iptrial;
-							cdf.audit.disp_update( src );
+							flags(3) = cdf.audit.disp_update( src, true );
 						end
 					end
 				case 'pageup'
 					if nmods == 0 || (nmods == 1 && ...
 							(any( strcmp( event.Modifier, 'shift' ) ) || any( strcmp( event.Modifier, 'control' ) )))
-						flags(1) = true; % processed
+						flags(1) = true; % fproc
 
 						step = 1; % step size
 						if strcmp( event.Modifier, 'shift' )
@@ -97,60 +97,67 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 						iptrial = max( itrial - step, 1 ); % update trial number
 						if iptrial ~= itrial
 							itrial = iptrial;
-							cdf.audit.disp_update( src );
+							flags(3) = cdf.audit.disp_update( src, true );
 						end
 					end
 				case 'home'
 					if nmods == 0
-						flags(1) = true; % processed
+						flags(1) = true; % fproc
 
 						if itrial ~= 1 % update trial number
 							itrial = 1;
-							cdf.audit.disp_update( src );
+							flags(3) = cdf.audit.disp_update( src, true );
 						end
 					end
 				case 'end'
 					if nmods == 0
-						flags(1) = true; % processed
+						flags(1) = true; % fproc
 
 						if itrial ~= ntrials % update trial number
 							itrial = ntrials;
-							cdf.audit.disp_update( src );
+							flags(3) = cdf.audit.disp_update( src, true );
 						end
 					end
 
 				case 'return' % audio playback
 					if nmods == 0
-						flags(1) = true; % processed
+						flags(1) = true; % fproc
 
 						ovrr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % play overview
 						ovrts = run.audiodata(ovrr(1):ovrr(2), 1);
 						soundsc( ovrts, run.audiorate );
 					end
 
-				case 's' % axis scaling
+				case 's' % flags switching
 					if nmods == 0
-						flags(1) = true; % processed
+						flags(1) = true; % fproc
 
-						flags(3) = ~flags(3); % toggle log scale
-						cdf.audit.disp_update( src );
+						flags(5) = ~flags(5); % toggle flog
+						flags(3) = cdf.audit.disp_update( src, false );
+					end
+				case 'tab'
+					if nmods == 0
+						flags(1) = true; % fproc
+
+						flags(4) = ~flags(4); % toggle fdet
+						flags(3) = cdf.audit.disp_update( src, true );
 					end
 
 				case 'escape' % figure closing
 					if nmods == 0
-						flags(1) = true; % processed
+						flags(1) = true; % fproc
 
-						flags(2) = true; % done
-						cdf.audit.disp_update( src );
+						flags(2) = true; % fdone
+						flags(3) = cdf.audit.disp_update( src, false );
 					end
 
 			end
 
 			% figure closing
 		case 'close'
-			flags(1) = true; % processed
+			flags(1) = true; % fproc
 
-			flags(2) = true; % done
+			flags(2) = true; % fdone
 			delete( src );
 
 	end

@@ -1,7 +1,7 @@
-function audit_activity( run, cfg )
+function activity( run, cfg )
 % activity auditing tool
 %
-% AUDIT_ACTIVITY( run, cfg )
+% ACTIVITY( run, cfg )
 % 
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -42,11 +42,13 @@ function audit_activity( run, cfg )
 
 			% default callback
 		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
-			run, cfg, trial, [false, fdone, flog], ...
+			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
 			itrial, ntrials );
 
 		fdone = flags(2);
-		flog = flags(3);
+		fredo = flags(3);
+		fdet = flags(4);
+		flog = flags(5);
 
 	end
 
@@ -68,6 +70,8 @@ function audit_activity( run, cfg )
 	itrial = 1;
 
 	fdone = false; % init flags
+	fredo = true;
+	fdet = false;
 	flog = false;
 
 	while ~fdone
@@ -77,15 +81,15 @@ function audit_activity( run, cfg )
 		clf( fig );
 
 		cdf.audit.plot_activity( ... % overview and details
-			run, cfg, trial, [flog], ...
-			sprintf( 'AUDIT_ACTIVITY (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
+			run, cfg, trial, [fredo, fdet, flog], ...
+			sprintf( 'ACTIVITY (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );
 
 		cdf.audit.plot_info( trial, true ); % info and commands
 		cdf.audit.plot_commands( true );
 
 			% wait for figure update
-		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change
+		waitfor( fig, 'Clipping' ); % (unused) clipping property change
 
 	end
 

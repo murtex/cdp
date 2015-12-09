@@ -1,7 +1,7 @@
-function label_activity( run, cfg )
+function activity( run, cfg )
 % activity labeling tool
 %
-% LABEL_ACTIVITY( run, cfg )
+% ACTIVITY( run, cfg )
 % 
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -77,13 +77,15 @@ function label_activity( run, cfg )
 
 			% default callback
 		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
-			run, cfg, trial, [false, fdone, flog], ...
+			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
 			itrial, ntrials );
 
 		fdone = flags(2);
-		flog = flags(3);
+		fredo = flags(3);
+		fdet = flags(4);
+		flog = flags(5);
 
-		if flags(1) % processed
+		if flags(1) % fproc
 			return;
 		end
 
@@ -99,7 +101,7 @@ function label_activity( run, cfg )
 					case 'space' % trial browsing
 						if nmods == 0
 							itrial = next_unlabeled( trials, itrial );
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, true );
 						end
 
 					case 'return' % playback
@@ -113,19 +115,19 @@ function label_activity( run, cfg )
 					case 'k' % class setting
 						if nmods == 0
 							trial.resplab.label = 'ka';
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 					case 't'
 						if nmods == 0
 							trial.resplab.label = 'ta';
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 
 					case 'backspace' % clearing
 						if nmods == 1 && strcmp( event.Modifier, 'control' ) % clear trial
 							resplab.label = '';
 							resplab.range = [NaN, NaN];
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, false );
 						elseif nmods == 3 && any( strcmp( event.Modifier, 'shift' ) ) ... % clear run (valids only)
 								&& any( strcmp( event.Modifier, 'control' ) )  && any( strcmp( event.Modifier, 'alt' ) )
 							for i = 1:ntrials
@@ -133,7 +135,7 @@ function label_activity( run, cfg )
 								trials(i).resplab.range = [NaN, NaN];
 							end
 							itrial = 1;
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, true );
 						end
 
 				end
@@ -149,12 +151,12 @@ function label_activity( run, cfg )
 					case 'normal'
 						if cp(1) >= trial.range(1) && cp(2) <= trial.range(2)
 							resplab.range(1) = snap( ovrts, trial.range(1), cp(1), cfg.activity_zcsnap(1) );
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 					case 'alt'
 						if cp(1) >= trial.range(1) && cp(2) <= trial.range(2)
 							resplab.range(2) = snap( ovrts, trial.range(1), cp(1), cfg.activity_zcsnap(2) );
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 				end
 
@@ -180,6 +182,8 @@ function label_activity( run, cfg )
 	itrial = max( 1, next_unlabeled( trials, 0 ) );
 
 	fdone = false; % init flags
+	fredo = true;
+	fdet = false;
 	flog = false;
 
 	while ~fdone
@@ -195,8 +199,8 @@ function label_activity( run, cfg )
 		end
 
 		ovrts = cdf.audit.plot_activity( ... % overview and details
-			run, cfg, trial, [flog], ...
-			sprintf( 'LABEL_ACTIVITY (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
+			run, cfg, trial, [fredo, fdet, flog], ...
+			sprintf( 'ACTIVITY (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );
 
 		cdf.audit.plot_info( trial, false ); % info and commands
@@ -204,7 +208,7 @@ function label_activity( run, cfg )
 		cdf.label.plot_commands( 'activity' );
 
 			% wait for figure update
-		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change
+		waitfor( fig, 'Clipping' ); % (unused) clipping property change
 
 	end
 

@@ -7,7 +7,7 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 % run : cue-distractor run (scalar object)
 % cfg : framework configuration (scalar object)
 % trial : cue-distractor trial (scalar object)
-% flags : flags [log] (vector logical)
+% flags : flags [redo, det, log] (vector logical)
 % stitle : title string (row char)
 % callback : button down event dispatcher [function, argument] (vector cell)
 %
@@ -30,7 +30,7 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 		error( 'invalid argument: trial' );
 	end
 
-	if nargin < 4 || ~isvector( flags ) || numel( flags ) ~= 1 || ~islogical( flags )
+	if nargin < 4 || ~isvector( flags ) || numel( flags ) ~= 3 || ~islogical( flags )
 		error( 'invalid argument: flags' );
 	end
 
@@ -46,26 +46,32 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 	style = xis.hStyle.instance();
 
 	function ts = scale( ts ) % log scale
-		if flags(1)
+		if flags(3)
 			ts = mag2db( abs( ts ) + eps );
 		end
 	end
 
-	function plot_marker( yl, flegend ) % landmarks
+	function plot_marks( yl, flegend ) % landmarks
 		h1 = plot( (resplab.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % manual
+			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'warm', +1 ), ...
 			'DisplayName', 'manual' );
 		plot( (resplab.vo * [1, 1] - trial.range(1)) * 1000, yl, ...
+			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'warm', +1 ) );
 		plot( (resplab.vr * [1, 1] - trial.range(1)) * 1000, yl, ...
+			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'warm', +1 ) );
 
 		h2 = plot( (respdet.bo * [1, 1] - trial.range(1)) * 1000, yl, ... % detected
+			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'signal', +1 ), ...
 			'DisplayName', 'detected' );
 		plot( (respdet.vo * [1, 1] - trial.range(1)) * 1000, yl, ...
+			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'signal', +1 ) );
 		plot( (respdet.vr * [1, 1] - trial.range(1)) * 1000, yl, ...
+			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'signal', +1 ) );
 
 		if flegend % legend
@@ -124,7 +130,7 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 		det3ts = run.audiodata(det3r(1):det3r(2), 1);
 	end
 
-	if ~flags(1) % linear axes
+	if ~flags(3) % linear axes
 		ovryl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 
 		if ~isempty( det1ts ) || ~isempty( det2ts ) || ~isempty( det3ts )
@@ -153,7 +159,7 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 		max( resplab.range(2), respdet.range(2) )] - trial.range(1)) * 1000 );
 	ylim( ovryl );
 
-	plot_marker( ovryl, true );
+	plot_marks( ovryl, true );
 	plot_signal( ovrr, ovrts );
 
 		% plot detail #1 (burst onset)
@@ -169,7 +175,7 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 			max( resplab.bo, respdet.bo ) + cfg.landmarks_det1(2)] - trial.range(1)) * 1000 );
 		ylim( detyl );
 
-		plot_marker( detyl, false );
+		plot_marks( detyl, false );
 		plot_signal( det1r, det1ts );
 	end
 
@@ -186,7 +192,7 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 			max( resplab.vo, respdet.vo ) + cfg.landmarks_det2(2)] - trial.range(1)) * 1000 );
 		ylim( detyl );
 
-		plot_marker( detyl, false );
+		plot_marks( detyl, false );
 		plot_signal( det2r, det2ts );
 	end
 
@@ -203,7 +209,7 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 			max( resplab.vr, respdet.vr ) + cfg.landmarks_det3(2)] - trial.range(1)) * 1000 );
 		ylim( detyl );
 
-		plot_marker( detyl, false );
+		plot_marks( detyl, false );
 		plot_signal( det3r, det3ts );
 	end
 

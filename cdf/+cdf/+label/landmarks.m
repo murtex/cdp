@@ -1,7 +1,7 @@
-function label_landmarks( run, cfg )
+function landmarks( run, cfg )
 % landmarks labeling tool
 %
-% LABEL_LANDMARKS( run, cfg )
+% LANDMARKS( run, cfg )
 % 
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -77,13 +77,15 @@ function label_landmarks( run, cfg )
 
 			% default callback
 		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
-			run, cfg, trial, [false, fdone, flog], ...
+			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
 			itrial, ntrials );
 
 		fdone = flags(2);
-		flog = flags(3);
+		fredo = flags(3);
+		fdet = flags(4);
+		flog = flags(5);
 
-		if flags(1) % processed
+		if flags(1) % fproc
 			return;
 		end
 
@@ -99,7 +101,7 @@ function label_landmarks( run, cfg )
 					case 'space' % trial browsing
 						if nmods == 0
 							itrial = next_unlabeled( trials, itrial );
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, true );
 						end
 
 					case 'return' % playback
@@ -125,7 +127,7 @@ function label_landmarks( run, cfg )
 								resplab.vr = x(3);
 							end
 
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 					case 'b'
 						if nmods == 0
@@ -136,7 +138,7 @@ function label_landmarks( run, cfg )
 								resplab.bo = x(1);
 							end
 
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 					case 'v'
 						if nmods == 0
@@ -147,7 +149,7 @@ function label_landmarks( run, cfg )
 								resplab.vo = x(1);
 							end
 
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 					case 'r'
 						if nmods == 0
@@ -158,7 +160,7 @@ function label_landmarks( run, cfg )
 								resplab.vr = x(1);
 							end
 
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, false );
 						end
 
 					case 'backspace' % clearing
@@ -166,7 +168,7 @@ function label_landmarks( run, cfg )
 							resplab.bo = NaN;
 							resplab.vo = NaN;
 							resplab.vr = NaN;
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, false );
 						elseif nmods == 3 && any( strcmp( event.Modifier, 'shift' ) ) ... % clear run (valids only)
 								&& any( strcmp( event.Modifier, 'control' ) )  && any( strcmp( event.Modifier, 'alt' ) )
 							for i = 1:ntrials
@@ -175,7 +177,7 @@ function label_landmarks( run, cfg )
 								trials(i).resplab.vr = NaN;
 							end
 							itrial = 1;
-							cdf.audit.disp_update( fig );
+							fredo = cdf.audit.disp_update( fig, true );
 						end
 
 				end
@@ -193,17 +195,17 @@ function label_landmarks( run, cfg )
 							case hdet1
 								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
 									resplab.bo = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(1) );
-									cdf.audit.disp_update( fig );
+									fredo = cdf.audit.disp_update( fig, false );
 								end
 							case hdet2
 								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
 									resplab.vo = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(2) );
-									cdf.audit.disp_update( fig );
+									fredo = cdf.audit.disp_update( fig, false );
 								end
 							case hdet3
 								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
 									resplab.vr = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(3) );
-									cdf.audit.disp_update( fig );
+									fredo = cdf.audit.disp_update( fig, false );
 								end
 						end
 				end
@@ -230,6 +232,8 @@ function label_landmarks( run, cfg )
 	itrial = max( 1, next_unlabeled( trials, 0 ) );
 
 	fdone = false; % init flags
+	fredo = true;
+	fdet = false;
 	flog = false;
 
 	while ~fdone
@@ -245,8 +249,8 @@ function label_landmarks( run, cfg )
 		end
 
 		[ovrts, hdet1, hdet2, hdet3] = cdf.audit.plot_landmarks( ... % overview and details
-			run, cfg, trial, [flog], ...
-			sprintf( 'LABEL_LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
+			run, cfg, trial, [fredo, fdet, flog], ...
+			sprintf( 'LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );
 
 		cdf.audit.plot_info( trial, false ); % info and commands
@@ -254,7 +258,7 @@ function label_landmarks( run, cfg )
 		cdf.label.plot_commands( 'landmarks' );
 
 			% wait for figure update
-		waitfor( fig, 'Clipping' ); % wait for (unused) clipping property change
+		waitfor( fig, 'Clipping' ); % (unused) clipping property change
 
 	end
 

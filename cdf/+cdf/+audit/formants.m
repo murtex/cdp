@@ -1,7 +1,7 @@
-function landmarks( run, cfg )
-% landmarks auditing tool
+function formants( run, cfg )
+% formants auditing tool
 %
-% LANDMARKS( run, cfg )
+% FORMANTS( run, cfg )
 % 
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -18,7 +18,7 @@ function landmarks( run, cfg )
 
 		% init
 	logger = xis.hLogger.instance(); % start logging
-	logger.tab( 'landmarks auditing tool...' );
+	logger.tab( 'formants auditing tool...' );
 
 	style = xis.hStyle.instance(); % prepare interactive figure
 
@@ -29,16 +29,15 @@ function landmarks( run, cfg )
 
 		% helper functions
 	function f = is_valid( trials )
-		f = false( size( trials ) );
+		f = true( size( trials ) );
 		for i = 1:numel( trials )
-			if (~isempty( trials(i).resplab.label ) && ~any( isnan( trials(i).resplab.range ) )) ...
-					|| (~isempty( trials(i).respdet.label ) && ~any( isnan( trials(i).respdet.range ) ))
-				f(i) = true;
+			if isempty( trials(i).resplab.label ) || any( isnan( trials(i).resplab.range ) )
+				f(i) = false;
 			end
 		end
 	end
 
-		% event dispatching
+		% event dispatcher
 	function disp_commands( src, event, type )
 
 			% default callback
@@ -50,6 +49,10 @@ function landmarks( run, cfg )
 		fredo = flags(3);
 		fdet = flags(4);
 		flog = flags(5);
+
+		if flags(1) % fproc
+			return;
+		end
 
 	end
 
@@ -74,6 +77,7 @@ function landmarks( run, cfg )
 	fredo = true;
 	fdet = false;
 	flog = false;
+	fblend = false;
 
 	while ~fdone
 		trial = trials(itrial);
@@ -81,11 +85,11 @@ function landmarks( run, cfg )
 			% plot
 		clf( fig );
 
-		cdf.audit.plot_landmarks( ... % overview and details
-			run, cfg, trial, [fredo, fdet, flog], ...
-			sprintf( 'LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
+		cdf.audit.plot_formants( ... % spectrograms
+			run, cfg, trial, [fredo, fdet, flog, fblend], ...
+			sprintf( 'FORMANTS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );
-
+			
 		cdf.audit.plot_info( trial, true ); % info and commands
 		cdf.audit.plot_commands( true );
 

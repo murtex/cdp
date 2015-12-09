@@ -7,7 +7,7 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 % run : cue-distractor run (scalar object)
 % cfg : framework configuration (scalar object)
 % trial : cue-distractor trial (scalar object)
-% flags : flags [log] (vector logical)
+% flags : flags [redo, det, log] (vector logical)
 % stitle : title string (row char)
 % callback : button down event dispatcher [function, argument] (vector cell)
 %
@@ -27,7 +27,7 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 		error( 'invalid argument: trial' );
 	end
 
-	if nargin < 4 || ~isvector( flags ) || numel( flags ) ~= 1 || ~islogical( flags )
+	if nargin < 4 || ~isvector( flags ) || numel( flags ) ~= 3 || ~islogical( flags )
 		error( 'invalid argument: flags' );
 	end
 
@@ -43,12 +43,12 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 	style = xis.hStyle.instance();
 
 	function ts = scale( ts ) % log scale
-		if flags(1)
+		if flags(3)
 			ts = mag2db( abs( ts ) + eps );
 		end
 	end
 
-	function plot_marker( yl, flegend ) % activity range
+	function plot_marks( yl, flegend ) % activity range
 		h1 = plot( (resplab.range(1) * [1, 1] - trial.range(1)) * 1000, yl, ... % manual
 			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'warm', +1 ), ...
@@ -108,7 +108,7 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 		det2ts = run.audiodata(det2r(1):det2r(2), 1);
 	end
 
-	if ~flags(1) % linear axes
+	if ~flags(3) % linear axes
 		ovryl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 
 		if ~isempty( det1ts ) || ~isempty( det2ts )
@@ -135,7 +135,7 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 	xlim( (trial.range - trial.range(1)) * 1000 );
 	ylim( ovryl );
 
-	plot_marker( ovryl, true );
+	plot_marks( ovryl, true );
 	plot_signal( ovrr, ovrts );
 
 		% plot detail #1 (activity start)
@@ -151,7 +151,7 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 			max( resplab.range(1), respdet.range(1) ) + cfg.activity_det1(2)] - trial.range(1)) * 1000 );
 		ylim( detyl );
 
-		plot_marker( detyl, false );
+		plot_marks( detyl, false );
 		plot_signal( det1r, det1ts );
 	end
 
@@ -168,7 +168,7 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 			max( resplab.range(2), respdet.range(2) ) + cfg.activity_det2(2)] - trial.range(1)) * 1000 );
 		ylim( detyl );
 
-		plot_marker( detyl, false );
+		plot_marks( detyl, false );
 		plot_signal( det2r, det2ts );
 	end
 

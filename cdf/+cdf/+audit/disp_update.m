@@ -1,10 +1,11 @@
-function disp_update( src )
+function fredo = disp_update( src, fredo )
 % toggle update flag
 %
-% DISP_UPDATE( src )
+% fredo = DISP_UPDATE( src, fredo )
 %
 % INPUT
 % src : event source handle (internal)
+% fredo : redo flag (scalar logical)
 
 		% safeguard
 	if nargin < 1
