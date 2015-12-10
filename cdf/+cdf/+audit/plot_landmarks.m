@@ -42,6 +42,12 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 		error( 'invalid argument: callback' );
 	end
 
+		% init output
+	ovrts = [];
+	hdet1 = NaN;
+	hdet2 = NaN;
+	hdet3 = NaN;
+
 		% return with detection view, TODO!
 	if flags(2)
 		return;

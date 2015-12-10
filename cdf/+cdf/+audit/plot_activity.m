@@ -39,6 +39,9 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 		error( 'invalid argument: callback' );
 	end
 
+		% init output
+	ovrts = [];
+
 		% return with detection view, TODO!
 	if flags(2)
 		cdf.detect.plot_activity( run, cfg, trial, stitle );
