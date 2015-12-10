@@ -172,7 +172,8 @@ classdef (Sealed = true) hStyle < handle
 			end
 
 			function rgb = neutral( shade )
-				rgb = mean( (cold( shade ) + warm( shade ) + signal( shade )) / 3 ) * [1, 1, 1];
+				rgb = [1, 1, 1] * dot( [0.299, 0.587, 0.114], ... % YIQ luma
+					mean( [cold( shade ); warm( shade ); signal( shade )], 1 ) );
 			end
 
 				% set shaded color
