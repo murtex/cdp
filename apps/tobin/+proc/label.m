@@ -57,6 +57,9 @@ function label( indir, outdir, ids, labmode, logfile )
 	cfg.formants_fx_freqband = [0, 5000, 100];
 	cfg.formants_fx_gamma = 0.15;
 
+	cfg.vad_freqband = [500, 4000, 100];
+	cfg.vad_window = {@hann, 0.020, 50/100};
+
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'labeling tool...' );
 
