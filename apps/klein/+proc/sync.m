@@ -36,10 +36,6 @@ function sync( indir, outdir, ids, logfile )
 
 	cfg = cdf.hConfig(); % configure framework
 
-	cfg.sync_range = [-0.125, 0.010];
-	cfg.sync_smooth = 0.002;
-	cfg.sync_thresh = 3.0;
-
 	logger = xis.hLogger.instance( logfile ); % start logging
 	logger.tab( 'marker synchronization...' );
 

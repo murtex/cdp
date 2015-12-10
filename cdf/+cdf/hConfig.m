@@ -5,9 +5,9 @@ classdef (Sealed = true) hConfig < handle
 	properties (Access = public)
 
 			% marker synchronization
-		sync_range = [NaN, NaN]; % (relative) search range [start, stop] (row numeric)
-		sync_smooth = NaN; % sample smoothing [approx. marker length] (scalar numeric)
-		sync_thresh = NaN; % mahalanobis threshold [sigmas] (scalar numeric)
+		sync_range = [-0.050, 0.010]; % (relative) search range [start, stop] (row numeric)
+		sync_smooth = 0.002; % sample smoothing [approx. marker length] (scalar numeric)
+		sync_thresh = 3.0; % mahalanobis threshold [sigmas] (scalar numeric)
 
 			% labeling/auditing
 		activity_det1 = [-0.025, 0.050]; % (relative) activity detail #1 (start) range [start, stop] (row numeric)
