@@ -30,9 +30,15 @@ Cue-distractor framework
 Digital signal processing
 -------------------------
 
+- TODO!
+
 Detection system
 ----------------
 
+- TODO!
+
 Convenience classes
 -------------------
+
+- TODO!
 
