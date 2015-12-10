@@ -1,9 +1,3 @@
-Raw data
---------
-
-- `proc.read_audio` -- read raw audio data
-- `proc.read_trials` -- read raw trial data
-
 Preprocessing
 -------------
 
@@ -20,6 +14,11 @@ Manual labeling
 ---------------
 
 - `proc.label` -- labeling tool
+
+Label detection
+---------------
+
+- **TODO!**
 
 Auditing
 --------
@@ -42,5 +41,28 @@ proc.label( '../../data/cdd/label/', '../../data/cdd/label/', 1, 'activity', 'la
 proc.label( '../../data/cdd/label/', '../../data/cdd/label/', 1, 'landmarks', 'label.log' );
 proc.label( '../../data/cdd/label/', '../../data/cdd/label/', 1, 'formants', 'label.log' );
 
+	% TODO...
+
 ```
+
+Server batch processing
+-----------------------
+
+##### Preprocessing and detection
+
+- `proc_convert.sh` -- raw conversion
+- `proc_sync.sh` -- marker synchronization
+
+<!-- -->
+
+- **TODO!**
+
+##### Statistics
+
+- `test_convert.sh` -- raw conversion statistics
+- `test_sync.sh` -- marker synchronization statistics
+
+<!-- -->
+
+- **TODO!**
 

@@ -1,10 +1,3 @@
-Raw data
---------
-
-- `proc.read_audio` -- read raw audio data
-- `proc.read_trials` -- read raw trial data
-- `proc.read_labels` -- read raw label data
-
 Preprocessing
 -------------
 
@@ -17,12 +10,15 @@ Preprocessing
 - `test.sync` -- marker synchronization statistics
 - `test.sync_samples` -- marker synchronization samples
 
+Manual (re-)labeling
+---------------
+
+- `proc.label` -- labeling tool
+
 Label detection
 ---------------
 
-`proc.activity` -- activity detection
-`proc.landmarks` -- landmarks detection
-`proc.formants` -- formants detection
+- **TODO!**
 
 Auditing
 --------
@@ -38,10 +34,28 @@ Example
 proc.convert( '../../data/klein/raw/', '../../data/klein/convert/', 1, 'convert.log' );
 proc.sync( '../../data/klein/convert/', '../../data/klein/sync/', 1, 'sync.log' );
 
-	% label detection
-proc.activity( '../../data/klein/sync/', '../../data/klein/activity/', 1, 'activity.log' );
-proc.landmarks( '../../data/klein/sync/', '../../data/klein/landmarks/', 1, 'landmarks.log' );
-proc.formants( '../../data/klein/sync/', '../../data/klein/formants/', 1, 'formants.log' );
+	% TODO...
 
 ```
+
+Server batch processing
+-----------------------
+
+##### Preprocessing and detection
+
+- `proc_convert.sh` -- raw conversion
+- `proc_sync.sh` -- marker synchronization
+
+<!-- -->
+
+- **TODO!**
+
+##### Statistics
+
+- `test_convert.sh` -- raw conversion statistics
+- `test_sync.sh` -- marker synchronization statistics
+
+<!-- -->
+
+- **TODO!**
 
