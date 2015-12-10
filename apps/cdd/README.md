@@ -2,23 +2,12 @@ Preprocessing
 -------------
 
 - `proc.convert` -- raw conversion
-- `test.convert` -- raw conversion statistics
-
-<!-- -->
-
 - `proc.sync` -- marker synchronization
-- `test.sync` -- marker synchronization statistics
-- `test.sync_samples` -- marker synchronization samples
 
 Manual labeling
 ---------------
 
 - `proc.label` -- labeling tool
-
-Label detection
----------------
-
-- **TODO!**
 
 Auditing
 --------
@@ -41,28 +30,13 @@ proc.label( '../../data/cdd/label/', '../../data/cdd/label/', 1, 'activity', 'la
 proc.label( '../../data/cdd/label/', '../../data/cdd/label/', 1, 'landmarks', 'label.log' );
 proc.label( '../../data/cdd/label/', '../../data/cdd/label/', 1, 'formants', 'label.log' );
 
-	% TODO...
-
 ```
 
 Server batch processing
 -----------------------
 
-##### Preprocessing and detection
+##### Preprocessing
 
 - `proc_convert.sh` -- raw conversion
 - `proc_sync.sh` -- marker synchronization
-
-<!-- -->
-
-- **TODO!**
-
-##### Statistics
-
-- `test_convert.sh` -- raw conversion statistics
-- `test_sync.sh` -- marker synchronization statistics
-
-<!-- -->
-
-- **TODO!**
 
