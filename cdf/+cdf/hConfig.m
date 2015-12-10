@@ -27,8 +27,8 @@ classdef (Sealed = true) hConfig < handle
 		formants_fx_gamma = NaN; % spectrogram gamma (scalar numeric)
 
 			% label detection
-		det_vad_freqband = [NaN, NaN, NaN]; % voice activity frequency band [lower, upper, count] (row numeric)
-		det_vad_window = {@rectwin, NaN, NaN}; % short-time window [function, length, overlap] (row cell)
+		vad_freqband = [NaN, NaN, NaN]; % voice activity frequency band [lower, upper, count] (row numeric)
+		vad_window = {@rectwin, NaN, NaN}; % short-time window [function, length, overlap] (row cell)
 
 	end
 

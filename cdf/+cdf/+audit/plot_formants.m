@@ -36,7 +36,7 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 		error( 'invalid argument: callback' );
 	end
 
-		% return with detection view
+		% return with detection view, TODO!
 	if flags(2)
 		return;
 	end

@@ -71,7 +71,7 @@ function activity( run, cfg )
 
 	fdone = false; % init flags
 	fredo = true;
-	fdet = false;
+	fdet = true; % DEBUG
 	flog = false;
 
 	while ~fdone

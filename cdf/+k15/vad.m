@@ -1,4 +1,4 @@
-function vad( ts, rate, freqband, window )
+function [stft, times, freqs, pwsf, t1, t2, va] = vad( ts, rate, freqband, window )
 % voice activity detection
 %
 % VAD( ts, rate, freqband, window )
@@ -8,6 +8,15 @@ function vad( ts, rate, freqband, window )
 % rate : sampling rate (scalar numeric)
 % freqband : frequency band [lower, upper, count] (row numeric)
 % window : short-time window [function, length, overlay] (row cell)
+%
+% OUTPUT
+% stft : short-time fourier transform power (matrix numeric)
+% times : time values (column numeric)
+% freqs : frequencies (column numeric)
+% pwsf : power weighted spectral flatness (row numeric)
+% t1 : lower threshold (scalar numeric)
+% t2 : upper threshold (scalar numeric)
+% va : voice activity (column numeric)
 %
 % SEE
 % [1] D. Burileanu, L. Pascalin, C.Burileanu, M. Puchiu: An adaptive and fast speech detection algorithm (2000)
@@ -82,55 +91,6 @@ function vad( ts, rate, freqband, window )
 
 		statelen = statelen + 1;
 	end
-
-		% DEBUG
-	style = xis.hStyle.instance();
-	fig = style.figure( 'Visible', 'on' );
-
-	subplot( 9, 1, [1, 2] ); % signal and activity
-
-	xlabel( 'time in milliseconds' );
-	ylabel( 'magnitude' );
-
-	xlim( dsp.smp2msec( [0, numel( ts )-1], rate ) );
-	ylim( [-1, 1] * max( abs( ts ) ) * style.scale( 1/2 ) );
-
-	h = stairs( times * 1000, va * max( abs( ts ) ), ...
-		'DisplayName', 'activity', 'Color', style.color( 'signal', +1 ) );
-
-	stairs( dsp.smp2msec( 0:numel( ts )-1, rate ), ts, 'Color', style.color( 'cold', -1 ) ); % signal
-
-	legend( h, 'Location', 'southEast' ); % legend
-
-	subplot( 9, 1, [3, 4] ); % spectrogram
-
-	xlabel( 'time in milliseconds' );
-	ylabel( 'frequency in hertz' );
-
-	xlim( dsp.smp2msec( [0, numel( ts )-1], rate ) );
-	ylim( freqband(1:2) );
-
-	colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) );
-	imagesc( times * 1000, freqs, stft .^ 0.15 );
-
-	subplot( 9, 1, [5, 6] ); % power weighted spectral flatness and thresholds
-
-	xlabel( 'time in milliseconds' );
-	ylabel( 'power weighted spectral flatness' );
-
-	xlim( dsp.smp2msec( [0, numel( ts )-1], rate ) );
-
-	h = plot( xlim(), pow2db( [t1, t1] + eps ), ...
-		'DisplayName', 'thresholds', 'Color', style.color( 'signal', +1 ) ); % thresholds
-	plot( xlim(), pow2db( [t2, t2] + eps ), 'Color', style.color( 'signal', +1 ) );
-
-	stairs( times * 1000, pow2db( pwsf + eps ), 'Color', style.color( 'cold', -1 ) ); % flatness
-
-	legend( h, 'Location', 'NorthEast' ); % legend
-
-	error( 'DEBUG' );
-
-	delete( fig );
 
 end
 

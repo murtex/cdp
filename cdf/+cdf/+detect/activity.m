@@ -45,17 +45,15 @@ function activity( run, cfg )
 
 	logger.progress();
 	for i = 1:ntrials
+		trial = trials(i);
 
 			% prepare data
-		trial = trials(i);
-		respdet = trial.respdet;
-
 		tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % ranges
 
 		tts = run.audiodata(tr(1):tr(2), 1); % signals
 
 			% detect activity, TODO
-		k15.vad( tts, run.audiorate, cfg.det_vad_freqband, cfg.det_vad_window );
+		k15.vad( tts, run.audiorate, cfg.vad_freqband, cfg.vad_window );
 
 		logger.progress( i, ntrials );
 	end
