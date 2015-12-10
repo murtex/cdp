@@ -62,7 +62,7 @@ function plot_activity( run, cfg, trial, stitle )
 
 	stairs( ... % signal
 		(dsp.smp2sec( (tr(1):tr(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, [tts; tts(end)], ...
-		'Color', style.color( 'cold', -1 ) );
+		'Color', style.color( 'neutral', 0 ) );
 
 	hl = legend( [h2], 'Location', 'southeast' );
 	set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
@@ -76,7 +76,7 @@ function plot_activity( run, cfg, trial, stitle )
 	xlim( (trial.range - trial.range(1)) * 1000 );
 	ylim( cfg.vad_freqband(1:2) );
 
-	colormap( style.gradient( 64, [1, 1, 1], style.color( 'cold', -2 ) ) );
+	colormap( style.gradient( 64, [1, 1, 1], style.color( 'neutral', -2 ) ) );
 	imagesc( times * 1000, freqs, stft .^ 0.15 ); % TODO: fixed gamma!
 
 		% plot flatness and thresholds
@@ -94,7 +94,7 @@ function plot_activity( run, cfg, trial, stitle )
 		'Color', style.color( 'signal', +1 ), ...
 		'DisplayName', 'upper threshold' );
 
-	stairs( times * 1000, pow2db( pwsf + eps ), 'Color', style.color( 'cold', -1 ) ); % flatness
+	stairs( times * 1000, pow2db( pwsf + eps ), 'Color', style.color( 'neutral', 0 ) ); % flatness
 
 	hl = legend( [h1, h2], 'Location', 'northeast' ); % legend
 	set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
