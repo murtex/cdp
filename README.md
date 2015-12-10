@@ -1,7 +1,6 @@
 Cue-distractor package
 ----------------------
 
-- `apps` -- applications
-- `cdf` -- framework
-- `data` -- public data
+- `apps` -- project applications
+- `cdf` -- main framework
 
