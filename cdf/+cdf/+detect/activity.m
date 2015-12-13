@@ -53,7 +53,10 @@ function activity( run, cfg )
 		tts = run.audiodata(tr(1):tr(2), 1); % signals
 
 			% detect activity, TODO
-		k15.vad( tts, run.audiorate, cfg.vad_freqband, cfg.vad_window );
+		[stft, times, freqs, ~, ~, ~, ~, va] = k15.vad( ... % voice
+			tts, run.audiorate, cfg.vad_freqband, cfg.vad_window );
+
+		[~, ~, ~, sa] = k15.sad( va, stft, times, freqs, cfg.sad_subband ); % speech
 
 		logger.progress( i, ntrials );
 	end

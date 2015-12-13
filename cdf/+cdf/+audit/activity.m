@@ -67,11 +67,11 @@ function activity( run, cfg )
 		error( 'invalid value: ntrials' );
 	end
 
-	itrial = 1;
+	itrial = 12; % DEBUG
 
 	fdone = false; % init flags
 	fredo = true;
-	fdet = false;
+	fdet = true; % DEBUG
 	flog = false;
 
 	while ~fdone

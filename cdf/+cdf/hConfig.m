@@ -30,6 +30,8 @@ classdef (Sealed = true) hConfig < handle
 		vad_freqband = [0, 5000, 100]; % voice activity frequency band [lower, upper, count] (row numeric)
 		vad_window = {@hamming, 0.020, 50/100}; % short-time window [function, length, overlap] (row cell)
 
+		sad_subband = [200, 2000]; % speech activity frequency subband [lower, upper] (row numeric)
+
 	end
 
 end
