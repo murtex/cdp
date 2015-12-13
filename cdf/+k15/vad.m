@@ -1,7 +1,7 @@
-function [stft, times, freqs, pwsf, t1, t2, va] = vad( ts, rate, freqband, window )
+function [stft, times, freqs, stride, pwsf, t1, t2, va] = vad( ts, rate, freqband, window )
 % voice activity detection
 %
-% VAD( ts, rate, freqband, window )
+% [stft, times, freqs, stride, pwsf, t1, t2, va] = VAD( ts, rate, freqband, window )
 %
 % INPUT
 % ts : time series (column numeric)
@@ -11,8 +11,9 @@ function [stft, times, freqs, pwsf, t1, t2, va] = vad( ts, rate, freqband, windo
 %
 % OUTPUT
 % stft : short-time fourier transform power (matrix numeric)
-% times : time values (column numeric)
+% times : time values (row numeric)
 % freqs : frequencies (column numeric)
+% stride : window stride (scalar numeric)
 % pwsf : power weighted spectral flatness (row numeric)
 % t1 : lower threshold (scalar numeric)
 % t2 : upper threshold (scalar numeric)

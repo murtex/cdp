@@ -1,7 +1,7 @@
 function [stft, times, freqs, stride] = stftransf( ts, rate, freqband, window )
 % short-time fourier transform
 %
-% [stft, times, freqs] = stftransf( ts, rate, freqband, window )
+% [stft, times, freqs, stride] = stftransf( ts, rate, freqband, window )
 %
 % INPUT
 % ts : signal/time series (column numeric)

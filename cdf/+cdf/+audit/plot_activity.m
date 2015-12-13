@@ -39,10 +39,9 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 		error( 'invalid argument: callback' );
 	end
 
-		% init output
+		% return with detection view
 	ovrts = [];
 
-		% return with detection view, TODO!
 	if flags(2)
 		cdf.detect.plot_activity( run, cfg, trial, stitle );
 		return;
@@ -82,7 +81,8 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 
 	function plot_signal( r, ts ) % signal
 		stairs( ...
-			(dsp.smp2sec( (r(1):r(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, scale( [ts; ts(end)] ), ...
+			(dsp.smp2sec( (r(1):r(2)+1) - 1 - 1/2, run.audiorate ) - trial.range(1)) * 1000, ...
+			scale( [ts; ts(end)] ), ...
 			'ButtonDownFcn', callback, ...
 			'Color', style.color( 'neutral', 0 ) );
 	end

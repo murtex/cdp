@@ -31,17 +31,23 @@ function plot_activity( run, cfg, trial, stitle )
 	end
 
 		% prepare data
+	style = xis.hStyle.instance();
+
 	tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % ranges
+	resplabr = dsp.sec2smp( trial.resplab.range, run.audiorate ) + [1, 0];
 
 	tts = run.audiodata(tr(1):tr(2), 1); % signals
 
-		% activities
-	[stft, times, freqs, pwsf, t1, t2, vadet] = k15.vad( ... % detected
+	yl = max( abs( tts ) ) * [-1, 1] * style.scale( 1/2 ); % axes
+
+		% set activities
+	valab = false( numel( tts ), 1 ); % manual
+	valab((resplabr(1):resplabr(2)) - tr(1)) = true;
+
+	[stft, times, freqs, stride, pwsf, t1, t2, vadet] = k15.vad( ... % detected
 		tts, run.audiorate, cfg.vad_freqband, cfg.vad_window );
 
-		% plot signal and activity
-	style = xis.hStyle.instance();
-
+		% plot signal and activities
 	subplot( 3, 1, 1 );
 
 	title( stitle );
@@ -49,22 +55,26 @@ function plot_activity( run, cfg, trial, stitle )
 	ylabel( 'magnitude' );
 
 	xlim( (trial.range - trial.range(1)) * 1000 );
-	ylim( max( abs( tts ) ) * [-1, 1] * style.scale( 1/2 ) );
+	ylim( yl );
 
-	plot( (trial.resplab.range(1) * [1, 1] - trial.range(1)) * 1000, ylim(), ... % manual, TODO
-		'Color', style.color( 'warm', +1 ) );
-	plot( (trial.resplab.range(2) * [1, 1] - trial.range(1)) * 1000, ylim(), ...
-		'Color', style.color( 'warm', +1 ) );
+	h1 = stairs( ... % manual
+		(dsp.smp2sec( (tr(1):tr(2)+1) - 1 - 1/2, run.audiorate ) - trial.range(1)) * 1000, ...
+		[valab; valab(end)] * yl(2) / style.scale( 1/2 ), ...
+		'Color', style.color( 'warm', +1 ), ...
+		'DisplayName', 'manual' );
 
-	h2 = stairs( times * 1000, vadet * max( abs( tts ) ) * -1, ... % detected
+	h2 = stairs( ... % detected
+		([times, times(end) + stride] - stride/2) * 1000, ...
+		[vadet; vadet(end)] * yl(1) / style.scale( 1/2 ), ...
 		'Color', style.color( 'signal', +1 ), ...
 		'DisplayName', 'detected' );
 
 	stairs( ... % signal
-		(dsp.smp2sec( (tr(1):tr(2)+1) - 1, run.audiorate ) - trial.range(1)) * 1000, [tts; tts(end)], ...
+		(dsp.smp2sec( (tr(1):tr(2)+1) - 1 - 1/2, run.audiorate ) - trial.range(1)) * 1000, ...
+		[tts; tts(end)], ...
 		'Color', style.color( 'neutral', 0 ) );
 
-	hl = legend( [h2], 'Location', 'southeast' );
+	hl = legend( [h1, h2], 'Location', 'northeast' ); % legend
 	set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 
 		% plot spectrogram
@@ -88,13 +98,19 @@ function plot_activity( run, cfg, trial, stitle )
 	xlim( (trial.range - trial.range(1)) * 1000 );
 
 	h1 = plot( xlim(), pow2db( [t1, t1] + eps ), ... % thresholds
-		'Color', style.color( 'warm', +1 ), ...
+		'Color', style.color( 'signal', +1 ), ...
 		'DisplayName', 'lower threshold' );
 	h2 = plot( xlim(), pow2db( [t2, t2] + eps ), ...
-		'Color', style.color( 'signal', +1 ), ...
+		'LineStyle', '--', 'Color', style.color( 'signal', +1 ), ...
 		'DisplayName', 'upper threshold' );
 
-	stairs( times * 1000, pow2db( pwsf + eps ), 'Color', style.color( 'neutral', 0 ) ); % flatness
+	size( times )
+	size( pwsf )
+
+	stairs( ... % flatness
+		([times, times(end) + stride] - stride/2) * 1000, ...
+		pow2db( [pwsf, pwsf(end)] + eps ), ...
+		'Color', style.color( 'neutral', 0 ) ); % flatness
 
 	hl = legend( [h1, h2], 'Location', 'northeast' ); % legend
 	set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
