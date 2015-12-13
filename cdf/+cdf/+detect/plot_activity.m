@@ -42,12 +42,15 @@ function plot_activity( run, cfg, trial, stitle )
 
 		% set activities
 	valab = false( numel( tts ), 1 ); % manual
-	valab((resplabr(1):resplabr(2)) - tr(1)) = true;
+
+	if ~any( isnan( resplabr ) )
+		valab((resplabr(1):resplabr(2)) - tr(1)) = true;
+	end
 
 	[stft, times, freqs, stride, pwsf, t1, t2, vadet] = k15.vad( ... % detected
 		tts, run.audiorate, cfg.vad_freqband, cfg.vad_window );
 
-		% plot signal and activities
+		% plot signal amd activites
 	subplot( 3, 1, 1 );
 
 	title( stitle );
@@ -103,9 +106,6 @@ function plot_activity( run, cfg, trial, stitle )
 	h2 = plot( xlim(), pow2db( [t2, t2] + eps ), ...
 		'LineStyle', '--', 'Color', style.color( 'signal', +1 ), ...
 		'DisplayName', 'upper threshold' );
-
-	size( times )
-	size( pwsf )
 
 	stairs( ... % flatness
 		([times, times(end) + stride] - stride/2) * 1000, ...
