@@ -1,4 +1,4 @@
-function [stft, times, freqs] = stftransf( ts, rate, freqband, window )
+function [stft, times, freqs, stride] = stftransf( ts, rate, freqband, window )
 % short-time fourier transform
 %
 % [stft, times, freqs] = stftransf( ts, rate, freqband, window )
@@ -13,6 +13,7 @@ function [stft, times, freqs] = stftransf( ts, rate, freqband, window )
 % stft : short-time fourier transform (matrix numeric)
 % times : time values (column numeric)
 % freqs : frequencies (column numeric)
+% stride : window stride (scalar numeric)
 
 		% safeguard
 	if nargin < 1 || ~iscolumn( ts ) || ~isnumeric( ts )
@@ -38,5 +39,7 @@ function [stft, times, freqs] = stftransf( ts, rate, freqband, window )
 
 	[stft, freqs, times] = spectrogram( ts, window{1}( wlen ), wovl, ...
 		linspace( freqband(1), freqband(2), freqband(3) ), rate );
+
+	stride = dsp.smp2sec( wstr, rate );
 
 end

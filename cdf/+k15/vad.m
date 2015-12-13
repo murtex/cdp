@@ -42,7 +42,7 @@ function [stft, times, freqs, pwsf, t1, t2, va] = vad( ts, rate, freqband, windo
 	end
 
 		% short-time fourier transform
-	[stft, times, freqs] = dsp.stftransf( ts, rate, freqband, window );
+	[stft, times, freqs, stride] = dsp.stftransf( ts, rate, freqband, window );
 	stft = stft .* conj( stft ); % powers
 
 		% power weighted spectral flatness, SEE: [2-3]

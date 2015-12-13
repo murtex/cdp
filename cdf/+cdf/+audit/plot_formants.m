@@ -131,12 +131,12 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 	persistent stft2 times2 freqs2;
 
 	if flags(1) % fredo
-		[stft1, times1, freqs1] = dsp.stftransf( ovrts, run.audiorate, ... % f1..f3
+		[stft1, times1, freqs1, stride1] = dsp.stftransf( ovrts, run.audiorate, ... % f1..f3
 			cfg.formants_fx_freqband, cfg.formants_fx_window );
 		stft1 = stft1 .* conj( stft1 );
 		times1 = (min( resplab.range(1), respdet.range(1) ) + times1 - trial.range(1)) * 1000;
 
-		[stft2, times2, freqs2] = dsp.stftransf( ovrts, run.audiorate, ... % f0
+		[stft2, times2, freqs2, stride2] = dsp.stftransf( ovrts, run.audiorate, ... % f0
 			cfg.formants_f0_freqband, cfg.formants_f0_window );
 		stft2 = stft2 .* conj( stft2 );
 		times2 = (min( resplab.range(1), respdet.range(1) ) + times2 - trial.range(1)) * 1000;
