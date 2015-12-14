@@ -141,6 +141,13 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 		det3ts = run.audiodata(det3r(1):det3r(2), 1);
 	end
 
+	dc = mean( ovrts ); % preprocessing
+
+	ovrts = ovrts - dc;
+	det1ts = det1ts - dc;
+	det2ts = det2ts - dc;
+	det3ts = det3ts - dc;
+
 	if ~flags(3) % linear axes
 		ovryl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 

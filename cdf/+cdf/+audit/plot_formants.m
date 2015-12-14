@@ -135,6 +135,10 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 
 	ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
 
+	dc = mean( ovrts ); % preprocessing
+
+	ovrts = ovrts - dc;
+
 	persistent stft1 times1 freqs1; % transforms
 	persistent stft2 times2 freqs2;
 

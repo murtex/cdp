@@ -117,6 +117,12 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 		det2ts = run.audiodata(det2r(1):det2r(2), 1);
 	end
 
+	dc = mean( ovrts ); % preprocessing
+
+	ovrts = ovrts - dc;
+	det1ts = det1ts - dc;
+	det2ts = det2ts - dc;
+
 	if ~flags(3) % linear axes
 		ovryl = max( abs( ovrts ) ) * [-1, 1] * style.scale( 1/2 );
 
