@@ -12,12 +12,12 @@ classdef (Sealed = true) hConfig < handle
 			% labeling/auditing
 		activity_det1 = [-0.025, 0.050]; % (relative) activity detail #1 (start) range [start, stop] (row numeric)
 		activity_det2 = [-0.050, 0.025]; % (relative) detail #2 (stop) range [start, stop] (row numeric)
-		activity_zcsnap = [true, true]; % zero-crossings alignment [det1, det2] (logical scalar)
+		activity_zcsnap = [true, true]; % zero-crossings snapping [det1, det2] (row logical)
 
 		landmarks_det1 = [-0.003, 0.006]; % (relative) landmarks detail #1 (burst onset) range [start, stop] (row numeric)
 		landmarks_det2 = [-0.015, 0.030]; % (relative) detail #2 (voice onset) range [start, stop] (row numeric)
 		landmarks_det3 = [-0.030, 0.015]; % (relative) detail #3 (voice release) range [start, stop] (row numeric)
-		landmarks_zcsnap = [false, true, true]; % zero-crossings alignment [det1, det2, det3] (row logical)
+		landmarks_zcsnap = [false, true, true]; % zero-crossings snapping [det1, det2, det3] (row logical)
 
 		formants_f0_freqband = [0, 400, 100]; % f0 frequency band [lower, upper, count] (row numeric)
 		formants_f0_window = {@hamming, 0.075, 95/100}; % short-time window [function, length, overlap] (row cell)
