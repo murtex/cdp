@@ -107,11 +107,15 @@ function activity( run, cfg )
 		fdet = flags(4);
 		flog = flags(5);
 
+			% mode callback
 		if flags(1) % fproc
 			return;
 		end
 
-			% mode callback
+		if fdet
+			return;
+		end
+
 		switch type
 
 				% key presses
@@ -194,7 +198,7 @@ function activity( run, cfg )
 		clf( fig );
 
 		set( fig, 'Color', figcol );
-		if ~is_labeled( trial )
+		if ~is_labeled( trial ) && ~fdet
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
