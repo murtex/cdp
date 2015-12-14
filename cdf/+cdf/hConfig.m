@@ -19,18 +19,18 @@ classdef (Sealed = true) hConfig < handle
 		landmarks_det3 = [-0.030, 0.015]; % (relative) detail #3 (voice release) range [start, stop] (row numeric)
 		landmarks_zcsnap = [false, true, true]; % zero-crossings alignment [det1, det2, det3] (row logical)
 
-		formants_f0_freqband = [0, 500, 100]; % f0 frequency band [lower, upper, count] (row numeric)
+		formants_f0_freqband = [0, 400, 100]; % f0 frequency band [lower, upper, count] (row numeric)
 		formants_f0_window = {@hamming, 0.075, 95/100}; % short-time window [function, length, overlap] (row cell)
-		formants_f0_gamma = 0.15; % spectrogram gamma (scalar numeric)
-		formants_fx_freqband = [0, 5000, 100]; % f1..f3 frequency band [lower, upper, count] (row numeric)
+		formants_f0_gamma = 0.1; % spectrogram gamma (scalar numeric)
+		formants_fx_freqband = [0, 4000, 100]; % f1..f3 frequency band [lower, upper, count] (row numeric)
 		formants_fx_window = {@hamming, 0.005, 95/100}; % short-time window [function, length, overlap] (function handle)
-		formants_fx_gamma = 0.15; % spectrogram gamma (scalar numeric)
+		formants_fx_gamma = 0.1; % spectrogram gamma (scalar numeric)
 
 			% label detection
-		vad_freqband = [0, 5000, 100]; % voice activity frequency band [lower, upper, count] (row numeric)
+		vad_freqband = [0, 4000, 100]; % voice activity frequency band [lower, upper, count] (row numeric)
 		vad_window = {@hamming, 0.020, 50/100}; % short-time window [function, length, overlap] (row cell)
 
-		sad_subband = [200, 2000]; % speech activity frequency subband [lower, upper] (row numeric)
+		sad_subband = [200, 1000]; % speech activity frequency subband [lower, upper] (row numeric)
 
 	end
 
