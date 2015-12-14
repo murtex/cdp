@@ -210,6 +210,11 @@ function formants( run, cfg )
 		set( fig, 'Pointer', 'watch' );
 		drawnow( 'expose' );
 
+		set( fig, 'Color', figcol ); % indicate unlabeled trial
+		if ~is_labeled( trial ) && ~fdet
+			set( fig, 'Color', style.color( 'signal', +2 ) );
+		end
+
 		cdf.audit.plot_formants( ... % plot spectrograms
 			run, cfg, trial, [fredo, fdet, flog, fblend], ...
 			sprintf( 'FORMANTS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
@@ -219,11 +224,6 @@ function formants( run, cfg )
 			cdf.audit.plot_info( trial, false );
 			cdf.audit.plot_commands( false );
 			cdf.label.plot_commands( 'formants' );
-		end
-
-		set( fig, 'Color', figcol ); % indicate unlabeled trial
-		if ~is_labeled( trial ) && ~fdet
-			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
 			% wait for figure update

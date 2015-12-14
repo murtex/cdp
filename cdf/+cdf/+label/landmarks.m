@@ -250,6 +250,11 @@ function landmarks( run, cfg )
 		set( fig, 'Pointer', 'watch' );
 		drawnow( 'expose' );
 
+		set( fig, 'Color', figcol ); % indicate unlabeled trial
+		if ~is_labeled( trial ) && ~fdet
+			set( fig, 'Color', style.color( 'signal', +2 ) );
+		end
+
 		[ovrts, hdet1, hdet2, hdet3] = cdf.audit.plot_landmarks( ... % plot overview and details
 			run, cfg, trial, [fredo, fdet, flog], ...
 			sprintf( 'LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
@@ -259,11 +264,6 @@ function landmarks( run, cfg )
 			cdf.audit.plot_info( trial, false );
 			cdf.audit.plot_commands( false );
 			cdf.label.plot_commands( 'landmarks' );
-		end
-
-		set( fig, 'Color', figcol ); % indicate unlabeled trial
-		if ~is_labeled( trial ) && ~fdet
-			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
 			% wait for figure update

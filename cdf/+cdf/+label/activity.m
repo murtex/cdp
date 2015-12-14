@@ -200,6 +200,11 @@ function activity( run, cfg )
 		set( fig, 'Pointer', 'watch' );
 		drawnow( 'expose' );
 
+		set( fig, 'Color', figcol ); % indicate unlabeled trial
+		if ~is_labeled( trial ) && ~fdet
+			set( fig, 'Color', style.color( 'signal', +2 ) );
+		end
+
 		ovrts = cdf.audit.plot_activity( ... % plot overview and details
 			run, cfg, trial, [fredo, fdet, flog], ...
 			sprintf( 'ACTIVITY (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
@@ -209,11 +214,6 @@ function activity( run, cfg )
 			cdf.audit.plot_info( trial, false );
 			cdf.audit.plot_commands( false );
 			cdf.label.plot_commands( 'activity' );
-		end
-
-		set( fig, 'Color', figcol ); % indicate unlabeled trial
-		if ~is_labeled( trial ) && ~fdet
-			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
 			% wait for figure update
