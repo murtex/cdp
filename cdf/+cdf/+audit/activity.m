@@ -44,11 +44,11 @@ function activity( run, cfg )
 		error( 'invalid value: ntrials' );
 	end
 
-	itrial = 12; % DEBUG
+	itrial = 1;
 
 	fdone = false; % init flags
 	fredo = true;
-	fdet = true; % DEBUG
+	fdet = false;
 	flog = false;
 
 	style = xis.hStyle.instance(); % prepare interactive figure
