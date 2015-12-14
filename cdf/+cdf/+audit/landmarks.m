@@ -16,18 +16,7 @@ function landmarks( run, cfg )
 		error( 'invalid argument: cfg' );
 	end
 
-		% init
-	logger = xis.hLogger.instance(); % start logging
-	logger.tab( 'landmarks auditing tool...' );
-
-	style = xis.hStyle.instance(); % prepare interactive figure
-
-	fig = style.figure( 'Visible', 'on' );
-
-	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
-	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
-
-		% helper functions
+		% helpers
 	function f = is_valid( trials )
 		f = false( size( trials ) );
 		for i = 1:numel( trials )
@@ -38,22 +27,10 @@ function landmarks( run, cfg )
 		end
 	end
 
-		% event dispatching
-	function disp_commands( src, event, type )
+		% init
+	logger = xis.hLogger.instance(); % start logging
+	logger.tab( 'landmarks auditing tool...' );
 
-			% default callback
-		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
-			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
-			itrial, ntrials );
-
-		fdone = flags(2);
-		fredo = flags(3);
-		fdet = flags(4);
-		flog = flags(5);
-
-	end
-
-		% interaction loop
 	trials = [run.trials]; % prepare valid trials
 	itrials = 1:numel( trials );
 
@@ -75,6 +52,29 @@ function landmarks( run, cfg )
 	fdet = false;
 	flog = false;
 
+	style = xis.hStyle.instance(); % prepare interactive figure
+
+	fig = style.figure( 'Visible', 'on' );
+
+	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
+	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
+
+		% event dispatching
+	function disp_commands( src, event, type )
+
+			% default callback
+		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
+			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
+			itrial, ntrials );
+
+		fdone = flags(2);
+		fredo = flags(3);
+		fdet = flags(4);
+		flog = flags(5);
+
+	end
+
+		% interaction loop
 	while ~fdone
 		trial = trials(itrial);
 

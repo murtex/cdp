@@ -16,17 +16,6 @@ function activity( run, cfg )
 		error( 'invalid argument: cfg' );
 	end
 
-		% init
-	logger = xis.hLogger.instance(); % start logging
-	logger.tab( 'activity auditing tool...' );
-
-	style = xis.hStyle.instance(); % prepare interactive figure
-
-	fig = style.figure( 'Visible', 'on' );
-
-	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
-	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
-
 		% helpers
 	function f = is_valid( trials )
 		f = true( size( trials ) );
@@ -37,22 +26,10 @@ function activity( run, cfg )
 		end
 	end
 
-		% event dispatcher
-	function disp_commands( src, event, type )
+		% init
+	logger = xis.hLogger.instance(); % start logging
+	logger.tab( 'activity auditing tool...' );
 
-			% default callback
-		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
-			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
-			itrial, ntrials );
-
-		fdone = flags(2);
-		fredo = flags(3);
-		fdet = flags(4);
-		flog = flags(5);
-
-	end
-
-		% interaction loop
 	trials = [run.trials]; % prepare valid trials
 	itrials = 1:numel( trials );
 
@@ -74,6 +51,29 @@ function activity( run, cfg )
 	fdet = true; % DEBUG
 	flog = false;
 
+	style = xis.hStyle.instance(); % prepare interactive figure
+
+	fig = style.figure( 'Visible', 'on' );
+
+	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
+	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
+
+		% event dispatching
+	function disp_commands( src, event, type )
+
+			% default callback
+		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
+			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
+			itrial, ntrials );
+
+		fdone = flags(2);
+		fredo = flags(3);
+		fdet = flags(4);
+		flog = flags(5);
+
+	end
+
+		% interaction loop
 	while ~fdone
 		trial = trials(itrial);
 

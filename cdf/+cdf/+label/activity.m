@@ -16,18 +16,6 @@ function activity( run, cfg )
 		error( 'invalid argument: cfg' );
 	end
 
-		% init
-	logger = xis.hLogger.instance(); % start logging
-	logger.tab( 'activity labeling tool...' );
-
-	style = xis.hStyle.instance(); % prepare interactive figure
-
-	fig = style.figure( 'Visible', 'on' );
-	figcol = get( fig, 'Color' );
-
-	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
-	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
-
 		% helpers
 	function f = is_valid( trials )
 		f = true( size( trials ) );
@@ -54,6 +42,41 @@ function activity( run, cfg )
 		end
 	end
 
+		% init
+	logger = xis.hLogger.instance(); % start logging
+	logger.tab( 'activity labeling tool...' );
+
+	trials = [run.trials]; % prepare valid trials
+	itrials = 1:numel( trials );
+
+	invalids = ~is_valid( trials );
+	trials(invalids) = [];
+	itrials(invalids) = [];
+
+	ntrials = numel( trials );
+	logger.log( 'valid trials: %d', ntrials );
+	logger.log( 'unlabeled trials: %d', sum( ~is_labeled( trials ) ) );
+
+	if ntrials == 0
+		error( 'invalid value: ntrials' );
+	end
+
+	itrial = max( 1, next_unlabeled( trials, 0 ) );
+
+	fdone = false; % init flags
+	fredo = true;
+	fdet = false;
+	flog = false;
+
+	style = xis.hStyle.instance(); % prepare interactive figure
+
+	fig = style.figure( 'Visible', 'on' );
+	figcol = get( fig, 'Color' );
+
+	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
+	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
+
+		% event dispatching
 	function i = snap( ts, t0, i, align )
 		if align
 			zc = sign( ts ); % find zero crossings
@@ -72,7 +95,6 @@ function activity( run, cfg )
 		end
 	end
 
-		% event dispatcher
 	function disp_commands( src, event, type )
 
 			% default callback
@@ -164,28 +186,6 @@ function activity( run, cfg )
 	end
 
 		% interaction loop
-	trials = [run.trials]; % prepare valid trials
-	itrials = 1:numel( trials );
-
-	invalids = ~is_valid( trials );
-	trials(invalids) = [];
-	itrials(invalids) = [];
-
-	ntrials = numel( trials );
-	logger.log( 'valid trials: %d', ntrials );
-	logger.log( 'unlabeled trials: %d', sum( ~is_labeled( trials ) ) );
-
-	if ntrials == 0
-		error( 'invalid value: ntrials' );
-	end
-
-	itrial = max( 1, next_unlabeled( trials, 0 ) );
-
-	fdone = false; % init flags
-	fredo = true;
-	fdet = false;
-	flog = false;
-
 	while ~fdone
 		trial = trials(itrial);
 		resplab = trial.resplab;

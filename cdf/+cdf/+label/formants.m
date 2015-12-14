@@ -16,19 +16,7 @@ function formants( run, cfg )
 		error( 'invalid argument: cfg' );
 	end
 
-		% init
-	logger = xis.hLogger.instance(); % start logging
-	logger.tab( 'formants labeling tool...' );
-
-	style = xis.hStyle.instance(); % prepare interactive figure
-
-	fig = style.figure( 'Visible', 'on' );
-	figcol = get( fig, 'Color' );
-
-	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
-	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
-
-		% helper functions
+		% helpers
 	function f = is_valid( trials )
 		f = true( size( trials ) );
 		for i = 1:numel( trials )
@@ -55,7 +43,42 @@ function formants( run, cfg )
 		end
 	end
 
-		% event dispatcher
+		% init
+	logger = xis.hLogger.instance(); % start logging
+	logger.tab( 'formants labeling tool...' );
+
+	trials = [run.trials]; % prepare valid trials
+	itrials = 1:numel( trials );
+
+	invalids = ~is_valid( trials );
+	trials(invalids) = [];
+	itrials(invalids) = [];
+
+	ntrials = numel( trials );
+	logger.log( 'valid trials: %d', ntrials );
+	logger.log( 'unlabeled trials: %d', sum( ~is_labeled( trials ) ) );
+
+	if ntrials == 0
+		error( 'invalid value: ntrials' );
+	end
+
+	itrial = max( 1, next_unlabeled( trials, 0 ) );
+
+	fdone = false; % init flags
+	fredo = true;
+	fdet = false;
+	flog = false;
+	fblend = false;
+
+	style = xis.hStyle.instance(); % prepare interactive figure
+
+	fig = style.figure( 'Visible', 'on' );
+	figcol = get( fig, 'Color' );
+
+	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
+	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
+
+		% event dispatching
 	function disp_commands( src, event, type )
 
 			% default callback
@@ -173,29 +196,6 @@ function formants( run, cfg )
 	end
 
 		% interaction loop
-	trials = [run.trials]; % prepare valid trials
-	itrials = 1:numel( trials );
-
-	invalids = ~is_valid( trials );
-	trials(invalids) = [];
-	itrials(invalids) = [];
-
-	ntrials = numel( trials );
-	logger.log( 'valid trials: %d', ntrials );
-	logger.log( 'unlabeled trials: %d', sum( ~is_labeled( trials ) ) );
-
-	if ntrials == 0
-		error( 'invalid value: ntrials' );
-	end
-
-	itrial = max( 1, next_unlabeled( trials, 0 ) );
-
-	fdone = false; % init flags
-	fredo = true;
-	fdet = false;
-	flog = false;
-	fblend = false;
-
 	while ~fdone
 		trial = trials(itrial);
 		resplab = trial.resplab;
