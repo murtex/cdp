@@ -80,7 +80,7 @@ function activity( run, cfg )
 			% plot
 		clf( fig ); % clear figure
 
-		set( fig, 'Pointer', 'watch' );
+		set( fig, 'Pointer', 'watch' ); % set watch pointer, TODO: drawnow causes flickering!
 		drawnow( 'expose' );
 
 		cdf.audit.plot_activity( ... % plot overview and details
