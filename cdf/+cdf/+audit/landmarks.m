@@ -79,19 +79,24 @@ function landmarks( run, cfg )
 		trial = trials(itrial);
 
 			% plot
-		clf( fig );
+		clf( fig ); % clear figure
 
-		cdf.audit.plot_landmarks( ... % overview and details
+		set( fig, 'Pointer', 'watch' );
+		drawnow( 'expose' );
+
+		cdf.audit.plot_landmarks( ... % plot overview and details
 			run, cfg, trial, [fredo, fdet, flog], ...
 			sprintf( 'LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );
 
-		if ~fdet % info and commands
+		if ~fdet % plot info and commands
 			cdf.audit.plot_info( trial, true );
 			cdf.audit.plot_commands( true );
 		end
 
 			% wait for figure update
+		set( fig, 'Pointer', 'arrow' );
+
 		waitfor( fig, 'Clipping' ); % (unused) clipping property change
 
 	end

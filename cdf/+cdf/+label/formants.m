@@ -205,25 +205,30 @@ function formants( run, cfg )
 		resplab = trial.resplab;
 
 			% plot
-		clf( fig );
+		clf( fig ); % clear figure
 
-		set( fig, 'Color', figcol );
-		if ~is_labeled( trial ) && ~fdet
-			set( fig, 'Color', style.color( 'signal', +2 ) );
-		end
+		set( fig, 'Pointer', 'watch' );
+		drawnow( 'expose' );
 
-		cdf.audit.plot_formants( ... % spectrograms
+		cdf.audit.plot_formants( ... % plot spectrograms
 			run, cfg, trial, [fredo, fdet, flog, fblend], ...
 			sprintf( 'FORMANTS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );
 			
-		if ~fdet % info and commands
+		if ~fdet % plot info and commands
 			cdf.audit.plot_info( trial, false );
 			cdf.audit.plot_commands( false );
 			cdf.label.plot_commands( 'formants' );
 		end
 
+		set( fig, 'Color', figcol ); % indicate unlabeled trial
+		if ~is_labeled( trial ) && ~fdet
+			set( fig, 'Color', style.color( 'signal', +2 ) );
+		end
+
 			% wait for figure update
+		set( fig, 'Pointer', 'arrow' );
+
 		waitfor( fig, 'Clipping' ); % (unused) clipping property change
 
 	end

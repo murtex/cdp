@@ -7,7 +7,7 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 % run : cue-distractor run (scalar object)
 % cfg : framework configuration (scalar object)
 % trial : cue-distractor trial (scalar object)
-% flags : flags [redo, det, log] (vector logical)
+% flags : flags [fredo, fdet, flog] (vector logical)
 % stitle : title string (row char)
 % callback : button down event dispatcher [function, argument] (vector cell)
 %

@@ -7,7 +7,7 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 % run : cue-distractor run (scalar object)
 % cfg : framework configuration (scalar object)
 % trial : cue-distractor trial (scalar object)
-% flags : flags [redo, det, log, blend] (vector logical)
+% flags : flags [fredo, fdet, flog, fblend] (vector logical)
 % stitle : title string (row char)
 % callback : button down event dispatcher [function, argument] (vector cell)
 
@@ -121,7 +121,7 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 
 	function plot_signal( times, freqs, stft, gamma ) % spectrogram
 		colormap( style.gradient( 64, [1, 1, 1], style.color( 'neutral', -2 ) ) );
-		imagesc( times, freqs, scale( stft .^ gamma ), ...
+		imagesc( times, freqs, scale( stft .^ gamma ), ... % TODO: applying gamma on log scale!
 			'ButtonDownFcn', callback );
 	end
 
@@ -149,7 +149,7 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 		stft2 = stft2 .* conj( stft2 );
 		times2 = (min( resplab.range(1), respdet.range(1) ) + times2 - trial.range(1)) * 1000;
 
-		if flags(4) % blending
+		if flags(4) % blending, TODO!
 			[stft1, times1] = blend( stft1, ovrts, cfg.formants_fx_window );
 			[stft2, times2] = blend( stft2, ovrts, cfg.formants_f0_window );
 		end
