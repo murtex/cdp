@@ -76,11 +76,15 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 		times = dsp.smp2sec( 0:numel( ts )-1, run.audiorate );
 	end
 
-	function plot_marks( flegend ) % formant onsets, TODO: NaNs give errors!
-		h1 = scatter( (resplab.f0(1) - trial.range(1)) * 1000, resplab.f0(2), ... % manual
-			'ButtonDownFcn', callback, ...
+	function plot_marks( flegend ) % formant onsets
+
+			% manual
+		h1 = scatter( -1000, -1000, ... % dummy to avoid legend error
 			'MarkerFaceColor', style.color( 'warm', +2 ), 'MarkerEdgeColor', style.color( 'warm', -2 ), ...
 			'DisplayName', 'manual' );
+		scatter( (resplab.f0(1) - trial.range(1)) * 1000, resplab.f0(2), ...
+			'ButtonDownFcn', callback, ...
+			'MarkerFaceColor', style.color( 'warm', +2 ), 'MarkerEdgeColor', style.color( 'warm', -2 ) );
 		scatter( (resplab.f1(1) - trial.range(1)) * 1000, resplab.f1(2), ...
 			'ButtonDownFcn', callback, ...
 			'MarkerFaceColor', style.color( 'warm', +2 ), 'MarkerEdgeColor', style.color( 'warm', -2 ) );
@@ -91,10 +95,13 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 			'ButtonDownFcn', callback, ...
 			'MarkerFaceColor', style.color( 'warm', +2 ), 'MarkerEdgeColor', style.color( 'warm', -2 ) );
 
-		h2 = scatter( (respdet.f0(1) - trial.range(1)) * 1000, respdet.f0(2), ... % detected
-			'ButtonDownFcn', callback, ...
+			% detected
+		h2 = scatter( -1000, -1000, ... % dummy to avoid legend error
 			'MarkerFaceColor', style.color( 'signal', +2 ), 'MarkerEdgeColor', style.color( 'signal', -2 ), ...
 			'DisplayName', 'detected' );
+		scatter( (respdet.f0(1) - trial.range(1)) * 1000, respdet.f0(2), ...
+			'ButtonDownFcn', callback, ...
+			'MarkerFaceColor', style.color( 'signal', +2 ), 'MarkerEdgeColor', style.color( 'signal', -2 ) );
 		scatter( (respdet.f1(1) - trial.range(1)) * 1000, respdet.f1(2), ...
 			'ButtonDownFcn', callback, ...
 			'MarkerFaceColor', style.color( 'signal', +2 ), 'MarkerEdgeColor', style.color( 'signal', -2 ) );
@@ -105,8 +112,9 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 			'ButtonDownFcn', callback, ...
 			'MarkerFaceColor', style.color( 'signal', +2 ), 'MarkerEdgeColor', style.color( 'signal', -2 ) );
 
-		if flegend % legend
-			hl = legend( {'manual', 'detected'}, 'Location', 'southeast' );
+			% legend
+		if flegend
+			hl = legend( [h1, h2], 'Location', 'southeast' );
 			set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 		end
 	end
