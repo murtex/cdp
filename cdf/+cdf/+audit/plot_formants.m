@@ -1,7 +1,7 @@
-function plot_formants( run, cfg, trial, flags, stitle, callback )
+function ovrts = plot_formants( run, cfg, trial, flags, stitle, callback )
 % plot landmarks
 %
-% PLOT_FORMANTS( run, cfg, trial, flags, stitle, callback )
+% ovrts = PLOT_FORMANTS( run, cfg, trial, flags, stitle, callback )
 %
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -10,6 +10,9 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 % flags : flags [fredo, fdet, flog, fblend] (vector logical)
 % stitle : title string (row char)
 % callback : button down event dispatcher [function, argument] (vector cell)
+%
+% OUTPUT
+% ovrts : overview signal (column numeric)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
@@ -34,11 +37,6 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 
 	if nargin < 6 || ~isvector( callback ) || numel( callback ) ~= 2 || ~iscell( callback )
 		error( 'invalid argument: callback' );
-	end
-
-		% return with detection view, TODO!
-	if flags(2)
-		return;
 	end
 
 		% helpers
@@ -157,6 +155,11 @@ function plot_formants( run, cfg, trial, flags, stitle, callback )
 			[stft1, times1] = blend( stft1, ovrts, cfg.formants_fx_window );
 			[stft2, times2] = blend( stft2, ovrts, cfg.formants_f0_window );
 		end
+	end
+
+		% return with detection view, TODO!
+	if flags(2)
+		return;
 	end
 
 		% plot spectrogram #1 (f1..f3)

@@ -65,7 +65,8 @@ function landmarks( run, cfg )
 			% default callback
 		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
 			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
-			itrial, ntrials );
+			itrial, ntrials, ...
+			ovrts );
 
 		fdone = flags(2);
 		fredo = flags(3);
@@ -84,7 +85,7 @@ function landmarks( run, cfg )
 		set( fig, 'Pointer', 'watch' ); % set watch pointer, TODO: drawnow causes flickering!
 		drawnow( 'expose' );
 
-		cdf.audit.plot_landmarks( ... % plot overview and details
+		[ovrts, ~, ~, ~] = cdf.audit.plot_landmarks( ... % plot overview and details
 			run, cfg, trial, [fredo, fdet, flog], ...
 			sprintf( 'LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );

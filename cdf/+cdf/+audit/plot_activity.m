@@ -39,14 +39,6 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 		error( 'invalid argument: callback' );
 	end
 
-		% return with detection view
-	ovrts = [];
-
-	if flags(2)
-		cdf.detect.plot_activity( run, cfg, trial, stitle );
-		return;
-	end
-
 		% helpers
 	style = xis.hStyle.instance();
 
@@ -138,6 +130,12 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 			detyl = [min( scale( cat( 1, det1ts, det2ts ) ) ), max( scale( cat( 1, det1ts, det2ts ) ) )];
 			detyl(2) = detyl(1) + diff( detyl ) * (1 + (style.scale( 1/2 ) - 1) / 2);
 		end
+	end
+
+		% return with detection view
+	if flags(2)
+		cdf.detect.plot_activity( run, cfg, trial, stitle );
+		return;
 	end
 
 		% plot overview

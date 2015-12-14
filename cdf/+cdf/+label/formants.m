@@ -84,7 +84,8 @@ function formants( run, cfg )
 			% default callback
 		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
 			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
-			itrial, ntrials );
+			itrial, ntrials, ...
+			ovrts );
 
 		fdone = flags(2);
 		fredo = flags(3);
@@ -215,7 +216,7 @@ function formants( run, cfg )
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
-		cdf.audit.plot_formants( ... % plot spectrograms
+		ovrts = cdf.audit.plot_formants( ... % plot spectrograms
 			run, cfg, trial, [fredo, fdet, flog, fblend], ...
 			sprintf( 'FORMANTS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );

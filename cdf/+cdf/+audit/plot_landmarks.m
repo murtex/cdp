@@ -42,16 +42,6 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 		error( 'invalid argument: callback' );
 	end
 
-		% return with detection view, TODO!
-	ovrts = [];
-	hdet1 = NaN;
-	hdet2 = NaN;
-	hdet3 = NaN;
-
-	if flags(2)
-		return;
-	end
-
 		% helpers
 	style = xis.hStyle.instance();
 
@@ -165,6 +155,15 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 		end
 	end
 
+		% return with detection view, TODO!
+	hdet1 = NaN;
+	hdet2 = NaN;
+	hdet3 = NaN;
+
+	if flags(2)
+		return;
+	end
+
 		% plot overview
 	subplot( 4, 3, [1, 3], 'ButtonDownFcn', callback );
 
@@ -181,7 +180,6 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 	plot_signal( ovrr, ovrts );
 
 		% plot detail #1 (burst onset)
-	hdet1 = NaN;
 	if ~isempty( det1ts )
 		hdet1 = subplot( 4, 3, [4, 7], 'ButtonDownFcn', callback );
 
@@ -198,7 +196,6 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 	end
 
 		% plot detail #2 (voice onset)
-	hdet2 = NaN;
 	if ~isempty( det2ts )
 		hdet2 = subplot( 4, 3, [5, 8], 'ButtonDownFcn', callback );
 
@@ -215,7 +212,6 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 	end
 
 		% plot detail #3 (voice release )
-	hdet3 = NaN;
 	if ~isempty( det3ts )
 		hdet3 = subplot( 4, 3, [6, 9], 'ButtonDownFcn', callback );
 

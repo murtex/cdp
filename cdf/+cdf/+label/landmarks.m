@@ -100,7 +100,8 @@ function landmarks( run, cfg )
 			% default callback
 		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
 			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
-			itrial, ntrials );
+			itrial, ntrials, ...
+			ovrts );
 
 		fdone = flags(2);
 		fredo = flags(3);

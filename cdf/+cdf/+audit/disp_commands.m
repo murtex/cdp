@@ -1,7 +1,7 @@
-function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, flags, itrial, ntrials )
+function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, flags, itrial, ntrials, ovrts )
 % dispatch commands
 %
-% [flags, itrial] = DISP_COMMANDS( src, event, type, run, cfg, trial, flags, itrial, ntrials )
+% [flags, itrial] = DISP_COMMANDS( src, event, type, run, cfg, trial, flags, itrial, ntrials, ovrts )
 %
 % INPUT
 % src : event source handle (internal)
@@ -13,6 +13,7 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 % flags : flags [proc, done, redo, det, log] (vector logical)
 % itrial : trial number (scalar numeric)
 % ntrials : number of trials (scalar numeric)
+% ovrts : overview signal (colmn numeric)
 %
 % OUTPUT
 % flags : flags [proc, done, redo, det, log] (vector logical)
@@ -53,6 +54,10 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 
 	if nargin < 9 || ~isscalar( ntrials ) || ~isnumeric( ntrials )
 		error( 'invalid argument: ntrials' );
+	end
+
+	if nargin < 10 || ~iscolumn( ovrts ) || ~isnumeric( ovrts )
+		error(' invalid argument: ovrts' );
 	end
 
 		% dispatch events
@@ -122,9 +127,6 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 				case 'return' % audio playback
 					if nmods == 0
 						flags(1) = true; % fproc
-
-						ovrr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % play overview
-						ovrts = run.audiodata(ovrr(1):ovrr(2), 1);
 						soundsc( ovrts, run.audiorate );
 					end
 
