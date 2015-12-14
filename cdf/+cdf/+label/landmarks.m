@@ -247,7 +247,7 @@ function landmarks( run, cfg )
 			% plot
 		clf( fig ); % clear figure
 
-		set( fig, 'Pointer', 'watch' );
+		set( fig, 'Pointer', 'watch' ); % set watch pointer, TODO: drawnow causes flickering!
 		drawnow( 'expose' );
 
 		set( fig, 'Color', figcol ); % indicate unlabeled trial
