@@ -138,7 +138,7 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 						flags(3) = cdf.audit.disp_update( src, false );
 					end
 				case 'tab'
-					if nmods == 0
+					if nmods == 1 && strcmp( event.Modifier, 'control' )
 						flags(1) = true; % fproc
 
 						flags(4) = ~flags(4); % toggle fdet
