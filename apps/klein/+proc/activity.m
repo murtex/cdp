@@ -61,7 +61,7 @@ function activity( indir, outdir, ids, logfile )
 
 		proc.read_audio( run, run.audiofile ); % audio data
 
-			% detect activity, TODO
+			% detect activity
 		cdf.detect.activity( run, cfg );
 
 			% write data

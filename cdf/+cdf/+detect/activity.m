@@ -1,5 +1,5 @@
 function activity( run, cfg )
-% activity detction
+% activity detection
 %
 % ACTIVITY( run, cfg )
 %
@@ -46,17 +46,29 @@ function activity( run, cfg )
 	logger.progress();
 	for i = 1:ntrials
 		trial = trials(i);
+		respdet = trial.respdet;
 
 			% prepare data
 		tr = dsp.sec2smp( trial.range, run.audiorate ) + [1, 0]; % ranges
 
 		tts = run.audiodata(tr(1):tr(2), 1); % signals
 
-			% detect activity, TODO
-		[stft, times, freqs, ~, ~, ~, ~, va] = k15.vad( ... % voice
+			% detect activities
+		[stft, times, freqs, stride, ~, ~, ~, va] = k15.vad( ... % voice
 			tts, run.audiorate, cfg.vad_freqband, cfg.vad_window );
 
 		[~, ~, ~, sa] = k15.sad( va, stft, times, freqs, cfg.sad_subband ); % speech
+
+			% set activity range
+		astarts = find( diff( cat( 1, false, sa ) ) == 1 );
+		astops = find( diff( cat( 1, sa, false ) ) == -1 );
+
+		if ~isempty( astarts ) % choose first active range, TODO: more sophisticated choice?!
+			respdet.range(1) = trial.range(1) + times(astarts(1)) - stride/2;
+		end
+		if ~isempty( astops )
+			respdet.range(2) = trial.range(1) + times(astops(1)) + stride/2;
+		end
 
 		logger.progress( i, ntrials );
 	end
