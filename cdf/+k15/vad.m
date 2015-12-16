@@ -1,11 +1,12 @@
-function [stft, times, freqs, stride, pwsf, t1, t2, va] = vad( ts, rate, freqband, window )
+function [stft, times, freqs, stride, pwsf, t1, t2, va] = vad( ts, rate, noilen, freqband, window )
 % voice activity detection
 %
-% [stft, times, freqs, stride, pwsf, t1, t2, va] = VAD( ts, rate, freqband, window )
+% [stft, times, freqs, stride, pwsf, t1, t2, va] = VAD( ts, rate, noilen, freqband, window )
 %
 % INPUT
 % ts : time series (column numeric)
 % rate : sampling rate (scalar numeric)
+% noilen : initial noise length (scalar numeric)
 % freqband : frequency band [lower, upper, count] (row numeric)
 % window : short-time window [function, length, overlay] (row cell)
 %
@@ -34,17 +35,38 @@ function [stft, times, freqs, stride, pwsf, t1, t2, va] = vad( ts, rate, freqban
 		error( 'invalid argument: rate' );
 	end
 
-	if nargin < 3 || ~isrow( freqband ) || numel( freqband ) ~= 3 || ~isnumeric( freqband )
+	if nargin < 3 || ~isscalar( noilen ) || ~isnumeric( noilen )
+		error( 'invalid argument: noilen' );
+	end
+
+	if nargin < 4 || ~isrow( freqband ) || numel( freqband ) ~= 3 || ~isnumeric( freqband )
 		error( 'invalid argument: freqband' );
 	end
 
-	if nargin < 4 || ~isrow( window ) || numel( window ) ~= 3
+	if nargin < 5 || ~isrow( window ) || numel( window ) ~= 3
 		error( 'invalid argument: window' );
 	end
+
+		% preprocessing
+	ts = dsp.rgain( ts, rate ); % equal loudness filter
 
 		% short-time fourier transform
 	[stft, times, freqs, stride] = dsp.stftransf( ts, rate, freqband, window );
 	stft = stft .* conj( stft ); % powers
+
+		% spectral noise subtraction
+	noir = dsp.sec2smp( [0, noilen], rate ) + [1, 0];
+	noits = ts(noir(1):noir(2));
+
+	[noistft, ~, ~] = dsp.stftransf( noits, rate, freqband, window );
+	noistft = noistft .* conj( noistft ); % powers
+	noistft = mean( noistft, 2 ); % average
+
+	spfl = min( stft, [], 2 ); % spectral floor
+
+	for i = 1:numel( freqs ) % spectral subtraction
+		stft(i, :) = max( spfl(i), stft(i, :) - noistft(i) );
+	end
 
 		% power weighted spectral flatness, SEE: [2-3]
 	pwsf = geomean( stft, 1 ) ./ mean( stft, 1 ); % spectral flatness

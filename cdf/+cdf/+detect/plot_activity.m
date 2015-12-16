@@ -48,7 +48,9 @@ function plot_activity( run, cfg, trial, stitle )
 	end
 
 	[stft, times, freqs, stride, pwsf, vathresh1, vathresh2, vadet] = k15.vad( ... % detected
-		tts, run.audiorate, cfg.vad_freqband, cfg.vad_window );
+		tts, run.audiorate, ...
+		trial.soa, ...
+		cfg.vad_freqband, cfg.vad_window );
 
 	[sbpw, sathresh1, sathresh2, sadet] = k15.sad( vadet, stft, times, freqs, cfg.sad_subband );
 

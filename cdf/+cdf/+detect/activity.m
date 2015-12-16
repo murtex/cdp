@@ -55,7 +55,9 @@ function activity( run, cfg )
 
 			% detect activities
 		[stft, times, freqs, stride, ~, ~, ~, va] = k15.vad( ... % voice
-			tts, run.audiorate, cfg.vad_freqband, cfg.vad_window );
+			tts, run.audiorate, ...
+			trial.soa, ...
+			cfg.vad_freqband, cfg.vad_window );
 
 		[~, ~, ~, sa] = k15.sad( va, stft, times, freqs, cfg.sad_subband ); % speech
 
