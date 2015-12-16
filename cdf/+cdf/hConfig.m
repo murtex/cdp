@@ -27,10 +27,10 @@ classdef (Sealed = true) hConfig < handle
 		formants_fx_gamma = 0.1; % spectrogram gamma (scalar numeric)
 
 			% label detection
-		vad_freqband = [0, 4000, 100]; % voice activity frequency band [lower, upper, count] (row numeric)
+		vad_freqband = [0, 1000, 100]; % voice activity frequency band [lower, upper, count] (row numeric)
 		vad_window = {@hamming, 0.020, 50/100}; % short-time window [function, length, overlap] (row cell)
 
-		sad_subband = [200, 1000]; % speech activity frequency subband [lower, upper] (row numeric)
+		sad_subband = [200, 500]; % speech activity frequency subband [lower, upper] (row numeric)
 
 	end
 
