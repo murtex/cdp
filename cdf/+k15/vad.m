@@ -63,6 +63,7 @@ function [stft, times, freqs, stride, pwsf, t1, t2, va] = vad( ts, rate, noilen,
 	%noistft = mean( noistft, 2 ); % average
 
 	%spfl = min( stft, [], 2 ); % spectral floor
+	%spfl = noistft;
 
 	%for i = 1:numel( freqs ) % spectral subtraction
 		%stft(i, :) = max( spfl(i), stft(i, :) - noistft(i) );
