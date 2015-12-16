@@ -48,7 +48,7 @@ function [stft, times, freqs, stride, pwsf, t1, t2, va] = vad( ts, rate, noilen,
 	end
 
 		% preprocessing
-	%ts = dsp.rgain( ts, rate ); % equal loudness filter
+	ts = dsp.rgain( ts, rate ); % equal loudness filter
 
 		% short-time fourier transform
 	[stft, times, freqs, stride] = dsp.stftransf( ts, rate, freqband, window );
