@@ -55,19 +55,19 @@ function [stft, times, freqs, stride, pwsf, t1, t2, va] = vad( ts, rate, noilen,
 	stft = stft .* conj( stft ); % powers
 
 		% spectral noise subtraction
-	%noir = dsp.sec2smp( [0, noilen], rate ) + [1, 0];
-	%noits = ts(noir(1):noir(2));
+	noir = dsp.sec2smp( [0, noilen], rate ) + [1, 0];
+	noits = ts(noir(1):noir(2));
 
-	%[noistft, ~, ~] = dsp.stftransf( noits, rate, freqband, window );
-	%noistft = noistft .* conj( noistft ); % powers
-	%noistft = mean( noistft, 2 ); % average
+	[noistft, ~, ~] = dsp.stftransf( noits, rate, freqband, window );
+	noistft = noistft .* conj( noistft ); % powers
+	noistft = mean( noistft, 2 ); % average
 
-	%spfl = min( stft, [], 2 ); % spectral floor
-	%spfl = noistft;
+	spfl = min( stft, [], 2 ); % spectral floor
+	spfl = noistft;
 
-	%for i = 1:numel( freqs ) % spectral subtraction
-		%stft(i, :) = max( spfl(i), stft(i, :) - noistft(i) );
-	%end
+	for i = 1:numel( freqs ) % spectral subtraction
+		stft(i, :) = max( spfl(i), stft(i, :) - noistft(i) );
+	end
 
 		% power weighted spectral flatness, SEE: [2-3]
 	pwsf = geomean( stft, 1 ) ./ mean( stft, 1 ); % spectral flatness
