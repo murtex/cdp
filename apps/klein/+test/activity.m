@@ -155,14 +155,14 @@ function activity( indir, outdir, ids, logfile )
 		respdets = [trials.respdet];
 		resprs = cat( 1, respdets.range );
 
-		ntrials = numel( trials );
+		ntrials = numel( trials ); % trial numbers
 		ntottrials = numel( run.trials );
 
-		dstarts = resprs(:, 1) - transpose( [resplabs.bo] );
-		dstops = resprs(:, 2) - transpose( [resplabs.vr] );
-
-		acc_ntrials = acc_ntrials + ntrials; % accumulate
+		acc_ntrials = acc_ntrials + ntrials;
 		acc_ntottrials = acc_ntottrials + ntottrials;
+
+		dstarts = resprs(:, 1) - transpose( [resplabs.bo] ); % deltas
+		dstops = resprs(:, 2) - transpose( [resplabs.vr] );
 
 		acc_dstarts = cat( 1, acc_dstarts, dstarts );
 		acc_dstops = cat( 1, acc_dstops, dstops );

@@ -2,7 +2,7 @@
 
 	# arguments
 INDIR="../../data/klein/sync/"
-OUTDIR="../../data/klein/activity/"
+OUTDIR="../../data/klein/activity6/"
 
 IDS1="[3:8]"
 IDS2="[9:14]"
