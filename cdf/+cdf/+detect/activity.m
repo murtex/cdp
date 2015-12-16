@@ -65,10 +65,8 @@ function activity( run, cfg )
 		astarts = find( diff( cat( 1, false, sa ) ) == 1 );
 		astops = find( diff( cat( 1, sa, false ) ) == -1 );
 
-		if ~isempty( astarts ) % choose first active range, TODO: more sophisticated choice?!
+		if ~isempty( astarts ) && ~isempty( astops ) % choose first active range, TODO: more sophisticated choice?!
 			respdet.range(1) = trial.range(1) + times(astarts(1)) - stride/2;
-		end
-		if ~isempty( astops )
 			respdet.range(2) = trial.range(1) + times(astops(1)) + stride/2;
 		end
 
