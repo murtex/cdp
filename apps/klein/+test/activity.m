@@ -83,7 +83,8 @@ function activity( indir, outdir, ids, logfile )
 		ylim( [0, 1] * 100 );
 
 		bar( dstartpos * 1000, dstartns/ndstarts * 100, ...
-			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+			'BarWidth', 1, ...
+			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 			% plot cumulative start deltas
 		subplot( 3, 2, 2 );
@@ -94,7 +95,8 @@ function activity( indir, outdir, ids, logfile )
 		ylim( [0, 1] * 100 );
 
 		bar( absdstartpos * 1000, cumsum( absdstartns )/ndstarts * 100, ... % deltas
-			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+			'BarWidth', 1, ...
+			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 		hl = legend( sprintf( 'outlying: %.2f%%', (1 - numel( absdstarts )/ndstarts) * 100 ), ... % legend
 			'Location', 'southeast' );
@@ -109,7 +111,8 @@ function activity( indir, outdir, ids, logfile )
 		ylim( [0, 1] * 100 );
 
 		bar( dstoppos * 1000, dstopns/ndstops * 100, ...
-			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+			'BarWidth', 1, ...
+			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 			% plot cumulative stop deltas
 		subplot( 3, 2, 4 );
@@ -120,7 +123,8 @@ function activity( indir, outdir, ids, logfile )
 		ylim( [0, 1] * 100 );
 
 		bar( absdstoppos * 1000, cumsum( absdstopns )/ndstops * 100, ... % deltas
-			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+			'BarWidth', 1, ...
+			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 		hl = legend( sprintf( 'outlying: %.2f%%', (1 - numel( absdstops )/ndstops) * 100 ), ... % legend
 			'Location', 'southeast' );
@@ -128,7 +132,7 @@ function activity( indir, outdir, ids, logfile )
 
 	end
 
-	function plot_rates( sxlabel, ids, totlens, lablens, h1s, fa1s );
+	function plot_rates( sxlabel, ids, totlens, lablens, h1s, fa1s, facc );
 
 			% prepare data
 		hr1s = h1s ./ lablens; % speech hit rate
@@ -139,12 +143,18 @@ function activity( indir, outdir, ids, logfile )
 			% plot non-speech false alarm rate (far0 = 1 - hr1)
 		subplot( 3, 2, 5 );
 		xlabel( sxlabel );
-		ylabel( {'far0 in percent', '(non-speech false alarm rate)'} );
+		ylabel( {'far0 in percent', '(non-speech false alarm)'} );
 		
 		xlim( [min( ids ), max( ids )] );
 
-		stairs( [ids, ids(end)] - 1/2, (1 - [hr1s; hr1s(end)]) * 100, ... % individual
-			'Color', style.color( 'neutral', 0 ) );
+		if ~facc % individual
+			stairs( [ids, ids(end)+1] - 1/2, (1 - [hr1s; hr1s(end)]) * 100, ...
+				'Color', style.color( 'neutral', 0 ) );
+		else
+			bar( ids, (1 - hr1s) * 100, ...
+				'BarWidth', 1, ...
+				'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', style.color( 'neutral', -2 ) );
+		end
 
 		h = plot( xlim(), (1 - hr1) * [1, 1] * 100, ... % total
 			'Color', style.color( 'cold', +2 ), ...
@@ -153,21 +163,27 @@ function activity( indir, outdir, ids, logfile )
 		hl = legend( h, 'Location', 'northeast' ); % legend
 		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 
-			% plot non-speech hit rate (hr0 = 1 - far1)
+			% plot speech false alarm rate (note: far1 = 1 - hr0)
 		subplot( 3, 2, 6 );
 		xlabel( sxlabel );
-		ylabel( {'hr0 in percent', '(non-speech hit rate)'} );
+		ylabel( {'far1 in percent', '(speech false alarm)'} );
 
 		xlim( [min( ids ), max( ids )] );
 
-		stairs( [ids, ids(end)] - 1/2, (1 - [far1s; far1s(end)]) * 100, ... % individual
-			'Color', style.color( 'neutral', 0 ) );
+		if ~facc % individual
+			stairs( [ids, ids(end)+1] - 1/2, [far1s; far1s(end)] * 100, ...
+				'Color', style.color( 'neutral', 0 ) );
+		else
+			bar( ids, far1s * 100, ...
+				'BarWidth', 1, ...
+				'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', style.color( 'neutral', -2 ) );
+		end
 
-		h = plot( xlim(), (1 - far1) * [1, 1] * 100, ... % total
+		h = plot( xlim(), far1 * [1, 1] * 100, ... % total
 			'Color', style.color( 'cold', +2 ), ...
-			'DisplayName', sprintf( 'total: %.2f%%', (1 - far1) * 100 ) );
+			'DisplayName', sprintf( 'total: %.2f%%', far1 * 100 ) );
 
-		hl = legend( h, 'Location', 'southeast' ); % legend
+		hl = legend( h, 'Location', 'northeast' ); % legend
 		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 
 	end
@@ -254,8 +270,8 @@ function activity( indir, outdir, ids, logfile )
 		hr1 = sum( h1s ) / sum( lablens ); % logging
 		far1 = sum( fa1s ) / sum( totlens - lablens );
 
-		logger.log( 'far0 (non-speech false alarm rate): %.2f%%', (1 - hr1) * 100 );
-		logger.log( 'hr0 (non-speech hit rate): %.2f%%', (1 - far1) * 100 );
+		logger.log( 'far0 (non-speech false alarm): %.2f%%', (1 - hr1) * 100 );
+		logger.log( 'far1 (speech false alarm): %.2f%%', far1 * 100 );
 
 			% plot statistics
 		figfile = fullfile( outdir, sprintf( 'run_%d.png', id ) );
@@ -267,7 +283,7 @@ function activity( indir, outdir, ids, logfile )
 			sprintf( 'ACTIVITY (subject: #%d, trials: %d/%d)', id, ntrials, ntottrials ), ...
 			dstarts, dstops );
 
-		plot_rates( 'trial index', 1:ntrials, totlens, lablens, h1s, fa1s );
+		plot_rates( 'trial index', 1:ntrials, totlens, lablens, h1s, fa1s, false );
 
 		style.print( figfile );
 		delete( fig );
@@ -285,8 +301,8 @@ function activity( indir, outdir, ids, logfile )
 	acc_hr1 = sum( acc_h1s ) / sum( acc_lablens );
 	acc_far1 = sum( acc_fa1s ) / sum( acc_totlens - acc_lablens );
 
-	logger.log( 'far0 (non-speech false alarm rate): %.2f%%', (1 - acc_hr1) * 100 );
-	logger.log( 'hr0 (non-speech hit rate): %.2f%%', (1 - acc_far1) * 100 );
+	logger.log( 'far0 (non-speech false alarm): %.2f%%', (1 - acc_hr1) * 100 );
+	logger.log( 'far1 (speech false alarm): %.2f%%', acc_far1 * 100 );
 
 		% plot accumulated statistics
 	[~, logname, ~] = fileparts( logfile );
@@ -299,7 +315,7 @@ function activity( indir, outdir, ids, logfile )
 		sprintf( 'ACTIVITY (subjects: %d, trials: %d/%d)', numel( ids ), acc_ntrials, acc_ntottrials ), ...
 		acc_dstarts, acc_dstops );
 
-	plot_rates( 'subject identifier', ids, acc_totlens, acc_lablens, acc_h1s, acc_fa1s );
+	plot_rates( 'subject identifier', ids, acc_totlens, acc_lablens, acc_h1s, acc_fa1s, true );
 
 	style.print( figfile );
 	delete( fig );
