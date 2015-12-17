@@ -82,9 +82,13 @@ function activity( indir, outdir, ids, logfile )
 		xlim( MAXDELTA * [-1, 1] * 1000 );
 		ylim( [0, 1] * 100 );
 
-		bar( dstartpos * 1000, dstartns/ndstarts * 100, ...
+		bar( dstartpos * 1000, dstartns/ndstarts * 100, ... % deltas
 			'BarWidth', 1, ...
 			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+
+		hl = legend( sprintf( 'off-lying: %.2f%%', (1 - numel( dstarts )/ndstarts) * 100 ), ... % legend
+			'Location', 'northeast' );
+		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 
 			% plot cumulative start deltas
 		subplot( 3, 2, 2 );
@@ -94,13 +98,9 @@ function activity( indir, outdir, ids, logfile )
 		xlim( MAXDELTA * [0, 1] * 1000 );
 		ylim( [0, 1] * 100 );
 
-		bar( absdstartpos * 1000, cumsum( absdstartns )/ndstarts * 100, ... % deltas
+		bar( absdstartpos * 1000, cumsum( absdstartns )/ndstarts * 100, ...
 			'BarWidth', 1, ...
 			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
-
-		hl = legend( sprintf( 'outlying: %.2f%%', (1 - numel( absdstarts )/ndstarts) * 100 ), ... % legend
-			'Location', 'southeast' );
-		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 
 			% plot stop deltas
 		subplot( 3, 2, 3 );
@@ -110,9 +110,13 @@ function activity( indir, outdir, ids, logfile )
 		xlim( MAXDELTA * [-1, 1] * 1000 );
 		ylim( [0, 1] * 100 );
 
-		bar( dstoppos * 1000, dstopns/ndstops * 100, ...
+		bar( dstoppos * 1000, dstopns/ndstops * 100, ... % deltas
 			'BarWidth', 1, ...
 			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+
+		hl = legend( sprintf( 'off-lying: %.2f%%', (1 - numel( dstops )/ndstops) * 100 ), ... % legend
+			'Location', 'northwest' );
+		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 
 			% plot cumulative stop deltas
 		subplot( 3, 2, 4 );
@@ -122,13 +126,9 @@ function activity( indir, outdir, ids, logfile )
 		xlim( MAXDELTA * [0, 1] * 1000 );
 		ylim( [0, 1] * 100 );
 
-		bar( absdstoppos * 1000, cumsum( absdstopns )/ndstops * 100, ... % deltas
+		bar( absdstoppos * 1000, cumsum( absdstopns )/ndstops * 100, ...
 			'BarWidth', 1, ...
 			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
-
-		hl = legend( sprintf( 'outlying: %.2f%%', (1 - numel( absdstops )/ndstops) * 100 ), ... % legend
-			'Location', 'southeast' );
-		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 
 	end
 
