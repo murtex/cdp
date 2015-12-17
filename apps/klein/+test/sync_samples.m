@@ -6,7 +6,7 @@ function sync_samples( indir, outdir, ids, ntrials, rndseed, logfile )
 % INPUT
 % indir : input directory (row char)
 % outdir : output directory (row char)
-% ids : subject identifiers (vector numeric)
+% ids : subject identifiers (row numeric)
 % ntrials : number of trials (scalar numeric)
 % rndseed : randomization rndseed (scalar numeric)
 % logfile : logger filename (row char)
@@ -21,7 +21,7 @@ function sync_samples( indir, outdir, ids, ntrials, rndseed, logfile )
 		error( 'invalid argument: outdir' );
 	end
 
-	if nargin < 3 || ~isvector( ids ) || ~isnumeric( ids ) % subject identifiers
+	if nargin < 3 || ~isrow( ids ) || ~isnumeric( ids ) % subject identifiers
 		error( 'invalid arguments: ids' );
 	end
 

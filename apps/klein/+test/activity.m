@@ -6,7 +6,7 @@ function activity( indir, outdir, ids, logfile )
 % INPUT
 % indir : input directory (row char)
 % outdir : output directory (row char)
-% ids : subject identifiers (vector numeric)
+% ids : subject identifiers (row numeric)
 % logfile : logger filename (row char)
 
 		% safeguard
@@ -19,7 +19,7 @@ function activity( indir, outdir, ids, logfile )
 		error( 'invalid argument: outdir' );
 	end
 
-	if nargin < 3 || ~isvector( ids ) || ~isnumeric( ids ) % subject identifiers
+	if nargin < 3 || ~isrow( ids ) || ~isnumeric( ids ) % subject identifiers
 		error( 'invalid arguments: ids' );
 	end
 
@@ -139,7 +139,7 @@ function activity( indir, outdir, ids, logfile )
 			% plot non-speech false alarm rate (far0 = 1 - hr1)
 		subplot( 3, 2, 5 );
 		xlabel( sxlabel );
-		ylabel( {'far0 in percent', '(non-speech false alarm)'} );
+		ylabel( {'far0 in percent', '(non-speech false alarm rate)'} );
 		
 		xlim( [min( ids ), max( ids )] );
 
@@ -156,7 +156,7 @@ function activity( indir, outdir, ids, logfile )
 			% plot non-speech hit rate (hr0 = 1 - far1)
 		subplot( 3, 2, 6 );
 		xlabel( sxlabel );
-		ylabel( {'hr0 in percent', '(non-speech hit)'} );
+		ylabel( {'hr0 in percent', '(non-speech hit rate)'} );
 
 		xlim( [min( ids ), max( ids )] );
 

@@ -5,7 +5,7 @@ function audit( indir, ids, audmode, logfile )
 %
 % INPUT
 % indir : input directory (row char)
-% ids : subject identifiers (vector numeric)
+% ids : subject identifiers (row numeric)
 % audmode : auditing mode [activity | landmarks | formants] (row char)
 % logfile : logger filename (row char)
 
@@ -15,7 +15,7 @@ function audit( indir, ids, audmode, logfile )
 		error( 'invalid argument: indir' );
 	end
 
-	if nargin < 2 || ~isvector( ids ) || ~isnumeric( ids ) % subject identifiers
+	if nargin < 2 || ~isrow( ids ) || ~isnumeric( ids ) % subject identifiers
 		error( 'invalid arguments: ids' );
 	end
 
