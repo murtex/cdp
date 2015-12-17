@@ -4,7 +4,7 @@
 INDIR="../../data/klein/activity6/"
 OUTDIR="${INDIR}/test/"
 
-IDS="[3:27, 29, 31:47]"
+IDS="[3, 5:27, 29, 31:47]" # DEBUG
 
 	# workload
 MATLAB="matlab -nosplash -nodesktop -r"

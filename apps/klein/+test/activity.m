@@ -43,8 +43,7 @@ function activity( indir, outdir, ids, logfile )
 	function f = is_comparable( trials )
 		f = true( numel( trials ) );
 		for i = 1:numel( trials )
-			if isnan( trials(i).resplab.bo ) || isnan( trials(i).resplab.vr ) ...
-					|| any( isnan( trials(i).respdet.range ) )
+			if any( isnan( trials(i).resplab.range ) ) || any( isnan( trials(i).respdet.range ) )
 				f(i) = false;
 			end
 		end
@@ -56,7 +55,7 @@ function activity( indir, outdir, ids, logfile )
 		ndstarts = numel( dstarts );
 		ndstops = numel( dstops );
 
-		MAXDELTA = 0.3; % binning
+		MAXDELTA = 0.1; % binning
 
 		dstarts = dstarts(abs( dstarts) <= MAXDELTA);
 		dstartpos = linspace( min( dstarts ), max( dstarts ), style.bins( dstarts ) );
@@ -66,58 +65,112 @@ function activity( indir, outdir, ids, logfile )
 		dstoppos = linspace( min( dstops ), max( dstops ), style.bins( dstops ) );
 		dstopns = hist( dstops, dstoppos );
 
-		valdstarts = abs( dstarts(dstarts <= 0) ); % cumulative binning
-		valdstartpos = linspace( min( valdstarts ), max( valdstarts ), style.bins( valdstarts ) );
-		valdstartns = hist( valdstarts, valdstartpos );
+		absdstarts = abs( dstarts ); % cumulative binning
+		absdstartpos = linspace( min( absdstarts ), max( absdstarts ), style.bins( absdstarts ) );
+		absdstartns = hist( absdstarts, absdstartpos );
 
-		valdstops = dstops(dstops >= 0);
-		valdstoppos = linspace( min( valdstops ), max( valdstops ), style.bins( valdstops ) );
-		valdstopns = hist( valdstops, valdstoppos );
+		absdstops = abs( dstops );
+		absdstoppos = linspace( min( absdstops ), max( absdstops ), style.bins( absdstops ) );
+		absdstopns = hist( absdstops, absdstoppos );
 
 			% plot start deltas
-		subplot( 2, 2, 1 );
+		subplot( 3, 2, 1 );
 		title( stitle );
 		xlabel( 'start delta in milliseconds' );
-		ylabel( 'rate in percent' );
+		ylabel( 'rate' );
 
 		xlim( MAXDELTA * [-1, 1] * 1000 );
-		ylim( [0, 100] );
+		ylim( [0, 1] );
 
-		bar( dstartpos * 1000, dstartns / ndstarts * 100, ...
+		bar( dstartpos * 1000, dstartns/ndstarts, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 			% plot cumulative start deltas
-		subplot( 2, 2, 2 );
-		xlabel( 'valid delta in milliseconds' );
-		ylabel( 'cumulative rate in percent' );
+		subplot( 3, 2, 2 );
+		xlabel( 'abs(delta) in milliseconds' );
+		ylabel( 'cumulative rate' );
 
 		xlim( MAXDELTA * [0, 1] * 1000 );
-		ylim( [0, 100] );
+		ylim( [0, 1] );
 
-		bar( valdstartpos * 1000, cumsum( valdstartns ) / ndstarts * 100, ...
+		bar( absdstartpos * 1000, cumsum( absdstartns )/ndstarts, ... % deltas
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
+		hl = legend( sprintf( 'outlying: %.3f', (1 - numel( absdstarts )/ndstarts) ), ... % legend
+			'Location', 'southeast' );
+		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
+
 			% plot stop deltas
-		subplot( 2, 2, 3 );
+		subplot( 3, 2, 3 );
 		xlabel( 'stop delta in milliseconds' );
-		ylabel( 'rate in percent' );
+		ylabel( 'rate' );
 
 		xlim( MAXDELTA * [-1, 1] * 1000 );
-		ylim( [0, 100] );
+		ylim( [0, 1] );
 
-		bar( dstoppos * 1000, dstopns / ndstops * 100, ...
+		bar( dstoppos * 1000, dstopns/ndstops, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
 			% plot cumulative stop deltas
-		subplot( 2, 2, 4 );
-		xlabel( 'valid delta in milliseconds' );
-		ylabel( 'cumulative rate in percent' );
+		subplot( 3, 2, 4 );
+		xlabel( 'abs(delta) in milliseconds' );
+		ylabel( 'cumulative rate' );
 
 		xlim( MAXDELTA * [0, 1] * 1000 );
-		ylim( [0, 100] );
+		ylim( [0, 1] );
 
-		bar( valdstoppos * 1000, cumsum( valdstopns ) / ndstops * 100, ...
+		bar( absdstoppos * 1000, cumsum( absdstopns )/ndstops, ... % deltas
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+
+		hl = legend( sprintf( 'outlying: %.3f', (1 - numel( absdstops )/ndstops) ), ... % legend
+			'Location', 'southeast' );
+		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
+
+	end
+
+	function plot_rates( sxlabel, ids, totlens, lablens, h1s, fa1s );
+
+			% prepare data
+		hr1s = h1s ./ lablens; % speech hit rate
+		hr1 = sum( h1s ) / sum( lablens );
+		far1s = fa1s ./ (totlens - lablens); % speech false alarm rate
+		far1 = sum( fa1s ) / sum( totlens - lablens );
+
+			% plot non-speech false alarm rate (far0 = 1 - hr1)
+		subplot( 3, 2, 5, 'YScale', 'log' );
+		xlabel( sxlabel );
+		ylabel( {'far0', '(non-speech false alarm)'} );
+		
+		xlim( [min( ids ), max( ids )] );
+		ylim( [1e-4, 1] + eps );
+
+		stairs( ids, (1 - hr1s) + eps, ... % individual, TODO: log bar plot!
+			'Color', style.color( 'neutral', 0 ) );
+
+		h = plot( xlim(), (1 - hr1) * [1, 1] + eps, ... % total
+			'Color', style.color( 'cold', +2 ), ...
+			'DisplayName', sprintf( 'total: %.3f', (1 - hr1) ) );
+
+		hl = legend( h, 'Location', 'southeast' ); % legend
+		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
+
+			% plot speech false alarm rate (note: far1 = 1 - hr0)
+		subplot( 3, 2, 6, 'YScale', 'log' );
+		xlabel( sxlabel );
+		ylabel( {'far1', '(speech false alarm)'} );
+
+		xlim( [min( ids ), max( ids )] );
+		ylim( [1e-4, 1] + eps );
+
+		stairs( ids, far1s + eps, ... % individual, TODO: log bar plot!
+			'Color', style.color( 'neutral', 0 ) );
+
+		h = plot( xlim(), far1 * [1, 1] + eps, ... % total
+			'Color', style.color( 'cold', +2 ), ...
+			'DisplayName', sprintf( 'total: %.3f', far1 ) );
+
+		hl = legend( h, 'Location', 'southeast' ); % legend
+		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 
 	end
 
@@ -127,6 +180,11 @@ function activity( indir, outdir, ids, logfile )
 
 	acc_dstarts = [];
 	acc_dstops = [];
+
+	acc_totlens = NaN( numel( ids ), 1 );
+	acc_lablens = NaN( numel( ids ), 1 );
+	acc_h1s = NaN( numel( ids ), 1 );
+	acc_fa1s = NaN( numel( ids ), 1 );
 
 	cid = 1;
 	for id = ids % proceed subjects
@@ -148,24 +206,58 @@ function activity( indir, outdir, ids, logfile )
 		trials = [run.trials];
 		trials(~is_comparable( trials )) = [];
 
-		logger.log( 'comparable trials: %d/%d', numel( trials ), numel( run.trials ) );
-
-			% gather statistics
 		resplabs = [trials.resplab];
 		respdets = [trials.respdet];
-		resprs = cat( 1, respdets.range );
 
+			% gather statistics
 		ntrials = numel( trials ); % trial numbers
 		ntottrials = numel( run.trials );
 
 		acc_ntrials = acc_ntrials + ntrials;
 		acc_ntottrials = acc_ntottrials + ntottrials;
 
-		dstarts = resprs(:, 1) - transpose( [resplabs.bo] ); % deltas
-		dstops = resprs(:, 2) - transpose( [resplabs.vr] );
+		logger.log( 'comparable trials: %d/%d', ntrials, ntottrials );
+
+		labrs = cat( 1, resplabs.range ); % range deltas
+		detrs = cat( 1, respdets.range );
+
+		dstarts = detrs(:, 1) - labrs(:, 1);
+		dstops = detrs(:, 2) - labrs(:, 2);
 
 		acc_dstarts = cat( 1, acc_dstarts, dstarts );
 		acc_dstops = cat( 1, acc_dstops, dstops );
+
+		totlens = NaN( ntrials, 1 ); % perfomance rates
+		lablens = NaN( ntrials, 1 );
+		h1s = NaN( ntrials, 1 );
+		fa1s = NaN( ntrials, 1 );
+
+		for i = 1:ntrials
+			totr = dsp.sec2smp( trials(i).range, run.audiorate ) + [1, 0]; % total range
+			totr = totr(1):totr(2);
+			totlens(i) = numel( totr );
+
+			labr = dsp.sec2smp( resplabs(i).range, run.audiorate ) + [1, 0]; % manual range
+			labr = labr(1):labr(2);
+			lablens(i) = numel( labr );
+
+			detr = dsp.sec2smp( respdets(i).range, run.audiorate ) + [1, 0]; % detected range
+			detr = detr(1):detr(2);
+
+			h1s(i) = numel( intersect( detr, labr ) ); % speech hits
+			fa1s(i) = numel( setdiff( detr, labr ) ); % speech false alarms
+		end
+
+		acc_totlens(cid) = sum( totlens );
+		acc_lablens(cid) = sum( lablens );
+		acc_h1s(cid) = sum( h1s );
+		acc_fa1s(cid) = sum( fa1s );
+
+		hr1 = sum( h1s ) / sum( lablens ); % logging
+		far1 = sum( fa1s ) / sum( totlens - lablens );
+
+		logger.log( 'non-speech false alarm rate: %.3f', (1 - hr1) );
+		logger.log( 'speech false alarm rate: %.3f', far1 );
 
 			% plot statistics
 		figfile = fullfile( outdir, sprintf( 'run_%d.png', id ) );
@@ -177,6 +269,8 @@ function activity( indir, outdir, ids, logfile )
 			sprintf( 'ACTIVITY (subject: #%d, trials: %d/%d)', id, ntrials, ntottrials ), ...
 			dstarts, dstops );
 
+		plot_rates( 'trial index', 1:ntrials, totlens, lablens, h1s, fa1s );
+
 		style.print( figfile );
 		delete( fig );
 
@@ -186,6 +280,15 @@ function activity( indir, outdir, ids, logfile )
 		cid = cid + 1;
 		logger.untab();
 	end
+
+		% logging accumulated statistics
+	logger.log( 'comparable trials: %d/%d', acc_ntrials, acc_ntottrials );
+
+	acc_hr1 = sum( acc_h1s ) / sum( acc_lablens );
+	acc_far1 = sum( acc_fa1s ) / sum( acc_totlens - acc_lablens );
+
+	logger.log( 'non-speech false alarm rate: %.3f', (1 - acc_hr1) );
+	logger.log( 'speech false alarm rate: %.3f', acc_far1 );
 
 		% plot accumulated statistics
 	[~, logname, ~] = fileparts( logfile );
@@ -197,6 +300,8 @@ function activity( indir, outdir, ids, logfile )
 	plot_stats( ...
 		sprintf( 'ACTIVITY (subjects: %d, trials: %d/%d)', numel( ids ), acc_ntrials, acc_ntottrials ), ...
 		acc_dstarts, acc_dstops );
+
+	plot_rates( 'subject identifier', ids, acc_totlens, acc_lablens, acc_h1s, acc_fa1s );
 
 	style.print( figfile );
 	delete( fig );
