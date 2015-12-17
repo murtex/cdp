@@ -20,7 +20,7 @@ function activity( run, cfg )
 	logger = xis.hLogger.instance(); % start logging
 	logger.tab( 'activity detection...' );
 	
-		% helper functions
+		% helpers
 	function f = is_valid( trials )
 		f = true( size( trials ) );
 		for i = 1:numel( trials )
