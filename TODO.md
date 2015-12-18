@@ -4,11 +4,13 @@ Current TODOs
 ##### Majors
 
 - adjust audio playback to detection view
+- transfer detection tests to framework
 
 ##### Minors
 
 - update statistics plots (convert and sync) to match uniform layout/colors
 - update stairs plots (centered values and last value issue)
+- rename trial/response `is_valid` method to avoid confusions with `isvalid` handle method
 
 Currently done
 --------------
