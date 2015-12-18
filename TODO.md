@@ -12,6 +12,7 @@ Current TODOs
 
 - update statistics plots (convert and sync) to match uniform layout/colors
 - update stairs plots (centered values and last value issue)
+- use updated validity check in statistics plots
 
 Currently done
 --------------
