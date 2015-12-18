@@ -75,28 +75,20 @@ classdef (Sealed = true) hTrial < handle
 
 						% response class
 					case 'class'
-						if flab
-							if isempty( resplab.label )
-								fval(i) = false;
-							end
+						if flab && isempty( resplab.label )
+							fval(i) = false;
 						end
-						if fdet
-							if isempty( respdet.label )
-								fval(i) = false;
-							end
+						if fdet && isempty( respdet.label )
+							fval(i) = false;
 						end
 
 						% response activity
 					case 'activity'
-						if flab
-							if any( isnan( resplab.range ) ) || resplab.range(1) >= resplab.range(2)
-								fval(i) = false;
-							end
+						if flab && (any( isnan( resplab.range ) ) || resplab.range(1) >= resplab.range(2))
+							fval(i) = false;
 						end
-						if fdet
-							if any( isnan( respdet.range ) ) || respdet.range(1) >= respdet.range(2)
-								fval(i) = false;
-							end
+						if fdet && (any( isnan( respdet.range ) ) || respdet.range(1) >= respdet.range(2))
+							fval(i) = false;
 						end
 
 						% error

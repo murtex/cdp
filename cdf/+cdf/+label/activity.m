@@ -18,12 +18,7 @@ function activity( run, cfg )
 
 		% helpers
 	function f = is_labeled( trials )
-		f = true( size( trials ) );
-		for i = 1:numel( trials )
-			if isempty( trials(i).resplab.label ) || any( isnan( trials(i).resplab.range ) )
-				f(i) = false;
-			end
-		end
+		f = is_valid( trials, 'class', true, false ) & is_valid( trials, 'activity', true, false );
 	end
 
 	function i = next_unlabeled( trials, i )
