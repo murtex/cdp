@@ -27,18 +27,35 @@ Cue-distractor framework
 - `cdf.audit.landmarks` -- landmarks auditing tool
 - `cdf.audit.formants` -- formants auditing tool
 
+<!-- -->
+
+- `cdf.detect.activity` -- activity detection
+
 Digital signal processing
 -------------------------
 
-- TODO!
+- `dsp.sec2smp` -- unit conversion
+- `dsp.smp2msec` -- unit conversion
+- `dsp.smp2sec` -- unit conversion
+
+<!-- -->
+
+- `dsp.stftransf` -- short-time fourier transform
+- `dsp.stransf` -- stockwell tranform
+
+<!-- -->
+
+- `dsp.rgain` -- replay gain equal loudness filter
 
 Detection system
 ----------------
 
-- TODO!
+- `k15.vad` -- voice activity detection
+- `k15.sad` -- speech activity detection
 
 Convenience classes
 -------------------
 
-- TODO!
+- `xis.hLogger` -- hierarchic logging
+- `xis.hStyle` -- uniform styling
 
