@@ -16,16 +16,6 @@ function activity( run, cfg )
 		error( 'invalid argument: cfg' );
 	end
 
-		% helpers
-	function f = is_valid( trials )
-		f = true( size( trials ) );
-		for i = 1:numel( trials )
-			if any( isnan( trials(i).range ) )
-				f(i) = false;
-			end
-		end
-	end
-
 		% init
 	logger = xis.hLogger.instance(); % start logging
 	logger.tab( 'activity auditing tool...' );
@@ -33,7 +23,7 @@ function activity( run, cfg )
 	trials = [run.trials]; % prepare valid trials
 	itrials = 1:numel( trials );
 
-	invalids = ~is_valid( trials );
+	invalids = ~is_valid( trials, 'raw', false, false );
 	trials(invalids) = [];
 	itrials(invalids) = [];
 

@@ -20,20 +20,10 @@ function activity( run, cfg )
 	logger = xis.hLogger.instance(); % start logging
 	logger.tab( 'activity detection...' );
 	
-		% helpers
-	function f = is_valid( trials )
-		f = true( size( trials ) );
-		for i = 1:numel( trials )
-			if any( isnan( trials(i).range ) )
-				f(i) = false;
-			end
-		end
-	end
-
 		% proceed (valid) trials
 	trials = [run.trials]; % prepare valid trials
 	
-	invalids = ~is_valid( trials );
+	invalids = ~is_valid( trials, 'raw', false, false );
 	trials(invalids) = [];
 
 	ntrials = numel( trials );

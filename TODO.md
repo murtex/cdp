@@ -6,6 +6,7 @@ Current TODOs
 - check order of range markers, landmarks and formant onsets in auditing/labeling tools
 - separate validity and label checks (label checks are validity checks of preeceding phase)
 - adjust audio playback to detection view
+- split class and activity validity
 
 ##### Minors
 

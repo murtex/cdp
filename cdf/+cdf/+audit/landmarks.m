@@ -16,17 +16,6 @@ function landmarks( run, cfg )
 		error( 'invalid argument: cfg' );
 	end
 
-		% helpers
-	function f = is_valid( trials )
-		f = false( size( trials ) );
-		for i = 1:numel( trials )
-			if (~isempty( trials(i).resplab.label ) && ~any( isnan( trials(i).resplab.range ) )) ...
-					|| (~isempty( trials(i).respdet.label ) && ~any( isnan( trials(i).respdet.range ) ))
-				f(i) = true;
-			end
-		end
-	end
-
 		% init
 	logger = xis.hLogger.instance(); % start logging
 	logger.tab( 'landmarks auditing tool...' );
@@ -34,7 +23,8 @@ function landmarks( run, cfg )
 	trials = [run.trials]; % prepare valid trials
 	itrials = 1:numel( trials );
 
-	invalids = ~is_valid( trials );
+	invalids = ~is_valid( trials, 'activity', true, false ) & ...
+		~is_valid( trials, 'activity', false, true );
 	trials(invalids) = [];
 	itrials(invalids) = [];
 
