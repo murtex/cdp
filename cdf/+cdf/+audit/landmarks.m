@@ -23,8 +23,7 @@ function landmarks( run, cfg )
 	trials = [run.trials]; % prepare valid trials
 	itrials = 1:numel( trials );
 
-	invalids = ~is_valid( trials, 'activity', true, false ) & ...
-		~is_valid( trials, 'activity', false, true );
+	invalids = ~is_valid( [run.trials.resplab], 'activity' ) & ~is_valid( [run.trials.respdet], 'activity' );
 	trials(invalids) = [];
 	itrials(invalids) = [];
 

@@ -3,23 +3,23 @@ Current TODOs
 
 ##### Majors
 
-- check order of range markers, landmarks and formant onsets in auditing/labeling tools
-- separate validity and label checks (label checks are validity checks of preeceding phase)
 - adjust audio playback to detection view
-- split class and activity validity
 
 ##### Minors
 
 - update statistics plots (convert and sync) to match uniform layout/colors
 - update stairs plots (centered values and last value issue)
 - use updated validity check in statistics plots
-- split trial and response validities
 
 Currently done
 --------------
 
 - implemented basic activity detection
 - updated application argument types
+- split trial and response validities
+- split class and activity validity
+- separated validity and label checks
+- check order of range markers, landmarks and formant onsets in auditing/labeling tools
 
 Release notes
 -------------

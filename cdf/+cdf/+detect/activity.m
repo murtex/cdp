@@ -23,7 +23,7 @@ function activity( run, cfg )
 		% proceed (valid) trials
 	trials = [run.trials]; % prepare valid trials
 	
-	invalids = ~is_valid( trials, 'raw', false, false );
+	invalids = ~is_valid( [run.trials] );
 	trials(invalids) = [];
 
 	ntrials = numel( trials );

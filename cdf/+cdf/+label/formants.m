@@ -18,13 +18,7 @@ function formants( run, cfg )
 
 		% helpers
 	function f = is_labeled( trials )
-		f = true( size( trials ) );
-		for i = 1:numel( trials )
-			if any( isnan( trials(i).resplab.f0 ) ) || any( isnan( trials(i).resplab.f1 ) ) || ...
-					any( isnan( trials(i).resplab.f2 ) ) || any ( isnan( trials(i).resplab.f3 ) )
-				f(i) = false;
-			end
-		end
+		f = is_valid( [trials.resplab], 'formants' );
 	end
 
 	function i = next_unlabeled( trials, i )
@@ -41,7 +35,7 @@ function formants( run, cfg )
 	trials = [run.trials]; % prepare valid trials
 	itrials = 1:numel( trials );
 
-	invalids = ~is_valid( trials, 'activity', true, false );
+	invalids = ~is_valid( [run.trials.resplab], 'activity' );
 	trials(invalids) = [];
 	itrials(invalids) = [];
 

@@ -18,7 +18,7 @@ function activity( run, cfg )
 
 		% helpers
 	function f = is_labeled( trials )
-		f = is_valid( trials, 'class', true, false ) & is_valid( trials, 'activity', true, false );
+		f = is_valid( [trials.resplab], 'class' ) & is_valid( [trials.resplab], 'activity' );
 	end
 
 	function i = next_unlabeled( trials, i )
@@ -35,7 +35,7 @@ function activity( run, cfg )
 	trials = [run.trials]; % prepare valid trials
 	itrials = 1:numel( trials );
 
-	invalids = ~is_valid( trials, 'raw', false, false );
+	invalids = ~is_valid( [run.trials] );
 	trials(invalids) = [];
 	itrials(invalids) = [];
 

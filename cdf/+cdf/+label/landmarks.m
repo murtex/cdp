@@ -18,12 +18,7 @@ function landmarks( run, cfg )
 
 		% helpers
 	function f = is_labeled( trials )
-		f = true( size( trials ) );
-		for i = 1:numel( trials )
-			if isnan( trials(i).resplab.bo ) || isnan( trials(i).resplab.vo ) || isnan( trials(i).resplab.vr )
-				f(i) = false;
-			end
-		end
+		f = is_valid( [trials.resplab], 'landmarks' );
 	end
 
 	function i = next_unlabeled( trials, i )
@@ -40,7 +35,7 @@ function landmarks( run, cfg )
 	trials = [run.trials]; % prepare valid trials
 	itrials = 1:numel( trials );
 
-	invalids = ~is_valid( trials, 'activity', true, false );
+	invalids = ~is_valid( [run.trials.resplab], 'activity' );
 	trials(invalids) = [];
 	itrials(invalids) = [];
 
