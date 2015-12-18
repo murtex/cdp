@@ -5,6 +5,7 @@ Current TODOs
 
 - adjust audio playback to detection view
 - transfer detection tests to framework
+- recover Klein's participant #4
 
 ##### Minors
 
