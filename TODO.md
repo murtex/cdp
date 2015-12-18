@@ -9,7 +9,6 @@ Current TODOs
 
 - update statistics plots (convert and sync) to match uniform layout/colors
 - update stairs plots (centered values and last value issue)
-- use updated validity check in statistics plots
 
 Currently done
 --------------
@@ -20,6 +19,7 @@ Currently done
 - split class and activity validity
 - separated validity and label checks
 - check order of range markers, landmarks and formant onsets in auditing/labeling tools
+- using updated validity check in statistics plots
 
 Release notes
 -------------

@@ -40,15 +40,6 @@ function activity( indir, outdir, ids, logfile )
 	style = xis.hStyle.instance();
 
 		% helpers
-	function f = is_comparable( trials )
-		f = true( numel( trials ) );
-		for i = 1:numel( trials )
-			if any( isnan( trials(i).resplab.range ) ) || any( isnan( trials(i).respdet.range ) )
-				f(i) = false;
-			end
-		end
-	end
-
 	function plot_stats( stitle, dstarts, dstops )
 
 			% prepare data
@@ -217,8 +208,8 @@ function activity( indir, outdir, ids, logfile )
 		logger.untab();
 
 			% prepare comparable trials
-		trials = [run.trials];
-		trials(~is_comparable( trials )) = [];
+		comps = is_valid( [run.trials.resplab], 'activity' ) & is_valid( [run.trials.respdet], 'activity' );
+		trials = [run.trials(comps)];
 
 		resplabs = [trials.resplab];
 		respdets = [trials.respdet];
