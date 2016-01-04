@@ -1,7 +1,7 @@
 #!/bin/sh
 
 	# arguments
-INDIR="../../data/klein/activity4/"
+INDIR="../../data/klein/activity5/"
 OUTDIR="${INDIR}/test/"
 
 IDS="[3, 5:27, 29, 31:47]" # DEBUG

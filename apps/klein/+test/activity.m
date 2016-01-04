@@ -77,7 +77,7 @@ function activity( indir, outdir, ids, logfile )
 			'BarWidth', 1, ...
 			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
-		hl = legend( sprintf( 'off-lying: %.2f%%', (1 - numel( dstarts )/ndstarts) * 100 ), ... % legend
+		hl = legend( sprintf( 'outlying: %.2f%%', (1 - numel( dstarts )/ndstarts) * 100 ), ... % legend
 			'Location', 'northeast' );
 		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 
@@ -105,7 +105,7 @@ function activity( indir, outdir, ids, logfile )
 			'BarWidth', 1, ...
 			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
-		hl = legend( sprintf( 'off-lying: %.2f%%', (1 - numel( dstops )/ndstops) * 100 ), ... % legend
+		hl = legend( sprintf( 'outlying: %.2f%%', (1 - numel( dstops )/ndstops) * 100 ), ... % legend
 			'Location', 'northwest' );
 		set( hl, 'Color', style.color( 'grey', style.scale( -1/9 ) ) );
 
