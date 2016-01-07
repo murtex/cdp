@@ -18,6 +18,12 @@ Current TODOs
 Currently done
 --------------
 
+Release notes
+-------------
+
+##### Release 0.1.1
+
+- updated interaction behaviour
 - implemented basic activity detection
 - updated application argument types
 - split trial and response validities
@@ -25,9 +31,6 @@ Currently done
 - separated validity and label checks
 - check order of range markers, landmarks and formant onsets in auditing/labeling tools
 - using updated validity check in statistics plots
-
-Release notes
--------------
 
 ##### Release 0.1.0
 
