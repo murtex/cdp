@@ -21,7 +21,7 @@ Currently done
 Release notes
 -------------
 
-##### Release 0.1.1
+##### Release 0.2.0
 
 - updated interaction behaviour
 - implemented basic activity detection
