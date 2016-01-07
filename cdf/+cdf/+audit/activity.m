@@ -45,6 +45,8 @@ function activity( run, cfg )
 
 	fig = style.figure( 'Visible', 'on' );
 
+	set( fig, 'Interruptible', 'off' );
+
 	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
 	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
 

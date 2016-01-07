@@ -60,6 +60,8 @@ function formants( run, cfg )
 	fig = style.figure( 'Visible', 'on' );
 	figcol = get( fig, 'Color' );
 
+	set( fig, 'Interruptible', 'off' );
+
 	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
 	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
 
