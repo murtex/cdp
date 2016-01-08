@@ -60,10 +60,8 @@ function vots( indir, outdir, ids, logfile )
 		kavotns = hist( kavots, kavotpos );
 
 			% prepare axes scaling
-		MAXRATE = 0.5;
-
 		xl = [0, MAXVOT] * 1000;
-		yl = [0, MAXRATE] * 100;
+		yl = [0, ceil( max( cat( 2, tavotns/ntavots, kavotns/nkavots ) ) * 10 + 1 ) / 10 ] * 100;
 
 			% plot ta vots
 		subplot( 2, 1, 1 );
@@ -99,8 +97,8 @@ function vots( indir, outdir, ids, logfile )
 	end
 
 		% workload
-	acc_tavots = [];
-	acc_kavots = [];
+	acc_tavots = cell( 1, numel( ids ) );
+	acc_kavots = cell( 1, numel( ids ) );
 
 	cid = 1;
 	for id = ids % proceed subjects
@@ -118,10 +116,15 @@ function vots( indir, outdir, ids, logfile )
 
 		logger.untab();
 
-			% prepare valid trials
-		vals = is_valid( [run.trials.resplab], 'class' ) & is_valid( [run.trials.resplab], 'landmarks' );
+			% prepare trials
+		trials = [run.trials];
 
-		trials = [run.trials(vals)];
+		distlabels = {trials.distlabel}; % none distractor condition
+		trials(~strcmp( distlabels, 'none' )) = [];
+
+		vals = is_valid( [trials.resplab], 'class' ) & is_valid( [trials.resplab], 'landmarks' ); % validity
+		trials(~vals) = [];
+
 		resps = [trials.resplab];
 
 		labels = {resps.label};
@@ -132,8 +135,8 @@ function vots( indir, outdir, ids, logfile )
 		tavots = [taresps.vo] - [taresps.bo];
 		kavots = [karesps.vo] - [karesps.bo];
 
-		acc_tavots = cat( 2, acc_tavots, tavots ); % accumulate
-		acc_kavots = cat( 2, acc_kavots, kavots );
+		acc_tavots{cid} = tavots; % accumulate
+		acc_kavots{cid} = kavots;
 
 			% plot vots
 		figfile = fullfile( outdir, sprintf( 'run_%d.png', id ) );
@@ -155,8 +158,15 @@ function vots( indir, outdir, ids, logfile )
 		logger.untab();
 	end
 
-		% plot accumulated statistics
+		% output accumulated statistics
 	[~, logname, ~] = fileparts( logfile );
+	tafile = fullfile( outdir, sprintf( '%s_ta.mat', logname ) );
+	kafile = fullfile( outdir, sprintf( '%s_ka.mat', logname ) );
+
+	save( tafile, 'acc_tavots' );
+	save( kafile, 'acc_kavots' );
+
+		% plot accumulated statistics
 	figfile = fullfile( outdir, sprintf( '%s.png', logname ) );
 	logger.log( 'plot vot distributions (''%s'')...', figfile );
 
@@ -164,7 +174,7 @@ function vots( indir, outdir, ids, logfile )
 
 	plot_vots( ...
 		sprintf( 'VOTS (subjects: %d, trials: %d [%d+%d])', numel( ids ), numel( acc_tavots ) + numel( acc_kavots ), numel( acc_tavots ), numel( acc_kavots ) ), ...
-		acc_tavots, acc_kavots );
+		cat( 2, acc_tavots{:} ), cat( 2, acc_kavots{:} ) );
 
 	style.print( figfile );
 	delete( fig );
