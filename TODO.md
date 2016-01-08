@@ -18,6 +18,8 @@ Current TODOs
 Currently done
 --------------
 
+- added VOT distribution plots
+
 Release notes
 -------------
 
