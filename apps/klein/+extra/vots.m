@@ -158,7 +158,7 @@ function vots( indir, outdir, ids, logfile )
 		logger.untab();
 	end
 
-		% output accumulated statistics
+		% output accumulated vots
 	[~, logname, ~] = fileparts( logfile );
 	tafile = fullfile( outdir, sprintf( '%s_ta.mat', logname ) );
 	kafile = fullfile( outdir, sprintf( '%s_ka.mat', logname ) );
@@ -166,7 +166,7 @@ function vots( indir, outdir, ids, logfile )
 	save( tafile, 'acc_tavots' );
 	save( kafile, 'acc_kavots' );
 
-		% plot accumulated statistics
+		% plot accumulated vots
 	figfile = fullfile( outdir, sprintf( '%s.png', logname ) );
 	logger.log( 'plot vot distributions (''%s'')...', figfile );
 
