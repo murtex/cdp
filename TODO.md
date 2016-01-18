@@ -25,7 +25,7 @@ Release notes
 
 - fixed cursor issues in auditing/labeling tools
 - added additional mode specific commands in labeling tools
-- updated formant validy check
+- updated formant validity check
 - updated formant onsets plots
 
 ##### Release 0.2.1
