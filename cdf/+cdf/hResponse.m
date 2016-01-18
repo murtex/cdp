@@ -71,7 +71,7 @@ classdef (Sealed = true) hResponse < handle
 
 					case 'formants'
 						if any( isnan( this(i).f0 ) ) || any( isnan( this(i).f1 ) ) || any( isnan( this(i).f2 ) ) || any( isnan( this(i).f3 ) ) ...
-								|| this(i).f0(2) >= this(i).f1(2) || this(i).f1(2) >= this(i).f2(2) || this(i).f2(2) >= this(i).f3(2)
+								|| this(i).f1(2) >= this(i).f2(2) || this(i).f2(2) >= this(i).f3(2)
 							fval(i) = false;
 						end
 

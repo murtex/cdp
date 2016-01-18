@@ -59,8 +59,6 @@ function landmarks( run, cfg )
 	fig = style.figure( 'Visible', 'on' );
 	figcol = get( fig, 'Color' );
 
-	set( fig, 'Interruptible', 'off' );
-
 	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
 	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
 
@@ -81,6 +79,23 @@ function landmarks( run, cfg )
 			d = d(find( abs( d ) == min( abs( d ) ), 1 )) + 1;
 			i = dsp.smp2sec( is + d - 1, run.audiorate ) + t0;
 		end
+	end
+
+	function full_landmarks()
+		[x, ~] = ginput( 3 );
+		x = trial.range(1) + x / 1000;
+
+		if numel( x ) > 0 && x(1) >= resplab.range(1) && x(1) <= resplab.range(2)
+			resplab.bo = x(1);
+		end
+		if numel( x ) > 1 && x(2) >= resplab.range(1) && x(2) <= resplab.range(2)
+			resplab.vo = x(2);
+		end
+		if numel( x ) > 2 && x(3) >= resplab.range(1) && x(3) <= resplab.range(2)
+			resplab.vr = x(3);
+		end
+
+		fredo = cdf.audit.disp_update( fig, false );
 	end
 
 	function disp_commands( src, event, type )
@@ -129,20 +144,7 @@ function landmarks( run, cfg )
 
 					case 'l' % landmarks setting
 						if nmods == 0
-							[x, ~] = ginput( 3 );
-							x = trial.range(1) + x / 1000;
-
-							if numel( x ) > 0 && x(1) >= resplab.range(1) && x(1) <= resplab.range(2)
-								resplab.bo = x(1);
-							end
-							if numel( x ) > 1 && x(2) >= resplab.range(1) && x(2) <= resplab.range(2)
-								resplab.vo = x(2);
-							end
-							if numel( x ) > 2 && x(3) >= resplab.range(1) && x(3) <= resplab.range(2)
-								resplab.vr = x(3);
-							end
-
-							fredo = cdf.audit.disp_update( fig, false );
+							full_landmarks();
 						end
 					case 'b'
 						if nmods == 0
@@ -204,8 +206,9 @@ function landmarks( run, cfg )
 				end
 
 				cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000;
-				switch get( fig, 'SelectionType' ) % landmarks adjustment
-					case 'normal'
+				switch get( fig, 'SelectionType' )
+
+					case 'normal' % landmarks adjustment
 						switch src
 							case hdet1
 								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
@@ -223,6 +226,10 @@ function landmarks( run, cfg )
 									fredo = cdf.audit.disp_update( fig, false );
 								end
 						end
+
+					case 'alt' % landmarks setting
+						full_landmarks();
+
 				end
 
 		end

@@ -60,12 +60,30 @@ function formants( run, cfg )
 	fig = style.figure( 'Visible', 'on' );
 	figcol = get( fig, 'Color' );
 
-%	set( fig, 'Interruptible', 'off' ); TODO: nasty!
-
 	set( fig, 'WindowKeyPressFcn', {@disp_commands, 'keypress'} );
 	set( fig, 'CloseRequestFcn', {@disp_commands, 'close'} );
 
 		% event dispatching
+	function full_formants()
+		[x, y] = ginput( 3 );
+		x = trial.range(1) + x / 1000;
+
+		if numel( y ) > 0 && y(1) >= cfg.formants_fx_freqband(1) && y(1) <= cfg.formants_fx_freqband(2)
+			resplab.f1(1) = x(1);
+			resplab.f1(2) = y(1);
+		end
+		if numel( y ) > 1 && y(2) >= cfg.formants_fx_freqband(1) && y(2) <= cfg.formants_fx_freqband(2)
+			resplab.f2(1) = x(2);
+			resplab.f2(2) = y(2);
+		end
+		if numel( y ) > 2 && y(3) >= cfg.formants_fx_freqband(1) && y(3) <= cfg.formants_fx_freqband(2)
+			resplab.f3(1) = x(3);
+			resplab.f3(2) = y(3);
+		end
+
+		fredo = cdf.audit.disp_update( fig, false );
+	end
+
 	function disp_commands( src, event, type )
 
 			% default callback
@@ -104,20 +122,7 @@ function formants( run, cfg )
 
 					case 'f' % formants setting
 						if nmods == 0
-							[x, y] = ginput( 3 );
-							if numel( y ) > 0 && y(1) >= cfg.formants_fx_freqband(1) && y(1) <= cfg.formants_fx_freqband(2)
-								resplab.f1(1) = trial.range(1) + x(1) / 1000;
-								resplab.f1(2) = y(1);
-							end
-							if numel( y ) > 1 && y(2) >= cfg.formants_fx_freqband(1) && y(2) <= cfg.formants_fx_freqband(2)
-								resplab.f2(1) = trial.range(1) + x(2) / 1000;
-								resplab.f2(2) = y(2);
-							end
-							if numel( y ) > 2 && y(3) >= cfg.formants_fx_freqband(1) && y(3) <= cfg.formants_fx_freqband(2)
-								resplab.f3(1) = trial.range(1) + x(3) / 1000;
-								resplab.f3(2) = y(3);
-							end
-							fredo = cdf.audit.disp_update( fig, false );
+							full_formants();
 						end
 					case '1'
 						if nmods == 0
@@ -175,6 +180,7 @@ function formants( run, cfg )
 				end
 
 				switch get( fig, 'SelectionType' )
+
 					case 'normal' % f0 setting
 						cp = get( src, 'CurrentPoint' );
 						if cp(3) >= cfg.formants_f0_freqband(1) && cp(3) <= cfg.formants_f0_freqband(2)
@@ -182,6 +188,10 @@ function formants( run, cfg )
 							resplab.f0(2) = cp(3);
 							fredo = cdf.audit.disp_update( fig, false );
 						end
+
+					case 'alt' % formants setting
+						full_formants();
+
 				end
 
 		end

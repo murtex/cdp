@@ -18,10 +18,19 @@ Current TODOs
 Currently done
 --------------
 
-- added VOT distribution plots
-
 Release notes
 -------------
+
+##### Release 0.2.2
+
+- fixed cursor issues in auditing/labeling tools
+- added additional mode specific commands in labeling tools
+- updated formant validy check
+- updated formant onsets plots
+
+##### Release 0.2.1
+
+- fixed cursor issues in formant labeling tool
 
 ##### Release 0.2.0
 
