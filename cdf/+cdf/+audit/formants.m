@@ -76,9 +76,6 @@ function formants( run, cfg )
 			% plot
 		clf( fig ); % clear figure
 
-		set( fig, 'Pointer', 'watch' ); % set watch pointer, TODO: drawnow causes flickering!
-		drawnow( 'expose' );
-
 		ovrts = cdf.audit.plot_formants( ... % plot spectrograms
 			run, cfg, trial, [fredo, fdet, flog, fblend], ...
 			sprintf( 'FORMANTS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
@@ -90,8 +87,6 @@ function formants( run, cfg )
 		end
 
 			% wait for figure update
-		set( fig, 'Pointer', 'arrow' );
-
 		waitfor( fig, 'Clipping' ); % (unused) clipping property change
 
 	end

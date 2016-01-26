@@ -18,7 +18,10 @@ function activity( run, cfg )
 
 		% helpers
 	function f = is_labeled( trials )
-		f = is_valid( [trials.resplab], 'class' ) & is_valid( [trials.resplab], 'activity' );
+		f = [];
+		if ~isempty( trials )
+			f = is_valid( [trials.resplab], 'class' ) & is_valid( [trials.resplab], 'activity' );
+		end
 	end
 
 	function i = next_unlabeled( trials, i )
@@ -184,9 +187,6 @@ function activity( run, cfg )
 			% plot
 		clf( fig ); % clear figure
 
-		set( fig, 'Pointer', 'watch' ); % set watch pointer, TODO: drawnow causes flickering!
-		drawnow( 'expose' );
-
 		set( fig, 'Color', figcol ); % indicate unlabeled trial
 		if ~is_labeled( trial ) && ~fdet
 			set( fig, 'Color', style.color( 'signal', +2 ) );
@@ -204,8 +204,6 @@ function activity( run, cfg )
 		end
 
 			% wait for figure update
-		set( fig, 'Pointer', 'arrow' );
-
 		waitfor( fig, 'Clipping' ); % (unused) clipping property change
 
 	end

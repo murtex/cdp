@@ -18,7 +18,10 @@ function formants( run, cfg )
 
 		% helpers
 	function f = is_labeled( trials )
-		f = is_valid( [trials.resplab], 'formants' );
+		f = [];
+		if ~isempty( trials )
+			f = is_valid( [trials.resplab], 'formants' );
+		end
 	end
 
 	function i = next_unlabeled( trials, i )
@@ -205,9 +208,6 @@ function formants( run, cfg )
 			% plot
 		clf( fig ); % clear figure
 
-		set( fig, 'Pointer', 'watch' ); % set watch pointer, TODO: drawnow causes flickering!
-		drawnow( 'expose' );
-
 		set( fig, 'Color', figcol ); % indicate unlabeled trial
 		if ~is_labeled( trial ) && ~fdet
 			set( fig, 'Color', style.color( 'signal', +2 ) );
@@ -225,8 +225,6 @@ function formants( run, cfg )
 		end
 
 			% wait for figure update
-		set( fig, 'Pointer', 'arrow' );
-
 		waitfor( fig, 'Clipping' ); % (unused) clipping property change
 
 	end

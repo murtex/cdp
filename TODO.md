@@ -21,6 +21,11 @@ Currently done
 Release notes
 -------------
 
+##### Release 0.2.3
+
+- fixed last trial issue in auditing/labeling tools
+- fixed flickering issue in auditing/labeling tools
+
 ##### Release 0.2.2
 
 - fixed cursor issues in auditing/labeling tools

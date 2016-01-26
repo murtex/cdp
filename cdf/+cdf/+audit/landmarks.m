@@ -71,9 +71,6 @@ function landmarks( run, cfg )
 			% plot
 		clf( fig ); % clear figure
 
-		set( fig, 'Pointer', 'watch' ); % set watch pointer, TODO: drawnow causes flickering!
-		drawnow( 'expose' );
-
 		[ovrts, ~, ~, ~] = cdf.audit.plot_landmarks( ... % plot overview and details
 			run, cfg, trial, [fredo, fdet, flog], ...
 			sprintf( 'LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
@@ -85,8 +82,6 @@ function landmarks( run, cfg )
 		end
 
 			% wait for figure update
-		set( fig, 'Pointer', 'arrow' );
-
 		waitfor( fig, 'Clipping' ); % (unused) clipping property change
 
 	end
