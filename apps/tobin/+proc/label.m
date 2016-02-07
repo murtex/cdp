@@ -11,7 +11,7 @@ function label( indir, outdir, ids, labmode, logfile )
 % logfile : logger filename (row char)
 
 		% safeguard
-	if nargin < 1 || ~isrow( indir ) || ~ischar( indir ) ... % input directory
+	if nargin < 1 || ~isrow( indir ) || ~ischar( indir ) || ... % input directory
 			exist( indir, 'dir' ) ~= 7
 		error( 'invalid argument: indir' );
 	end
