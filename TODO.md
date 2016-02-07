@@ -18,6 +18,8 @@ Current TODOs
 Currently done
 --------------
 
+- fixed some minors
+
 Release notes
 -------------
 
