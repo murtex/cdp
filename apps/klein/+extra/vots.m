@@ -44,14 +44,18 @@ function vots( indir, outdir, ids, logfile )
 
 			% prepare data
 		MAXVOT = 0.2;
+		MAXVOT = 5; % standardized
 
-		tavots(tavots > MAXVOT) = []; % remove outliers
-		kavots(kavots > MAXVOT) = [];
+		SCALE = 1000;
+		SCALE = 1; % standardized
+
+		tavots(abs( tavots ) > MAXVOT) = []; % remove outliers
+		kavots(abs( kavots ) > MAXVOT) = [];
 
 		ntavots = numel( tavots );
 		nkavots = numel( kavots );
 
-		nbins = max( style.bins( tavots ), style.bins( kavots ) ); % uniform binning
+		nbins = max( style.bins( tavots ), 2 * style.bins( kavots ) ); % uniform binning
 
 		tavotpos = linspace( min( tavots ), max( tavots ), nbins );
 		tavotns = hist( tavots, tavotpos );
@@ -60,19 +64,24 @@ function vots( indir, outdir, ids, logfile )
 		kavotns = hist( kavots, kavotpos );
 
 			% prepare axes scaling
-		xl = [0, MAXVOT] * 1000;
 		yl = [0, ceil( max( cat( 2, tavotns/ntavots, kavotns/nkavots ) ) * 10 + 1 ) / 10 ] * 100;
+
+		xl = [0, MAXVOT] * SCALE;
+		xlmin = min( cat( 2, tavots, kavots ) ); % standardized
+		xlmax = max( cat( 2, tavots, kavots ) );
+		xl = round( max( abs( xlmin ), abs( xlmax ) ) ) * [-1, 1];
 
 			% plot ta vots
 		subplot( 2, 1, 1 );
 		title( stitle );
 		xlabel( 'vot in milliseconds' );
+		xlabel( 'standardized vot (z-score)' ); % standardized
 		ylabel( 'rate in percent' );
 
 		xlim( xl );
 		ylim( yl );
 
-		bar( tavotpos * 1000, tavotns/ntavots * 100, ... % distribution
+		bar( tavotpos * SCALE, tavotns/ntavots * 100, ... % distribution
 			'BarWidth', 1, ...
 			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
@@ -82,12 +91,13 @@ function vots( indir, outdir, ids, logfile )
 			% plot ka vots
 		subplot( 2, 1, 2 );
 		xlabel( 'vot in milliseconds' );
+		xlabel( 'standardized vot (z-score)' ); % standardized
 		ylabel( 'rate in percent' );
 
 		xlim( xl );
 		ylim( yl );
 
-		bar( kavotpos * 1000, kavotns/nkavots * 100, ... % distribution
+		bar( kavotpos * SCALE, kavotns/nkavots * 100, ... % distribution
 			'BarWidth', 1, ...
 			'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 
@@ -120,7 +130,7 @@ function vots( indir, outdir, ids, logfile )
 		trials = [run.trials];
 
 		distlabels = {trials.distlabel}; % none distractor condition
-		trials(~strcmp( distlabels, 'none' )) = [];
+		%trials(~strcmp( distlabels, 'none' )) = [];
 
 		vals = is_valid( [trials.resplab], 'class' ) & is_valid( [trials.resplab], 'landmarks' ); % validity
 		trials(~vals) = [];
@@ -132,8 +142,8 @@ function vots( indir, outdir, ids, logfile )
 		karesps = resps(strcmp( labels, 'ka' ));
 
 			% gather vots
-		tavots = [taresps.vo] - [taresps.bo];
-		kavots = [karesps.vo] - [karesps.bo];
+		tavots = zscore( [taresps.vo] - [taresps.bo] );
+		kavots = zscore( [karesps.vo] - [karesps.bo] );
 
 		acc_tavots{cid} = tavots; % accumulate
 		acc_kavots{cid} = kavots;
@@ -167,14 +177,17 @@ function vots( indir, outdir, ids, logfile )
 	save( kafile, 'acc_kavots' );
 
 		% plot accumulated vots
+	tavots = cat( 2, acc_tavots{:} );
+	kavots = cat( 2, acc_kavots{:} );
+
 	figfile = fullfile( outdir, sprintf( '%s.png', logname ) );
 	logger.log( 'plot vot distributions (''%s'')...', figfile );
 
 	fig = style.figure();
 
 	plot_vots( ...
-		sprintf( 'VOTS (subjects: %d, trials: %d [%d+%d])', numel( ids ), numel( acc_tavots ) + numel( acc_kavots ), numel( acc_tavots ), numel( acc_kavots ) ), ...
-		cat( 2, acc_tavots{:} ), cat( 2, acc_kavots{:} ) );
+		sprintf( 'VOTS (subjects: %d, trials: %d [%d+%d])', numel( ids ), numel( tavots ) + numel( kavots ), numel( tavots ), numel( kavots ) ), ...
+		tavots, kavots );
 
 	style.print( figfile );
 	delete( fig );

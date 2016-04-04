@@ -2,7 +2,7 @@
 
 	# arguments
 INDIR="../../data/klein/convert/"
-OUTDIR="${INDIR}/extra/vots_none/"
+OUTDIR="${INDIR}/extra/vots_all/"
 
 IDS="[3:27, 29, 31:47]"
 
