@@ -56,7 +56,7 @@ function formants( run, cfg )
 		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
 			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
 			itrial, ntrials, ...
-			ovrts );
+			ovrts, spects );
 
 		fdone = flags(2);
 		fredo = flags(3);
@@ -76,7 +76,7 @@ function formants( run, cfg )
 			% plot
 		clf( fig ); % clear figure
 
-		ovrts = cdf.audit.plot_formants( ... % plot spectrograms
+		[ovrts, spects] = cdf.audit.plot_formants( ... % plot spectrograms
 			run, cfg, trial, [fredo, fdet, flog, fblend], ...
 			sprintf( 'FORMANTS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );

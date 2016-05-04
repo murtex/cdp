@@ -1,7 +1,7 @@
-function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, flags, itrial, ntrials, ovrts )
+function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, flags, itrial, ntrials, ovrts, spects )
 % dispatch commands
 %
-% [flags, itrial] = DISP_COMMANDS( src, event, type, run, cfg, trial, flags, itrial, ntrials, ovrts )
+% [flags, itrial] = DISP_COMMANDS( src, event, type, run, cfg, trial, flags, itrial, ntrials, ovrts, spects )
 %
 % INPUT
 % src : event source handle (internal)
@@ -13,7 +13,8 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 % flags : flags [proc, done, redo, det, log] (vector logical)
 % itrial : trial number (scalar numeric)
 % ntrials : number of trials (scalar numeric)
-% ovrts : overview signal (colmn numeric)
+% ovrts : overview signal (column numeric)
+% spects : specific signal (column numeric)
 %
 % OUTPUT
 % flags : flags [proc, done, redo, det, log] (vector logical)
@@ -58,6 +59,10 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 
 	if nargin < 10 || ~iscolumn( ovrts ) || ~isnumeric( ovrts )
 		error(' invalid argument: ovrts' );
+	end
+
+	if nargin < 11 || ~iscolumn( spects ) || ~isnumeric( spects )
+		error(' invalid argument: spects' );
 	end
 
 		% dispatch events
@@ -128,6 +133,9 @@ function [flags, itrial] = disp_commands( src, event, type, run, cfg, trial, fla
 					if nmods == 0
 						flags(1) = true; % fproc
 						soundsc( ovrts, run.audiorate );
+					elseif nmods == 1 && strcmp( event.Modifier, 'shift' )
+						flags(1) = true; % fproc
+						soundsc( spects, run.audiorate );
 					end
 
 				case 's' % flags switching

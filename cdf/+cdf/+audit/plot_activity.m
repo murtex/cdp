@@ -1,7 +1,7 @@
-function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
+function [ovrts, spects] = plot_activity( run, cfg, trial, flags, stitle, callback )
 % plot activity
 %
-% PLOT_ACTIVITY( run, cfg, trial, flags, stitle, callback )
+% [ovrts, spects] = PLOT_ACTIVITY( run, cfg, trial, flags, stitle, callback )
 %
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -13,6 +13,7 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 %
 % OUTPUT
 % ovrts : overview signal (column numeric)
+% spects : specific signal (column numeric)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
@@ -97,7 +98,18 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 	det2r(det2r < 1) = 1;
 	det2r(det2r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 
+	specr = dsp.sec2smp( [...
+		min( resplab.range(1), respdet.range(1) ), ...
+		max( resplab.range(2), respdet.range(2) )], run.audiorate ) + [1, 0];
+	if isnan( specr(1) )
+		specr(1) = ovrr(1);
+	end
+	if isnan( specr(2) )
+		specr(2) = ovrr(2);
+	end
+
 	ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
+	spects = run.audiodata(specr(1):specr(2), 1);
 
 	det1ts = [];
 	if ~any( isnan( det1r ) )
@@ -112,6 +124,7 @@ function ovrts = plot_activity( run, cfg, trial, flags, stitle, callback )
 	dc = mean( ovrts ); % preprocessing
 
 	ovrts = ovrts - dc;
+	spects = spects - dc;
 	det1ts = det1ts - dc;
 	det2ts = det2ts - dc;
 

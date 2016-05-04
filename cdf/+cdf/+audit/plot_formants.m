@@ -1,7 +1,7 @@
-function ovrts = plot_formants( run, cfg, trial, flags, stitle, callback )
+function [ovrts, spects] = plot_formants( run, cfg, trial, flags, stitle, callback )
 % plot landmarks
 %
-% ovrts = PLOT_FORMANTS( run, cfg, trial, flags, stitle, callback )
+% [ovrts, spects] = PLOT_FORMANTS( run, cfg, trial, flags, stitle, callback )
 %
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -13,6 +13,7 @@ function ovrts = plot_formants( run, cfg, trial, flags, stitle, callback )
 %
 % OUTPUT
 % ovrts : overview signal (column numeric)
+% spects : specific signal (column numeric)
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
@@ -140,10 +141,12 @@ function ovrts = plot_formants( run, cfg, trial, flags, stitle, callback )
 		max( resplab.range(2), respdet.range(2) )], run.audiorate ) + [1, 0];
 
 	ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
+	spects = ovrts;
 
 	dc = mean( ovrts ); % preprocessing
 
 	ovrts = ovrts - dc;
+	spects = spects - dc;
 
 	persistent stft1 times1 freqs1; % transforms
 	persistent stft2 times2 freqs2;

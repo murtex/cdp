@@ -1,7 +1,7 @@
-function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, stitle, callback )
+function [ovrts, spects, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, stitle, callback )
 % plot landmarks
 %
-% [hdet1, hdet2, hdet3] = PLOT_LANDMARKS( run, cfg, trial, flags, stitle, callback )
+% [ovrts, spects, hdet1, hdet2, hdet3] = PLOT_LANDMARKS( run, cfg, trial, flags, stitle, callback )
 %
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -13,6 +13,7 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 %
 % OUTPUT
 % ovrts : overview signal (column numeric)
+% spects : specific signal (column numeric)
 % hdet1 : detail #1 (burst onset) axis handle (intern)
 % hdet2 : detail #2 (voice onset) axis handle (intern)
 % hdet3 : detail #3 (voice release) axis handle (intern)
@@ -114,7 +115,18 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 	det3r(det3r < 1) = 1;
 	det3r(det3r > size( run.audiodata, 1 )) = size( run.audiodata, 1 );
 
+	specr = dsp.sec2smp( [...
+		min( resplab.bo, respdet.bo ), ...
+		max( resplab.vr, respdet.vr )], run.audiorate ) + [1, 0];
+	if isnan( specr(1) )
+		specr(1) = ovrr(1);
+	end
+	if isnan( specr(2) )
+		specr(2) = ovrr(2);
+	end
+
 	ovrts = run.audiodata(ovrr(1):ovrr(2), 1); % signals
+	spects = run.audiodata(specr(1):specr(2), 1);
 
 	det1ts = [];
 	if ~any( isnan( det1r ) )
@@ -134,6 +146,7 @@ function [ovrts, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, 
 	dc = mean( ovrts ); % preprocessing
 
 	ovrts = ovrts - dc;
+	spects = spects - dc;
 	det1ts = det1ts - dc;
 	det2ts = det2ts - dc;
 	det3ts = det3ts - dc;

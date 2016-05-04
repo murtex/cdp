@@ -90,7 +90,7 @@ function activity( run, cfg )
 		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
 			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
 			itrial, ntrials, ...
-			ovrts );
+			ovrts, spects );
 
 		fdone = flags(2);
 		fredo = flags(3);
@@ -192,7 +192,7 @@ function activity( run, cfg )
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
-		ovrts = cdf.audit.plot_activity( ... % plot overview and details
+		[ovrts, spects] = cdf.audit.plot_activity( ... % plot overview and details
 			run, cfg, trial, [fredo, fdet, flog], ...
 			sprintf( 'ACTIVITY (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );

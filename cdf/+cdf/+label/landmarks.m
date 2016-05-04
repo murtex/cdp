@@ -107,7 +107,7 @@ function landmarks( run, cfg )
 		[flags, itrial] = cdf.audit.disp_commands( src, event, type, ...
 			run, cfg, trial, [false, fdone, fredo, fdet, flog], ...
 			itrial, ntrials, ...
-			ovrts );
+			ovrts, spects );
 
 		fdone = flags(2);
 		fredo = flags(3);
@@ -251,7 +251,7 @@ function landmarks( run, cfg )
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
-		[ovrts, hdet1, hdet2, hdet3] = cdf.audit.plot_landmarks( ... % plot overview and details
+		[ovrts, spects, hdet1, hdet2, hdet3] = cdf.audit.plot_landmarks( ... % plot overview and details
 			run, cfg, trial, [fredo, fdet, flog], ...
 			sprintf( 'LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );
