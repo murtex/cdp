@@ -18,10 +18,13 @@ Current TODOs
 Currently done
 --------------
 
-- fixed some minors
-
 Release notes
 -------------
+
+##### Release 0.2.4
+
+- added specific playback command
+- fixed some minor issues
 
 ##### Release 0.2.3
 
