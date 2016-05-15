@@ -18,6 +18,8 @@ Current TODOs
 Currently done
 --------------
 
+- improved speech activity detection
+
 Release notes
 -------------
 
