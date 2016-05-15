@@ -42,6 +42,7 @@ function [sbpw, t1, t2, sa] = sad( va, stft, times, freqs, subband )
 
 		% subband power
 	sbpw = sum( stft(freqs >= subband(1) & freqs <= subband(2), :), 1 );
+	sbpw(sbpw < 100*eps) = NaN; % mask low values
 
 		% adaptive thresholds, SEE: [1]
 	smin = min( sbpw );
