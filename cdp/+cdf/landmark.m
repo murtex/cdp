@@ -36,14 +36,16 @@ function landmark( run, cfg )
 		trial.detected.vo = NaN;
 		trial.detected.vr = NaN;
 
-		if any( isnan( trial.range ) ) || any( isnan( trial.detected.range ) ) % skip invalid trials
+		refrange = trial.labeled.range; % DEBUG: use labeled activity range here!
+
+		if any( isnan( trial.range ) ) || any( isnan( refrange ) ) % skip invalid trials
 			logger.progress( i, n );
 			continue;
 		end
 
 			% set signals
 		noiser = run.audiodata(trial.cue + (0:trial.soa-1), 1);
-		respser = run.audiodata(trial.detected.range(1):trial.detected.range(2), 1);
+		respser = run.audiodata(refrange(1):refrange(2), 1);
 
 			% get subband fft
 		frame = sta.msec2smp( cfg.sta_frame, run.audiorate );
@@ -85,8 +87,8 @@ function landmark( run, cfg )
 		[~, pairind] = max( pairlen ); % longest pair
 
 		if ~isempty( pairind )
-			trial.detected.vo = trial.detected.range(1) + respglottis(2*pairind-1)-1;
-			trial.detected.vr = trial.detected.range(1) + respglottis(2*pairind)-1;
+			trial.detected.vo = refrange(1) + respglottis(2*pairind-1)-1;
+			trial.detected.vr = refrange(1) + respglottis(2*pairind)-1;
 			nvos = nvos + 1;
 			nvrs = nvrs + 1;
 		end
@@ -94,7 +96,7 @@ function landmark( run, cfg )
 			% get plosion indices
 		resppiser = respser;
 		if ~isnan( trial.detected.vo )
-			resppiser(trial.detected.vo-trial.detected.range(1)+1:end) = []; % restrict detection range
+			resppiser(trial.detected.vo-refrange(1)+1:end) = []; % restrict detection range
 		end
 
 		resppi = k15.plosion( ...
@@ -108,7 +110,7 @@ function landmark( run, cfg )
 		end
 
 		if ~isempty( boi )
-			trial.detected.bo = trial.detected.range(1) + boi-1;
+			trial.detected.bo = refrange(1) + boi-1;
 			nbos = nbos + 1;
 		end
 
