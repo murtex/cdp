@@ -25,6 +25,10 @@ function landmark( run, cfg )
 	nvos = 0;
 	nvrs = 0;
 	nbos = 0;
+    
+    nrefvos = 0; % DEBUG: use labeled landmarks as reference!
+    nrefvrs = 0;
+    nrefbos = 0;
 
 	logger.progress();
 	for i = 1:n
@@ -35,13 +39,27 @@ function landmark( run, cfg )
 		trial.detected.bo = NaN;
 		trial.detected.vo = NaN;
 		trial.detected.vr = NaN;
+        
+        if ~isnan( trial.labeled.bo ) % DEBUG: use labeled landmarks as reference!
+            nrefbos = nrefbos + 1;
+        end
+        if ~isnan( trial.labeled.vo )
+            nrefvos = nrefvos + 1;
+        end
+        if ~isnan( trial.labeled.vr )
+            nrefvrs = nrefvrs + 1;
+        end
 
-		refrange = trial.labeled.range; % DEBUG: use labeled activity range here!
+		refrange = trial.labeled.range; % DEBUG: use labeled activity range as reference!
+        refrange = refrange + sta.msec2smp( 50, run.audiorate ) * [-1, 1]; % plus some extra space
 
 		if any( isnan( trial.range ) ) || any( isnan( refrange ) ) % skip invalid trials
 			logger.progress( i, n );
 			continue;
-		end
+        end
+        
+        refrange(1) = max( 1, refrange(1) ); % DEBUG: do not exceed maximum range!
+        refrange(2) = min( run.audiolen, refrange(2) );
 
 			% set signals
 		noiser = run.audiodata(trial.cue + (0:trial.soa-1), 1);
@@ -117,9 +135,13 @@ function landmark( run, cfg )
 		logger.progress( i, n );
 	end
 
-	logger.log( 'burst-onsets: %d/%d', nbos, n );
-	logger.log( 'voice-onsets: %d/%d', nvos, n );
-	logger.log( 'voice-releases: %d/%d', nvrs, n );
+	%logger.log( 'burst-onsets: %d/%d', nbos, n );
+	%logger.log( 'voice-onsets: %d/%d', nvos, n );
+	%logger.log( 'voice-releases: %d/%d', nvrs, n );
+    
+	logger.log( 'burst-onsets: %d/%d', nbos, nrefbos ); % DEBUG: use labeled landmarks as reference!
+	logger.log( 'voice-onsets: %d/%d', nvos, nrefvos );
+	logger.log( 'voice-releases: %d/%d', nvrs, nrefvrs );
 
 	logger.untab();
 end
