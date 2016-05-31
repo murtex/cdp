@@ -52,7 +52,8 @@ function ser = unframe( ser, frame )
 	end
 
 		% smoothing
-	kernel = fspecial( 'average', [2*overlap + 1, 1] );
+	%kernel = fspecial( 'average', [2*overlap + 1, 1] );
+	kernel = ones( 2*overlap + 1, 1 ) / (2*overlap + 1);
 
 	n = size( ser, 2 );
 	if n >= 8 % parallelize if worthy

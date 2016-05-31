@@ -121,10 +121,22 @@ function landmark( run, cfg )
 			k15.replaygain( resppiser, run.audiorate ), ...
 			sta.msec2smp( cfg.plosion_delta, run.audiorate ), sta.msec2smp( cfg.plosion_width, run.audiorate ) );
 
-			% set burst landmark
-		boi = find( resppi >= max( cfg.plosion_threshs ), 1, 'first' ); % upper threshold first
-		if isempty( boi )
-			boi = find( resppi >= min( cfg.plosion_threshs ), 1, 'first' ); % lower threshold next
+			% OLD: set burst landmark
+		%boi = find( resppi >= max( cfg.plosion_threshs ), 1, 'first' ); % upper threshold first
+		%if isempty( boi )
+			%boi = find( resppi >= min( cfg.plosion_threshs ), 1, 'first' ); % lower threshold next
+		%end
+
+			% NEW: successive thresholding
+		thresh = 75; % TODO: hard coded value
+		boi = [];
+
+		while isempty( boi )
+			boi = find( resppi >= thresh, 1, 'first' );
+			thresh = thresh - 1;
+			if thresh < 0
+				break;
+			end
 		end
 
 		if ~isempty( boi )

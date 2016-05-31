@@ -58,7 +58,7 @@ function landmark( indir, outdir, ids )
 		read_audio( run, run.audiofile, false );
 
 			% detect landmarks
-		cdf.landmark( run, cfg );
+		cdf.landmark4( run, cfg );
 
 			% plot detection statistics
 		trials = [run.trials.detected];
@@ -66,7 +66,7 @@ function landmark( indir, outdir, ids )
 		trials = [run.trials.labeled];
 		labeled = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
 		cdf.plot.landmark( run, detected, labeled, fullfile( plotdir, sprintf( 'run_%d_landmark.png', i ) ) );
-		cdf.plot.timing( run, detected, labeled, fullfile( plotdir, sprintf( 'run_%d_timing.png', i ) ) );
+		%cdf.plot.timing( run, detected, labeled, fullfile( plotdir, sprintf( 'run_%d_timing.png', i ) ) );
 
 			% write cdf data
 		run.audiodata = []; % do not write audio data

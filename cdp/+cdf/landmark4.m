@@ -68,21 +68,22 @@ function landmark( run, cfg )
 			% get subband fft
 		frame = sta.msec2smp( cfg.sta_frame, run.audiorate );
 
-		noift = sta.framing( noiser, frame, cfg.sta_wnd );
-		[noift, noifreqs] = sta.fft( noift, run.audiorate );
-		[noift, noifreqs] = sta.banding( noift, noifreqs, cfg.glottis_band );
+		%noift = sta.framing( noiser, frame, cfg.sta_wnd );
+		%[noift, noifreqs] = sta.fft( noift, run.audiorate );
+		%[noift, noifreqs] = sta.banding( noift, noifreqs, cfg.glottis_band );
 
 		respft = sta.framing( respser, frame, cfg.sta_wnd );
 		[respft, respfreqs] = sta.fft( respft, run.audiorate );
+		respft(:, 2:end) = 2*respft(:, 2:end);
 		[respft, respfreqs] = sta.banding( respft, respfreqs, cfg.glottis_band );
 
 			% set maximum powers
-		noimax = max( noift, [], 1 ); % denoising
-		m = size( respft, 1 );
-		for j = 1:m
-			respft(j, :) = respft(j, :) - noimax;
-		end
-		respft(respft < eps) = eps;
+		%noimax = max( noift, [], 1 ); % denoising
+		%m = size( respft, 1 );
+		%for j = 1:m
+			%respft(j, :) = respft(j, :) - noimax;
+		%end
+		%respft(respft < eps) = eps;
 
 		resppow = max( respft, [], 2 );
 
@@ -91,6 +92,9 @@ function landmark( run, cfg )
 		resppow = resppow(1:size( respser, 1 ));
 
 			% get ror and peaks
+		cfg.glottis_rorpeak = 9; % TODO: hard-coded value!
+		cfg.schwa_power = -18;
+
 		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
 
 		respror = k15.ror( pow2db( resppow ), rordt );
@@ -121,10 +125,22 @@ function landmark( run, cfg )
 			k15.replaygain( resppiser, run.audiorate ), ...
 			sta.msec2smp( cfg.plosion_delta, run.audiorate ), sta.msec2smp( cfg.plosion_width, run.audiorate ) );
 
-			% set burst landmark
-		boi = find( resppi >= max( cfg.plosion_threshs ), 1, 'first' ); % upper threshold first
-		if isempty( boi )
-			boi = find( resppi >= min( cfg.plosion_threshs ), 1, 'first' ); % lower threshold next
+			% OLD: set burst landmark
+		%boi = find( resppi >= max( cfg.plosion_threshs ), 1, 'first' ); % upper threshold first
+		%if isempty( boi )
+			%boi = find( resppi >= min( cfg.plosion_threshs ), 1, 'first' ); % lower threshold next
+		%end
+
+			% NEW: successive thresholding
+		thresh = 75; % TODO: hard coded value
+		boi = [];
+
+		while isempty( boi )
+			boi = find( resppi >= thresh, 1, 'first' );
+			thresh = thresh - 1;
+			if thresh < 0
+				break;
+			end
 		end
 
 		if ~isempty( boi )
