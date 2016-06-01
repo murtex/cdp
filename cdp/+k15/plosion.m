@@ -43,7 +43,8 @@ function p = plosion( ser, delta, width )
 
 			% plosion index
 		if imax > delta+1
-			p(imax) = hemax/mean( he(li:ri), 1 );
+% 			p(imax) = hemax/mean( he(li:ri), 1 );
+            p(zcs(i)) = hemax/mean( he(li:ri), 1 ); % DEBUG: choose earliest position
 		end
 
 	end

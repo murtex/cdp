@@ -1,11 +1,13 @@
-function rorser = ror( ser, delta )
+function rorser = ror( ser, delta, qsplit )
 % rate-of-rise
 %
 % rorser = ROR( ser, delta )
+% rorser = ROR( ser, delta, qsplit )
 %
 % INPUT
 % ser : time series (numeric)
 % delta : ror-delta (scalar numeric)
+% qsplit : split ratio (scalar numeric)
 %
 % OUTPUT
 % rorser : rate-of-rise (numeric)
@@ -17,33 +19,26 @@ function rorser = ror( ser, delta )
 
 	if nargin < 2 || ~isscalar( delta ) || ~isnumeric( delta )
 		error( 'invalid argument: delta' );
-	end
+    end
+    
+    if nargin < 3
+        qsplit = 0.5;
+    elseif ~isscalar( qsplit ) || ~isnumeric( qsplit )
+        error( 'invalid argument: qsplit' );
+    end
 
 		% set rates
 	n = size( ser, 1 );
 
-	ldelta = floor( (delta-1)/2 );
-	rdelta = ceil( (delta-1)/2 );
-
+	ldelta = floor( (delta-1) * qsplit ); % unbalanced split
+	rdelta = ceil( (delta-1) * (1-qsplit) );
+    
 	rorser = zeros( size( ser ) ); % pre-allocation
-
+    
 	for i = 1:n
-
 		li = max( 1, i-ldelta );
 		ri = min( n, i+rdelta );
-
-			% fade-in/out
-		w = 1;
-		
-		%if i < ldelta
-			%w = (i-1) / ldelta;
-		%elseif i > n-rdelta
-			%w = (n-i) / rdelta;
-		%end
-
-			% weighted ror
-		rorser(i, :) = w * (ser(ri, :) - ser(li, :));
-
+		rorser(i, :) = (ser(ri, :) - ser(li, :));
 	end
 
 end

@@ -1,11 +1,15 @@
-function landmark( run, cfg )
-% detect landmarks (original version)
+function landmark3( run, cfg )
+% detect landmarks (version #3)
 %
-% LANDMARK( run, cfg )
+% LANDMARK3( run, cfg )
 %
 % INPUT
 % run : run (scalar object)
 % cfg : configuration (scalar object)
+%
+% REMARKS
+% w/o noise subtraction
+% advanced successive thresholding
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )

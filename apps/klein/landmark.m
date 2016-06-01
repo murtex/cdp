@@ -1,12 +1,13 @@
-function landmark( indir, outdir, ids )
+function landmark( indir, outdir, ids, dver )
 % detect landmarks
 %
-% LANDMARK( indir, outdir, ids )
+% LANDMARK( indir, outdir, ids, method )
 %
 % INPUT
 % indir : input directory (row char)
 % outdir : output directory (row char)
 % ids : subject identifiers (row numeric)
+% dver : detection version (scalar numeric)
 
 		% safeguard
 	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
@@ -19,6 +20,10 @@ function landmark( indir, outdir, ids )
 
 	if nargin < 3 || ~isrow( ids ) || ~isnumeric( ids )
 		error( 'invalid argument: ids' );
+	end
+
+	if nargin < 4 || ~isscalar( dver ) || ~isnumeric( dver )
+		error( 'invalid argument: dver' );
 	end
 
 		% include cue-distractor package
@@ -58,14 +63,33 @@ function landmark( indir, outdir, ids )
 		read_audio( run, run.audiofile, false );
 
 			% detect landmarks
-		cdf.landmark4( run, cfg );
+		switch dver
+			case 0
+				cdf.landmark( run, cfg );
+			case 1
+				cdf.landmark1( run, cfg );
+			case 2
+				cdf.landmark2( run, cfg );
+			case 3
+				cdf.landmark3( run, cfg );
+			case 4
+				cdf.landmark4( run, cfg );
+			case 5
+				cdf.landmark5( run, cfg );
+			case 6
+				cdf.landmark6( run, cfg );
+			case 7
+				cdf.landmark7( run, cfg );
+			otherwise
+				error( 'invalid argument: dver' );
+		end
 
 			% plot detection statistics
-		trials = [run.trials.detected];
-		detected = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
-		trials = [run.trials.labeled];
-		labeled = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
-		cdf.plot.landmark( run, detected, labeled, fullfile( plotdir, sprintf( 'run_%d_landmark.png', i ) ) );
+		%trials = [run.trials.detected];
+		%detected = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
+		%trials = [run.trials.labeled];
+		%labeled = cat( 2, [trials.bo]', [trials.vo]', [trials.vr]' );
+		%cdf.plot.landmark( run, detected, labeled, fullfile( plotdir, sprintf( 'run_%d_landmark.png', i ) ) );
 		%cdf.plot.timing( run, detected, labeled, fullfile( plotdir, sprintf( 'run_%d_timing.png', i ) ) );
 
 			% write cdf data

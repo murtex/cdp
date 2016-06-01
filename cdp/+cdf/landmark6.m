@@ -1,7 +1,7 @@
-function landmark1( run, cfg )
-% detect landmarks (version #1)
+function landmark6( run, cfg )
+% detect landmarks (version #6)
 %
-% LANDMARK1( run, cfg )
+% LANDMARK6( run, cfg )
 %
 % INPUT
 % run : run (scalar object)
@@ -9,7 +9,9 @@ function landmark1( run, cfg )
 %
 % REMARKS
 % w/o noise subtraction
-% simple successive thresholding
+% rescaled powers
+% epsilon powers
+% more advanced successive thresholding
 
 		% safeguard
 	if nargin < 1 || ~isscalar( run ) || ~isa( run, 'cdf.hRun' )
@@ -55,7 +57,7 @@ function landmark1( run, cfg )
         end
 
 		refrange = trial.labeled.range; % DEBUG: use labeled activity range as reference!
-		refrange = refrange + dsp.msec2smp( 25, run.audiorate, true ) * [-1, 2];
+        refrange = refrange + sta.msec2smp( 25, run.audiorate ) * [-1, 2]; % plus some extra space
 
 		if any( isnan( trial.range ) ) || any( isnan( refrange ) ) % skip invalid trials
 			logger.progress( i, n );
@@ -66,75 +68,46 @@ function landmark1( run, cfg )
         refrange(2) = min( run.audiolen, refrange(2) );
 
 			% set signals
-		noisig = run.audiodata(trial.cue + (0:trial.soa-1), 1);
-		respsig = run.audiodata(refrange(1):refrange(2), 1);
+		noiser = run.audiodata(trial.cue + (0:trial.soa-1), 1);
+		respser = run.audiodata(refrange(1):refrange(2), 1);
 
-			% ---------------------------------------------------------------
-			% NEW: get short-time fft
-		%[noiframes, ~] = dsp.frame( noisig, run.audiorate, ...
-			%cfg.sta_frame(1) / 1000, (cfg.sta_frame(1) - cfg.sta_frame(2)) / 1000, cfg.sta_wnd );
-		%[noispecs, noifreqs] = dsp.powspec( noiframes, run.audiorate, 2 ^ nextpow2( size( noiframes, 2 ) ) );
-		%noispecs(:, noifreqs < cfg.glottis_band(1) | noifreqs > cfg.glottis_band(2)) = [];
-		%noifreqs(noifreqs < cfg.glottis_band(1) | noifreqs > cfg.glottis_band(2)) = [];
+			% get subband fft
+		frame = sta.msec2smp( cfg.sta_frame, run.audiorate );
 
-		%[respframes, ~] = dsp.frame( respsig, run.audiorate, ...
-			%cfg.sta_frame(1) / 1000, (cfg.sta_frame(1) - cfg.sta_frame(2)) / 1000, cfg.sta_wnd );
-		%[respspecs, respfreqs] = dsp.powspec( respframes, run.audiorate, 2 ^ nextpow2( size( respframes, 2 ) ) );
-		%respspecs(:, respfreqs < cfg.glottis_band(1) | respfreqs > cfg.glottis_band(2)) = [];
-		%respfreqs(respfreqs < cfg.glottis_band(1) | respfreqs > cfg.glottis_band(2)) = [];
-
-			% NEW: denoise by noise maximum
-		%noimax = max( noispecs, [], 1 );
-		%for j = 1:size( respspecs, 1 )
-			%respspecs(j, :) = respspecs(j, :) - noimax;
-		%end
-		%respspecs(respspecs < eps) = eps;
-
-			% NEW: follow maximum spectral component and smooth
-		%resppow = max( respspecs, [], 2 );
-
-		%resppow = kron( resppow, ones( 1, size( respframes, 2 ) ) );
-		%resppow = dsp.deframe( resppow, run.audiorate, ...
-			%cfg.sta_frame(1) / 1000, (cfg.sta_frame(1) - cfg.sta_frame(2)) / 1000, @rectwin );
-
-		%smoothlen = dsp.msec2smp( 2 * (cfg.sta_frame(1) - cfg.sta_frame(2)), run.audiorate, true );
-		%resppow = filter2( ones( 1, smoothlen ) / smoothlen, resppow );
-		%resppow = transpose( resppow(1:numel( respsig )) );
-
-			% ---------------------------------------------------------------
-			% OLD: get subband fft
-		frame = dsp.msec2smp( cfg.sta_frame, run.audiorate, true );
-
-		%noift = sta.framing( noisig, frame, cfg.sta_wnd );
+		%noift = sta.framing( noiser, frame, cfg.sta_wnd );
 		%[noift, noifreqs] = sta.fft( noift, run.audiorate );
 		%[noift, noifreqs] = sta.banding( noift, noifreqs, cfg.glottis_band );
 
-		respft = sta.framing( respsig, frame, cfg.sta_wnd );
+		respft = sta.framing( respser, frame, cfg.sta_wnd );
 		[respft, respfreqs] = sta.fft( respft, run.audiorate );
+		respft(:, 2:end) = 2*respft(:, 2:end);
 		[respft, respfreqs] = sta.banding( respft, respfreqs, cfg.glottis_band );
 
-			% OLD: spectral denoising
+			% set maximum powers
 		%noimax = max( noift, [], 1 ); % denoising
 		%m = size( respft, 1 );
 		%for j = 1:m
 			%respft(j, :) = respft(j, :) - noimax;
 		%end
-		%respft(respft < eps) = eps;
-
-			% OLD: follow most prominent frequency and smooth
+        
+		respft(respft < eps) = eps;        
 		resppow = max( respft, [], 2 );
 
+			% smoothing
 		resppow = sta.unframe( resppow, frame );
-		resppow = resppow(1:size( respsig, 1 ));
+		resppow = resppow(1:size( respser, 1 ));
 
 			% get ror and peaks
-		rordt = dsp.msec2smp( cfg.glottis_rordt, run.audiorate, true );
+		cfg.glottis_rorpeak = 9; % TODO: hard-coded value!
+		cfg.schwa_power = -18;
+
+		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
 
 		respror = k15.ror( pow2db( resppow ), rordt );
 
 		resppeak = k15.peak( respror, cfg.glottis_rorpeak );
-		respglottis = k15.peakg( resppeak, pow2db( resppow ), respror, ...
-			dsp.msec2smp( cfg.schwa_length, run.audiorate, true ), cfg.schwa_power );
+		respglottis = k15.peak_glottis( resppeak, pow2db( resppow ), respror, ...
+			sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
 
 			% set glottis landmarks
 		m = numel( respglottis );
@@ -146,20 +119,17 @@ function landmark1( run, cfg )
 			trial.detected.vr = refrange(1) + respglottis(2*pairind)-1;
 			nvos = nvos + 1;
 			nvrs = nvrs + 1;
-		end
-
-			% ---------------------------------------------------------------
+        end
+        
 			% get plosion indices
-		resppisig = run.audiodata(refrange(1):refrange(2), 1);
-
+		resppiser = respser;
 		if ~isnan( trial.detected.vo )
-			resppisig(trial.detected.vo-refrange(1)+1:end) = []; % restrict detection range
+			resppiser(trial.detected.vo-refrange(1)+1:end) = []; % restrict detection range
 		end
 
 		resppi = k15.plosion( ...
-			k15.replaygain( resppisig, run.audiorate ), ...
-			dsp.msec2smp( cfg.plosion_delta, run.audiorate, true ), ...
-			dsp.msec2smp( cfg.plosion_width, run.audiorate, true ) );
+			k15.replaygain( resppiser, run.audiorate ), ...
+			sta.msec2smp( cfg.plosion_delta, run.audiorate ), sta.msec2smp( cfg.plosion_width, run.audiorate ) );
 
 			% OLD: set burst landmark
 		%boi = find( resppi >= max( cfg.plosion_threshs ), 1, 'first' ); % upper threshold first
@@ -168,7 +138,7 @@ function landmark1( run, cfg )
 		%end
 
 			% NEW: successive thresholding
-		thresh = max( cfg.plosion_threshs );
+		thresh = 125; % TODO: hard coded value
 		boi = [];
 
 		while isempty( boi )

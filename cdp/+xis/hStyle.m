@@ -33,10 +33,12 @@ classdef (Sealed = true) hStyle < handle
 			fig = figure( ...
 				'Visible', 'off', ...
 				'Color', this.color( 'grey', 0.96 ), 'InvertHardCopy', 'off', ...
+				'PaperUnits', 'points', ...
 				'defaultAxesNextPlot', 'add', ...
 				'defaultAxesBox', 'on', ...
 				'defaultAxesLayer', 'top', ...
 				'defaultAxesXGrid', 'on', 'defaultAxesYGrid', 'on', ...
+				'defaultTextFontSize', 9, 'defaultAxesFontSize', 8, ...
 				varargin{:} );
 
 		end
@@ -59,8 +61,27 @@ classdef (Sealed = true) hStyle < handle
 				error( 'invalid argument: plotfile' );
 			end
 
+				% print output
+			[~, name, ext] = fileparts( plotfile );
+
+			switch lower( ext )
+
+				case '.png' % bitmaps
+					fmtopts = {'-dpng', '-r300'};
+				case '.jpg'
+					fmtopts = {'-djpeg', '-r300'};
+
+				case '.eps' % vector graphics
+					fmtopts = {'-depsc2', '-loose'};
+				case '.pdf'
+					fmtopts = {'-dpdf'};
+
+				otherwise
+					error( 'invalid argument: plotfile' )
+			end
+
 				% print figure
-			print( plotfile, '-dpng', '-r120' );
+			print( plotfile, fmtopts{:} );
 
 			%imwrite( hardcopy( gcf(), '-dzbuffer', '-r120' ), sprintf( '%s.png', plotfile ), 'png' );
 
