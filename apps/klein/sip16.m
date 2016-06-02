@@ -1,11 +1,12 @@
-function sip16( indir, ids )
+function sip16( indir, ids, labels )
 % landmark detection statistics (IEEE SIP 2016)
 %
-% sip16( indir, ids )
+% sip16( indir, ids, labels={} )
 %
 % INPUT
 % indir : input directory (row char)
 % ids : subject identifiers (row numeric)
+% labels : response labels (row char)
 
 		% safeguard
 	if nargin < 1 || ~isrow( indir ) || ~ischar( indir )
@@ -14,21 +15,35 @@ function sip16( indir, ids )
 
 	if nargin < 2 || ~isrow( ids ) || ~isnumeric( ids )
 		error( 'invalid argument: ids' );
-	end
-
+    end
+    
+    if nargin < 3
+        labels = {};
+    elseif ~iscellstr( labels )
+        error( 'invalid argument: labels' );
+    end
+    
 		% include cue-distractor package
 	addpath( '../../cdp/' );
     
 		% prepare for output
-	plotdir = fullfile( indir, 'plot' );
-	if exist( plotdir, 'dir' ) ~= 7
-		mkdir( plotdir );
+	statsdir = fullfile( indir, 'stats' );
+    if numel( labels ) == 1
+        statsdir = fullfile( statsdir, labels{1} );
+    end
+	if exist( statsdir, 'dir' ) ~= 7
+		mkdir( statsdir );
+    end
+
+	subjdir = fullfile( statsdir, 'subjects' );
+	if exist( subjdir, 'dir' ) ~= 7
+		mkdir( subjdir );
 	end
 
     style = xis.hStyle.instance();
     
-	logger = xis.hLogger.instance( fullfile( indir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
-	logger.tab( 'test landmarks...' );
+	logger = xis.hLogger.instance( fullfile( statsdir, sprintf( '%d-%d.log', min( ids ), max( ids ) ) ) ); % start logging
+	logger.tab( 'sip16 statistics...' );
 
 		% configure framework
 	cfg = cdf.hConfig(); % use defaults
@@ -36,6 +51,7 @@ function sip16( indir, ids )
 		% -------------------------------------------------------------------
 		% helper functions
     MAXDELTA = 15;
+    MAXVOT = 180; % 0.7; % 180;
 	BINFACTOR = 1;
     
 	global nrefbos nrefvos nrefvrs nrefvots nreflens
@@ -47,6 +63,8 @@ function sip16( indir, ids )
 	global dvrs ndvrs absdvrs dvrpos dvrns absdvrpos absdvrns
 	global dvots ndvots absdvots dvotpos dvotns absdvotpos absdvotns
 	global dlens ndlens absdlens dlenpos dlenns absdlenpos absdlenns
+    global prefvots nprefvots prefvotpos prefvotns
+    global pvots npvots pvotpos pvotns
 
 	function stats( refbos, refvos, refvrs, refvots, reflens, bos, vos, vrs, vots, lens )
 
@@ -128,7 +146,31 @@ function sip16( indir, ids )
 		dlenns = hist( dlens, dlenpos );
 		absdlenpos = linspace( min( absdlens ), max( absdlens ), numel( absdlens ) ); %style.bins( absdlens ) );
 		absdlenns = hist( absdlens, absdlenpos );
-    
+        
+            % distribution
+        prefvots = sta.smp2msec( refvots, audiorate ); % absolute vot
+        pvots = sta.smp2msec( vots, audiorate );
+        if MAXVOT < 1 % relative vot
+            prefvots = refvots ./ reflens;
+            pvots = vots ./ reflens;
+        end
+		prefvots(isnan( prefvots )) = [];
+		pvots(isnan( pvots )) = [];
+        
+        nprefvots = numel( prefvots ); % binning
+        prefvots(prefvots > MAXVOT) = [];
+        npvots = numel( pvots );        
+        pvots(pvots > MAXVOT) = [];
+
+        bmin = min( prefvots );
+        bmax = max( prefvots );
+        nbins = round( BINFACTOR * max( style.bins( prefvots ), style.bins( pvots ) ) );
+
+        prefvotpos = linspace( bmin, bmax, nbins );
+		prefvotns = hist( prefvots, prefvotpos );
+		pvotpos = linspace( bmin, bmax, nbins );
+		pvotns = hist( pvots, pvotpos );
+        
 	end
 
 	function logstats()
@@ -137,42 +179,47 @@ function sip16( indir, ids )
     	logger.tab( 'overall statistics' );
 		logger.log( 'ref. burst-onsets: %d', nrefbos );
 		logger.log( 'ref. voice-onsets: %d', nrefvos );
-		%logger.log( 'ref. voice-releases: %d', nrefvrs );
+		logger.log( 'ref. voice-releases: %d', nrefvrs );
 		logger.log( 'ref. voice-onset times: %d', nrefvots );
-		%logger.log( 'ref. vowel-lengths: %d', nreflens );
+		logger.log( 'ref. vowel-lengths: %d', nreflens );
 		logger.log( 'burst-onsets: %d', nbos );
 		logger.log( 'voice-onsets: %d', nvos );
-		%logger.log( 'voice-releases: %d', nvrs );    
+		logger.log( 'voice-releases: %d', nvrs );    
 		logger.log( 'voice-onset times: %d', nvots );
-		%logger.log( 'vowel-lengths: %d', nlens );
+		logger.log( 'vowel-lengths: %d', nlens );
     	logger.untab();
     
 			% deletions
 		logger.tab( 'deletion statistics' );
 		logger.log( 'burst-onset (rate): %d (%.3f)', nbodels, nbodels/nrefbos );
 		logger.log( 'voice-onset (rate): %d (%.3f)', nvodels, nvodels/nrefvos );
-		%logger.log( 'voice-release (rate): %d (%.3f)', nvrdels, nvrdels/nrefvrs );
+		logger.log( 'voice-release (rate): %d (%.3f)', nvrdels, nvrdels/nrefvrs );
 		logger.log( 'voice-onset time (rate): %d (%.3f)', nvotdels, nvotdels/nrefvots );
-		%logger.log( 'vowel-length (rate): %d (%.3f)', nlendels, nlendels/nreflens );
+		logger.log( 'vowel-length (rate): %d (%.3f)', nlendels, nlendels/nreflens );
 		logger.untab();    
 
 			% insertions
-		%logger.tab( 'insertion statistics' );
-		%logger.log( 'burst-onset (rate): %d (%.3f)', nboins, nboins/nrefbos );
-		%logger.log( 'voice-onset (rate): %d (%.3f)', nvoins, nvoins/nrefvos );
-		%logger.log( 'voice-release (rate): %d (%.3f)', nvrins, nvrins/nrefvrs );
-		%logger.log( 'voice-onset time (rate): %d (%.3f)', nvotins, nvotins/nrefvots );
-		%logger.log( 'vowel-length (rate): %d (%.3f)', nlenins, nlenins/nreflens );
-		%logger.untab();
+		logger.tab( 'insertion statistics' );
+		logger.log( 'burst-onset (rate): %d (%.3f)', nboins, nboins/nrefbos );
+		logger.log( 'voice-onset (rate): %d (%.3f)', nvoins, nvoins/nrefvos );
+		logger.log( 'voice-release (rate): %d (%.3f)', nvrins, nvrins/nrefvrs );
+		logger.log( 'voice-onset time (rate): %d (%.3f)', nvotins, nvotins/nrefvots );
+		logger.log( 'vowel-length (rate): %d (%.3f)', nlenins, nlenins/nreflens );
+		logger.untab();
 
 			% accuracy
-		logger.tab( 'accuracy statistics (+/-5ms)' );
+		logger.tab( 'accuracy statistics (+/-5ms, +/-10ms, +/-15ms)' );
 		
-		logger.log( 'burst-onset: %.3f', sum( absdbons(absdbopos <= 5) ) / ndbos );
-		logger.log( 'voice-onset: %.3f', sum( absdvons(absdvopos <= 5) ) / ndvos );
-		%logger.log( 'voice-release: %.3f', sum( absdvrns(absdvrpos <= 5) ) / ndvrs );
-		logger.log( 'voice-onset time: %.3f', sum( absdvotns(absdvotpos <= 5) ) / ndvots );
-		%logger.log( 'vowel-length: %.3f', sum( absdlenns(absdlenpos <= 5) ) / ndlens );
+		logger.log( 'burst-onset: %.3f, %.3f, %.3f', ...
+            sum( absdbons(absdbopos <= 5) ) / ndbos, sum( absdbons(absdbopos <= 10) ) / ndbos, sum( absdbons(absdbopos <= 15) ) / ndbos );
+		logger.log( 'voice-onset: %.3f, %.3f, %.3f', ...
+            sum( absdvons(absdvopos <= 5) ) / ndvos, sum( absdvons(absdvopos <= 10) ) / ndvos, sum( absdvons(absdvopos <= 15) ) / ndvos );
+  		logger.log( 'voice-release: %.3f, %.3f, %.3f', ...
+              sum( absdvrns(absdvrpos <= 5) ) / ndvrs, sum( absdvrns(absdvrpos <= 10) ) / ndvrs, sum( absdvrns(absdvrpos <= 15) ) / ndvrs );
+		logger.log( 'voice-onset time: %.3f, %.3f, %.3f', ...
+            sum( absdvotns(absdvotpos <= 5) ) / ndvots, sum( absdvotns(absdvotpos <= 10) ) / ndvots, sum( absdvotns(absdvotpos <= 15) ) / ndvots );
+ 		logger.log( 'vowel-length: %.3f, %.3f, %.3f', ...
+			sum( absdlenns(absdlenpos <= 5) ) / ndlens, sum( absdlenns(absdlenpos <= 10) ) / ndlens, sum( absdlenns(absdlenpos <= 15) ) / ndlens );
 		
 		logger.untab();
 
@@ -192,7 +239,7 @@ function sip16( indir, ids )
 		
 		subplot( 3, 2, 1 ); % burst-onset
 		title( 'burst-onset (+b) detection' );
-		ylabel( 'detection rate' );
+		ylabel( '^rate' );
 		xlim( MAXDELTA * [-1, 1] );
 		bar( dbopos, dbons / ndbos, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
@@ -205,7 +252,7 @@ function sip16( indir, ids )
 		
 		subplot( 3, 2, 3 ); % voice-onset
 		title( 'voice-onset (+g) detection' );
-		ylabel( 'detection rate' );
+		ylabel( 'rate' );
 		xlim( MAXDELTA * [-1, 1] );
 		bar( dvopos, dvons / ndvos, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
@@ -219,7 +266,7 @@ function sip16( indir, ids )
 		subplot( 3, 2, 5 ); % voice-release
 		title( 'voice-release (-g) detection' );
 		xlabel( 'delta in milliseconds' );
-		ylabel( 'detection rate' );
+		ylabel( 'rate' );
 		xlim( MAXDELTA * [-1, 1] );
 		bar( dvrpos, dvrns / ndvrs, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
@@ -242,7 +289,7 @@ function sip16( indir, ids )
 		
 		subplot( 2, 2, 1 ); % voice-onset time
 		title( 'voice-onset time detection' );
-		ylabel( 'detection rate' );
+		ylabel( 'rate' );
 		xlim( MAXDELTA * [-1, 1] );
 		bar( dvotpos, dvotns / ndvots, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
@@ -256,7 +303,7 @@ function sip16( indir, ids )
 		subplot( 2, 2, 3 ); % vowel-length
 		title( 'vowel-length detection' );
 		xlabel( 'delta in milliseconds' );
-		ylabel( 'detection rate' );
+		ylabel( 'rate' );
 		xlim( MAXDELTA * [-1, 1] );
 		bar( dlenpos, dlenns / ndlens, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
@@ -309,23 +356,57 @@ function sip16( indir, ids )
 		
 		style.print( plotfile );
 		delete( fig );
-	end
+    end
+
+    function plotstats4( plotfile )
+		logger.log( 'plot distribution statistics ''%s''...', plotfile );
+		
+		fig = style.figure( 'PaperPosition', plottile( 6, 8 ) );
+
+		h1 = subplot( 2, 1, 1 ); % labeling
+		title( 'labeling distribution' );
+		ylabel( 'rate' );
+        xlim( MAXVOT * [0, 1] );
+		bar( prefvotpos, prefvotns / nprefvots, ...
+			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+		
+		h2 = subplot( 2, 1, 2 ); % detection
+		title( 'detection distribution' );
+        if MAXVOT >= 1
+            xlabel( 'voice-onset time in milliseconds' );
+        else
+            xlabel( 'relative voice-onset time' );
+        end
+		ylabel( 'rate' );
+        xlim( MAXVOT * [0, 1] );
+		bar( pvotpos, pvotns / npvots, ...
+			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+        
+        yl1 = ylim( h1 ); % adjust axes limits
+        yl2 = ylim( h2 );
+        yl = [min( yl1(1), yl2(1) ), max( yl1(2), yl2(2) )];
+        ylim( h1, yl );
+        ylim( h2, yl );
+
+		style.print( plotfile );
+		delete( fig );
+    end
 
         % -------------------------------------------------------------------
         % statistics
     audiorate = NaN;
     
-    refbos = []; % landmarks
-    refvos = [];
-    refvrs = [];
-    refvots = [];
-    reflens = [];
+    refbos = {}; % landmarks
+    refvos = {};
+    refvrs = {};
+    refvots = {};
+    reflens = {};
     
-    bos = [];
-    vos = [];
-    vrs = [];
-    vots = [];
-    lens = [];
+    bos = {};
+    vos = {};
+    vrs = {};
+    vots = {};
+    lens = {};
     
 		% proceed subjects
 	for i = ids
@@ -351,26 +432,39 @@ function sip16( indir, ids )
         
         labtrials = [run.trials.labeled]; % labeled and detected trials
         dettrials = [run.trials.detected];
+        
+         if numel( labels ) > 0 % restrict response labels
+             dels = [];
+             for j = 1:numel( labtrials )
+                 if ~any( strcmp( run.trials(j).labeled.label, labels ) )
+                     dels(end+1) = j;
+                 end
+             end
+             labtrials(dels) = [];
+             dettrials(dels) = [];
+         end
+        
 
-        refbos(end+1, :) = [labtrials.bo]; % labeled landmarks
-        refvos(end+1, :) = [labtrials.vo];
-        refvrs(end+1, :) = [labtrials.vr];
-        refvots(end+1, :) = refvos(end, :) - refbos(end, :);
-        reflens(end+1, :) = refvrs(end, :) - refvos(end, :);
+        refbos{end+1} = [labtrials.bo]; % labeled landmarks
+        refvos{end+1} = [labtrials.vo];
+        refvrs{end+1} = [labtrials.vr];
+        refvots{end+1} = refvos{end} - refbos{end};
+        reflens{end+1} = refvrs{end} - refvos{end};
 
-        bos(end+1, :) = [dettrials.bo]; % detected landmarks
-        vos(end+1, :) = [dettrials.vo];
-        vrs(end+1, :) = [dettrials.vr];
-        vots(end+1, :) = vos(end, :) - bos(end, :);
-        lens(end+1, :) = vrs(end, :) - vos(end, :);
-
+        bos{end+1} = [dettrials.bo]; % detected landmarks
+        vos{end+1} = [dettrials.vo];
+        vrs{end+1} = [dettrials.vr];
+        vots{end+1} = vos{end} - bos{end};
+        lens{end+1} = vrs{end} - vos{end};
+        
 			% log and plot per-subject stats
-		stats( refbos(end, :), refvos(end, :), refvrs(end, :), refvots(end, :), reflens(end, :), ...
-			bos(end, :), vos(end, :), vrs(end, :), vots(end, :), lens(end, :) );
-		%logstats();
-		%plotstats1( fullfile( plotdir, sprintf( 'sip16_fig1_%02d.png', i ) ) );
-		%plotstats2( fullfile( plotdir, sprintf( 'sip16_fig2_%02d.png', i ) ) );
-		%plotstats3( fullfile( plotdir, sprintf( 'sip16_fig3_%02d.png', i ) ) );
+		stats( refbos{end}, refvos{end}, refvrs{end}, refvots{end}, reflens{end}, ...
+			bos{end}, vos{end}, vrs{end}, vots{end}, lens{end} );
+		logstats();
+		plotstats1( fullfile( subjdir, sprintf( 'sip16_fig1_%02d.png', i ) ) );
+		plotstats2( fullfile( subjdir, sprintf( 'sip16_fig2_%02d.png', i ) ) );
+		plotstats3( fullfile( subjdir, sprintf( 'sip16_fig3_%02d.png', i ) ) );
+		plotstats4( fullfile( subjdir, sprintf( 'sip16_fig4_%02d.png', i ) ) );
 
 			% cleanup
 		delete( run );
@@ -379,12 +473,13 @@ function sip16( indir, ids )
     end
 
 		% log and plot global stats
-	stats( refbos(:), refvos(:), refvrs(:), refvots(:), reflens(:), ...
-		bos(:), vos(:), vrs(:), vots(:), lens(:) );
+	stats( [refbos{:}], [refvos{:}], [refvrs{:}], [refvots{:}], [reflens{:}], ...
+		[bos{:}], [vos{:}], [vrs{:}], [vots{:}], [lens{:}] );
 	logstats();
-	plotstats1( fullfile( plotdir, 'sip16_fig1_all.png' ) );
-	plotstats2( fullfile( plotdir, 'sip16_fig2_all.png' ) );
-	plotstats3( fullfile( plotdir, 'sip16_fig3_all.png' ) );
+	plotstats1( fullfile( statsdir, 'sip16_fig1_all.png' ) );
+   	plotstats2( fullfile( statsdir, 'sip16_fig2_all.png' ) );
+   	plotstats3( fullfile( statsdir, 'sip16_fig3_all.png' ) );
+	plotstats4( fullfile( statsdir, 'sip16_fig4_all.png' ) );
     
 		% cleanup
 	logger.untab( 'done.' ); % stop logging

@@ -9,9 +9,7 @@ function landmark7( run, cfg )
 %
 % REMARKS
 % w/o noise subtraction
-% rescaled powers
 % epsilon powers
-% advanced glottal pairing
 % more advanced successive thresholding
 
 		% safeguard
@@ -81,7 +79,7 @@ function landmark7( run, cfg )
 
 		respft = sta.framing( respser, frame, cfg.sta_wnd );
 		[respft, respfreqs] = sta.fft( respft, run.audiorate );
-		respft(:, 2:end) = 2*respft(:, 2:end);
+		%respft(:, 2:end) = 2*respft(:, 2:end);
 		[respft, respfreqs] = sta.banding( respft, respfreqs, cfg.glottis_band );
 
 			% set maximum powers
@@ -99,12 +97,12 @@ function landmark7( run, cfg )
 		resppow = resppow(1:size( respser, 1 ));
 
 			% get ror and peaks
-		cfg.glottis_rorpeak = 9; % TODO: hard-coded value!
-		cfg.schwa_power = -18;
+		%cfg.glottis_rorpeak = 9; % TODO: hard-coded value!
+		%cfg.schwa_power = -18;
 
 		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
 
-		respror = k15.ror( pow2db( resppow ), rordt, 4/9 );
+		respror = k15.ror( pow2db( resppow ), rordt );
 
 		resppeak = k15.peak( respror, cfg.glottis_rorpeak );
 		respglottis = k15.peak_glottis( resppeak, pow2db( resppow ), respror, ...
@@ -115,7 +113,7 @@ function landmark7( run, cfg )
 		pairlen = respglottis(2:2:m) - respglottis(1:2:m) + 1;
 		[~, pairind] = max( pairlen ); % longest pair
 
-		if ~isempty( pairind ) && pairind ~= 3
+		if ~isempty( pairind )
 			trial.detected.vo = refrange(1) + respglottis(2*pairind-1)-1;
 			trial.detected.vr = refrange(1) + respglottis(2*pairind)-1;
 			nvos = nvos + 1;
