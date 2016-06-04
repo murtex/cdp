@@ -67,7 +67,7 @@ function sip16( indir, ids, labels )
     global pvots npvots pvotpos pvotns
 
 	function stats( refbos, refvos, refvrs, refvots, reflens, bos, vos, vrs, vots, lens )
-
+        
 			% overall
 		nrefbos = sum( ~isnan( refbos ) ); % labeled landmarks
 		nrefvos = sum( ~isnan( refvos ) );
@@ -363,15 +363,15 @@ function sip16( indir, ids, labels )
 		
 		fig = style.figure( 'PaperPosition', plottile( 6, 8 ) );
 
-		h1 = subplot( 2, 1, 1 ); % labeling
-		title( 'labeling distribution' );
+		h1 = subplot( 2, 1, 1 ); % detection
+		title( 'detection distribution' );
 		ylabel( 'rate' );
         xlim( MAXVOT * [0, 1] );
-		bar( prefvotpos, prefvotns / nprefvots, ...
+		bar( pvotpos, pvotns / npvots, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
-		
-		h2 = subplot( 2, 1, 2 ); % detection
-		title( 'detection distribution' );
+        
+		h2 = subplot( 2, 1, 2 ); % labeling
+		title( 'labeling distribution' );
         if MAXVOT >= 1
             xlabel( 'voice-onset time in milliseconds' );
         else
@@ -379,9 +379,9 @@ function sip16( indir, ids, labels )
         end
 		ylabel( 'rate' );
         xlim( MAXVOT * [0, 1] );
-		bar( pvotpos, pvotns / npvots, ...
+		bar( prefvotpos, prefvotns / nprefvots, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
-        
+		
         yl1 = ylim( h1 ); % adjust axes limits
         yl2 = ylim( h2 );
         yl = [min( yl1(1), yl2(1) ), max( yl1(2), yl2(2) )];
@@ -392,23 +392,128 @@ function sip16( indir, ids, labels )
 		delete( fig );
     end
 
+    function plottrial( plotfile, run, trial )
+		logger.log( 'plot example trial ''%s''...', plotfile );
+		
+		fig = style.figure( 'PaperPosition', plottile( 6, 12 ) );
+        
+            % prepare data
+        refrange = trial.labeled.range; % range
+        refrange = refrange + sta.msec2smp( 25, run.audiorate ) * [-1, 2];
+        refrange(1) = max( 1, refrange(1) );
+        refrange(2) = min( run.audiolen, refrange(2) );
+
+		respser = run.audiodata(refrange(1):refrange(2), 1); % signal
+        
+		frame = sta.msec2smp( cfg.sta_frame, run.audiorate ); % short-time fft
+		respft = sta.framing( respser, frame, cfg.sta_wnd );
+		[respft, respfreqs] = sta.fft( respft, run.audiorate );
+		respft(:, 2:end) = 2*respft(:, 2:end);
+		[respft, respfreqs] = sta.banding( respft, respfreqs, cfg.glottis_band );
+        
+		respft(respft < eps) = eps; % maximum power
+		resppow = max( respft, [], 2 );
+        
+		resppow = sta.unframe( resppow, frame ); % smoothing
+		resppow = resppow(1:size( respser, 1 ));
+
+		cfg.glottis_rorpeak = 9; % ror and peaks
+		cfg.schwa_power = -18;
+		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
+		respror = k15.ror( pow2db( resppow ), rordt );
+		resppeak = k15.peak( respror, cfg.glottis_rorpeak );
+		%respglottis = k15.peak_glottis( resppeak, pow2db( resppow ), respror, ...
+			%sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+		respglottis = k15.peakg( resppeak, pow2db( resppow ), respror, ...
+			sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+        
+		resppi = k15.plosion( ... % plosion index
+			k15.replaygain( respser, run.audiorate ), ...
+			sta.msec2smp( cfg.plosion_delta, run.audiorate ), sta.msec2smp( cfg.plosion_width, run.audiorate ) );
+
+			% helper functions
+		function msec = smp2msec( smp )
+			msec = sta.smp2msec( smp - refrange(1), run.audiorate );
+		end
+        
+            % plot landmarks and landmarks
+        h = subplot( 4, 1, 1 );
+        title( sprintf( 'syllable: ''%s'', sex: %s', trial.labeled.label, run.sex ) );
+        ylabel( 'amplitude' );
+        xlim( smp2msec( [refrange(1), refrange(2)] ) );
+		yl = 1.2 * max( abs( respser ) ) * [-1, 1];
+		ylim( yl );
+        plot( smp2msec( trial.detected.bo * [1, 1] ), [0, yl(2)], ... % detected landmarks
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( trial.detected.vo * [1, 1] ), [0, yl(2)], ...
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( trial.detected.vr * [1, 1] ), [0, yl(2)], ...
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( trial.labeled.bo * [1, 1] ), [yl(1), 0], ... % labeled landmarks
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( trial.labeled.vo * [1, 1] ), [yl(1), 0], ...
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( trial.labeled.vr * [1, 1] ), [yl(1), 0], ...
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( refrange(1):refrange(2) ), respser, ... % waveform
+            'Color', style.color( 'neutral', 0 ) );
+        
+            % plot power
+        subplot( 4, 1, 2 );
+        ylabel( 'band power' );
+        xlim( smp2msec( [refrange(1), refrange(2)] ) );
+        plot( smp2msec( refrange(1):refrange(2) ), pow2db( resppow ), ...
+            'Color', style.color( 'neutral', 0 ) );
+        
+            % plot peaks and ror
+        subplot( 4, 1, 3 );
+        ylabel( 'rate-of-rise' );
+        xlim( smp2msec( [refrange(1), refrange(2)] ) );
+        for i = 1:numel( resppeak ) % candidate peaks
+            stem( smp2msec( resppeak + refrange(1) - 1 ), respror(resppeak), ...
+                'Color', style.color( 'neutral', 0 ), 'LineStyle', '--', ...
+                'MarkerFaceColor', style.color( 'neutral', 0 ), 'MarkerSize', 1 );
+        end
+        for i = 1:numel( respglottis ) % glottal peaks
+            stem( smp2msec( respglottis + refrange(1) - 1 ), respror(respglottis), ...
+                'Color', style.color( 'neutral', 0 ), 'LineStyle', '-', ...
+                'MarkerFaceColor', style.color( 'neutral', 0 ), 'MarkerSize', 1 );
+        end
+        plot( smp2msec( refrange(1):refrange(2) ), respror, ... % ror
+            'Color', style.color( 'neutral', 0 ) );
+        
+            % plot plosion index
+        subplot( 4, 1, 4 );
+        xlabel( 'time in milliseconds' );
+        ylabel( 'plosion index' );
+        xlim( smp2msec( [refrange(1), refrange(2)] ) );
+        plot( smp2msec( refrange(1):refrange(2) ), resppi, ...
+            'Color', style.color( 'neutral', 0 ) );        
+
+		style.print( plotfile );
+		delete( fig );
+    end
+
         % -------------------------------------------------------------------
         % statistics
     audiorate = NaN;
     
-    refbos = {}; % landmarks
-    refvos = {};
-    refvrs = {};
-    refvots = {};
-    reflens = {};
+    refbos = []; % landmarks and intervals
+    refvos = [];
+    refvrs = [];
+    refvots = [];
+    reflens = [];
     
-    bos = {};
-    vos = {};
-    vrs = {};
-    vots = {};
-    lens = {};
+    bos = [];
+    vos = [];
+    vrs = [];
+    vots = [];
+    lens = [];
+    
+    ndubious = 0;
     
 		% proceed subjects
+    si = [];
 	for i = ids
 		logger.tab( 'subject: %d', i );
 
@@ -432,57 +537,126 @@ function sip16( indir, ids, labels )
         
         labtrials = [run.trials.labeled]; % labeled and detected trials
         dettrials = [run.trials.detected];
-        
-         if numel( labels ) > 0 % restrict response labels
-             dels = [];
-             for j = 1:numel( labtrials )
-                 if ~any( strcmp( run.trials(j).labeled.label, labels ) )
-                     dels(end+1) = j;
-                 end
-             end
-             labtrials(dels) = [];
-             dettrials(dels) = [];
-         end
-        
 
-        refbos{end+1} = [labtrials.bo]; % labeled landmarks
-        refvos{end+1} = [labtrials.vo];
-        refvrs{end+1} = [labtrials.vr];
-        refvots{end+1} = refvos{end} - refbos{end};
-        reflens{end+1} = refvrs{end} - refvos{end};
+        if numel( labels ) > 0 % invalidation by response label
+            for j = 1:numel( labtrials )
+                if ~any( strcmp( run.trials(j).labeled.label, labels ) )
+                    labtrials(j).bo = NaN;
+                    labtrials(j).vo = NaN;
+                    labtrials(j).vr = NaN;
+                    dettrials(j).bo = NaN;
+                    dettrials(j).vo = NaN;
+                    dettrials(j).vr = NaN;
+                end
+            end
+        end
+        
+		for j = 1:numel( labtrials ) % invalidate dubious labeled trials
+			if sta.smp2msec( labtrials(j).vo - labtrials(j).bo, run.audiorate ) > 150
+				labtrials(j).bo = NaN;
+				labtrials(j).vo = NaN;
+				labtrials(j).vr = NaN;
+				dettrials(j).bo = NaN;
+				dettrials(j).vo = NaN;
+				dettrials(j).vr = NaN;
+				ndubious = ndubious + 1;
+			end
+		end
+        
+        refbos(end+1, :) = [labtrials.bo]; % labeled landmarks
+        refvos(end+1, :) = [labtrials.vo];
+        refvrs(end+1, :) = [labtrials.vr];
+        refvots(end+1, :) = refvos(end, :) - refbos(end, :);
+        reflens(end+1, :) = refvrs(end, :) - refvos(end, :);
 
-        bos{end+1} = [dettrials.bo]; % detected landmarks
-        vos{end+1} = [dettrials.vo];
-        vrs{end+1} = [dettrials.vr];
-        vots{end+1} = vos{end} - bos{end};
-        lens{end+1} = vrs{end} - vos{end};
+        bos(end+1, :) = [dettrials.bo]; % detected landmarks
+        vos(end+1, :) = [dettrials.vo];
+        vrs(end+1, :) = [dettrials.vr];
+        vots(end+1, :) = vos(end, :) - bos(end, :);
+        lens(end+1, :) = vrs(end, :) - vos(end, :);
         
 			% log and plot per-subject stats
-		stats( refbos{end}, refvos{end}, refvrs{end}, refvots{end}, reflens{end}, ...
-			bos{end}, vos{end}, vrs{end}, vots{end}, lens{end} );
+		stats( refbos(end, :), refvos(end, :), refvrs(end, :), refvots(end, :), reflens(end, :), ...
+			bos(end, :), vos(end, :), vrs(end, :), vots(end, :), lens(end, :) );
 		logstats();
-		plotstats1( fullfile( subjdir, sprintf( 'sip16_fig1_%02d.png', i ) ) );
-		plotstats2( fullfile( subjdir, sprintf( 'sip16_fig2_%02d.png', i ) ) );
-		plotstats3( fullfile( subjdir, sprintf( 'sip16_fig3_%02d.png', i ) ) );
-		plotstats4( fullfile( subjdir, sprintf( 'sip16_fig4_%02d.png', i ) ) );
+% 		plotstats1( fullfile( subjdir, sprintf( 'sip16_fig1_%02d.png', i ) ) );
+% 		plotstats2( fullfile( subjdir, sprintf( 'sip16_fig2_%02d.png', i ) ) );
+% 		plotstats3( fullfile( subjdir, sprintf( 'sip16_fig3_%02d.png', i ) ) );
+% 		plotstats4( fullfile( subjdir, sprintf( 'sip16_fig4_%02d.png', i ) ) );
 
 			% cleanup
 		delete( run );
 
+            % contiunue
+        si(end+1) = i;   
 		logger.untab();
     end
 
+
+    
 		% log and plot global stats
-	stats( [refbos{:}], [refvos{:}], [refvrs{:}], [refvots{:}], [reflens{:}], ...
-		[bos{:}], [vos{:}], [vrs{:}], [vots{:}], [lens{:}] );
+	stats( refbos(:), refvos(:), refvrs(:), refvots(:), reflens(:), ...
+		bos(:), vos(:), vrs(:), vots(:), lens(:) );
 	logstats();
 	plotstats1( fullfile( statsdir, 'sip16_fig1_all.png' ) );
-   	plotstats2( fullfile( statsdir, 'sip16_fig2_all.png' ) );
-   	plotstats3( fullfile( statsdir, 'sip16_fig3_all.png' ) );
+	plotstats2( fullfile( statsdir, 'sip16_fig2_all.png' ) );
+	plotstats3( fullfile( statsdir, 'sip16_fig3_all.png' ) );
 	plotstats4( fullfile( statsdir, 'sip16_fig4_all.png' ) );
+
+        % pick best/worst detections
+    d1 = abs( bos - refbos );
+    d2 = abs( vos - refvos );
+    d3 = abs( vrs - refvrs );
+    d4 = abs( vots - refvots );
+    d5 = abs( lens - reflens );
+    d = d1.^2 + d2.^2 + d3 + d4.^2 + d5;
+	d = d2.^2;
     
+    %[d, ti] = min( d, [], 2 ); % best trials
+    %[d, order] = sort( d, 'ascend' );
+    [d, ti] = max( d, [], 2 ); % worst trials
+    [d, order] = sort( d, 'descend' );
+    
+    ci = 1;
+    for i = si(order)
+		logger.tab( 'subject: %d', i );
+
+			% read cdf data
+		infile = fullfile( indir, sprintf( 'run_%d.mat', i ) );
+
+		if exist( infile, 'file' ) ~= 2 % skip non-existing
+			logger.untab( 'skipping' );
+			continue;
+		end
+
+		logger.log( 'read cdf ''%s''...', infile );
+		load( infile, '-mat', 'run' );
+
+        read_audio( run, run.audiofile, false );
+        
+            % plot chosen trial
+        t = ti(order);
+        trial = run.trials(t(ci));
+        
+        if i ~= 47 && i ~= 38
+            plotfile = fullfile( statsdir, sprintf( 'example%02d_%02d_%04d.png', ci, i, t(ci) ) );
+            plottrial( plotfile, run, trial );
+        end
+        
+			% cleanup
+		delete( run );
+
+            % continue
+        ci = ci + 1;
+		logger.untab();
+        
+            % DEBUG
+        %if ci > 1
+            %break;
+        %end
+    end
+
 		% cleanup
 	logger.untab( 'done.' ); % stop logging
 
 end
-

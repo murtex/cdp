@@ -60,7 +60,7 @@ function p = peak( ser, thresh )
 			return;
 		
 			% set peak
-		elseif abs( ser( mind ) ) >= tpeak
+		elseif abs( ser(mind) ) >= tpeak
 			p = mind;
 		else
 			p = [];
@@ -68,7 +68,7 @@ function p = peak( ser, thresh )
 
 	end
 
-		% find +/- peaks
+		% find +/- peaks recursively
 	p = m75( abs( ser ), thresh, thresh );
 
 end

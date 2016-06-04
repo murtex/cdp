@@ -4,32 +4,32 @@
 INDIR='../../data/klein/sync/'
 
 	# proceed detection versions
-for DVER in 7
+for DVER in 11
 do
 
 		# output directory
 	OUTDIR="../../data/klein/landmark/lm$DVER/"
 
 		# spread workload
-	matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', setdiff( 1:5, 4 ), $DVER ); exit();" &
-	sleep 3
-	matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 6:10, $DVER ); exit();" &
-	sleep 3
-	matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 11:15, $DVER ); exit();" &
-	sleep 3
-	matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 16:20, $DVER ); exit();" &
-	sleep 3
-	matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 21:25, $DVER ); exit();" &
-	sleep 3
-	matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 26:30, $DVER ); exit();" &
-	sleep 3
-	matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 31:35, $DVER ); exit();" &
-	sleep 3
-	matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 36:40, $DVER ); exit();" &
-	sleep 3
-	matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 41:45, $DVER ); exit();" &
-	sleep 3
-	matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 46:47, $DVER ); exit();" &
+	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', setdiff( 1:5, 4 ), $DVER ); exit();" &
+	#sleep 3
+	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 6:10, $DVER ); exit();" &
+	#sleep 3
+	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 11:15, $DVER ); exit();" &
+	#sleep 3
+	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 16:20, $DVER ); exit();" &
+	#sleep 3
+	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 21:25, $DVER ); exit();" &
+	#sleep 3
+	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 26:30, $DVER ); exit();" &
+	#sleep 3
+	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 31:35, $DVER ); exit();" &
+	#sleep 3
+	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 36:40, $DVER ); exit();" &
+	#sleep 3
+	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 41:45, $DVER ); exit();" &
+	#sleep 3
+	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', 46:47, $DVER ); exit();" &
 
 	#matlab -nosplash -nodesktop -r "landmark( '$INDIR', '$OUTDIR', setdiff( 1:5, [4] ), $DVER ); exit();" &
 	#sleep 3
@@ -55,8 +55,8 @@ do
 
 		# statistics
 	matlab -nosplash -nodesktop -r "sip16( '$OUTDIR', 1:47 ); exit();" &
-	matlab -nosplash -nodesktop -r "sip16( '$OUTDIR', 1:47, {'ta'} ); exit();" &
-	matlab -nosplash -nodesktop -r "sip16( '$OUTDIR', 1:47, {'ka'} ); exit();" &
+	#matlab -nosplash -nodesktop -r "sip16( '$OUTDIR', 1:47, {'ta'} ); exit();" &
+	#matlab -nosplash -nodesktop -r "sip16( '$OUTDIR', 1:47, {'ka'} ); exit();" &
 
 	wait
 
