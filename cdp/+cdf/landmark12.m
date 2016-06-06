@@ -112,9 +112,10 @@ function landmark11( run, cfg )
 			sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
 
 			% NEW: pre-select glottal landmarks
-		bpos = (refrange(2) - refrange(1)) / 5; % TODO: hard-coded thresholds
+		m = numel( respglottis );
+		pairlen = respglottis(2:2:m) - respglottis(1:2:m) + 1;
 
-		while numel( respglottis ) > 3 && respglottis(1) <= bpos % skip possible burst-transition
+		if numel( pairlen ) > 1 && pairlen(1) < pairlen(2) / 2 && respglottis(1) < (resprange(2)-resprange(1)) / 5
 			respglottis(1:2) = [];
 		end
 
