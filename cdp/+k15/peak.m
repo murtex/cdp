@@ -69,7 +69,7 @@ function p = peak( ser, thresh )
 	end
 
 		% find +/- peaks recursively
-	p = m75( abs( ser ), thresh, thresh );
+	p = m75( abs( ser ), thresh, thresh/2 );
 
 end
 

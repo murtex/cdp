@@ -10,6 +10,7 @@ function landmark11( run, cfg )
 % REMARKS
 % w/o noise subtraction
 % revised glottal peak pairing
+% pre-select glottal pairs
 % rescaled powers
 % epsilon powers
 % more advanced successive thresholding
@@ -110,6 +111,13 @@ function landmark11( run, cfg )
 		respglottis = k15.peakg( resppeak, pow2db( resppow ), respror, ...
 			sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
 
+			% NEW: pre-select glottal landmarks
+		bpos = (refrange(2) - refrange(1)) / 5; % TODO: hard-coded thresholds
+
+		while numel( respglottis ) > 3 && respglottis(1) <= bpos % skip possible burst-transition
+			respglottis(1:2) = [];
+		end
+
 			% OLD: set glottis landmarks
 		m = numel( respglottis );
 		pairlen = respglottis(2:2:m) - respglottis(1:2:m) + 1;
@@ -120,7 +128,7 @@ function landmark11( run, cfg )
 			trial.detected.vr = refrange(1) + respglottis(2*pairind)-1;
 			nvos = nvos + 1;
 			nvrs = nvrs + 1;
-        end
+		end
 
 			% get plosion indices
 		resppiser = respser;

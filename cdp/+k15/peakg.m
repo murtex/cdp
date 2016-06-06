@@ -62,7 +62,14 @@ function pp = peakg( p, pow, ror, schwalen, schwapow )
 		pp(1) = [];
 	end
 
-	while numel( pp ) > 0 && ror(pp(end)) >= 0 % end with -peak
+	if numel( pp ) > 0 && ror(pp(end)) >= 0 % stop with -peak
+		[~, insindex] = min( ror(pp(end)+1:end) );
+		if ~isempty( insindex )
+			pp(end+1) = pp(end) + insindex; % unconditional insertion
+		end
+	end
+
+	while numel( pp ) > 0 && ror(pp(end)) >= 0
 		pp(end) = [];
 	end
 

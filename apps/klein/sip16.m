@@ -51,7 +51,8 @@ function sip16( indir, ids, labels )
 		% -------------------------------------------------------------------
 		% helper functions
     MAXDELTA = 15;
-    MAXVOT = 180; % 0.7; % 180;
+    MAXVOT = 180;
+	MAXLEN = 650;
 	BINFACTOR = 1;
     
 	global nrefbos nrefvos nrefvrs nrefvots nreflens
@@ -65,6 +66,8 @@ function sip16( indir, ids, labels )
 	global dlens ndlens absdlens dlenpos dlenns absdlenpos absdlenns
     global prefvots nprefvots prefvotpos prefvotns
     global pvots npvots pvotpos pvotns
+    global preflens npreflens preflenpos preflenns
+    global plens nplens plenpos plenns
 
 	function stats( refbos, refvos, refvrs, refvots, reflens, bos, vos, vrs, vots, lens )
         
@@ -147,13 +150,9 @@ function sip16( indir, ids, labels )
 		absdlenpos = linspace( min( absdlens ), max( absdlens ), numel( absdlens ) ); %style.bins( absdlens ) );
 		absdlenns = hist( absdlens, absdlenpos );
         
-            % distribution
+            % vot distribution
         prefvots = sta.smp2msec( refvots, audiorate ); % absolute vot
         pvots = sta.smp2msec( vots, audiorate );
-        if MAXVOT < 1 % relative vot
-            prefvots = refvots ./ reflens;
-            pvots = vots ./ reflens;
-        end
 		prefvots(isnan( prefvots )) = [];
 		pvots(isnan( pvots )) = [];
         
@@ -170,6 +169,26 @@ function sip16( indir, ids, labels )
 		prefvotns = hist( prefvots, prefvotpos );
 		pvotpos = linspace( bmin, bmax, nbins );
 		pvotns = hist( pvots, pvotpos );
+        
+            % len distribution
+        preflens = sta.smp2msec( reflens, audiorate ); % absolute length
+        plens = sta.smp2msec( lens, audiorate );
+		preflens(isnan( preflens )) = [];
+		plens(isnan( plens )) = [];
+        
+        npreflens = numel( preflens ); % binning
+        preflens(preflens > MAXLEN) = [];
+        nplens = numel( plens );        
+        plens(plens > MAXLEN) = [];
+
+        bmin = min( preflens );
+        bmax = max( preflens );
+        nbins = round( BINFACTOR * max( style.bins( preflens ), style.bins( plens ) ) );
+
+        preflenpos = linspace( bmin, bmax, nbins );
+		preflenns = hist( preflens, preflenpos );
+		plenpos = linspace( bmin, bmax, nbins );
+		plenns = hist( plens, plenpos );
         
 	end
 
@@ -372,14 +391,40 @@ function sip16( indir, ids, labels )
         
 		h2 = subplot( 2, 1, 2 ); % labeling
 		title( 'labeling distribution' );
-        if MAXVOT >= 1
-            xlabel( 'voice-onset time in milliseconds' );
-        else
-            xlabel( 'relative voice-onset time' );
-        end
+        xlabel( 'voice-onset time in milliseconds' );
 		ylabel( 'rate' );
         xlim( MAXVOT * [0, 1] );
 		bar( prefvotpos, prefvotns / nprefvots, ...
+			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+		
+        yl1 = ylim( h1 ); % adjust axes limits
+        yl2 = ylim( h2 );
+        yl = [min( yl1(1), yl2(1) ), max( yl1(2), yl2(2) )];
+        ylim( h1, yl );
+        ylim( h2, yl );
+
+		style.print( plotfile );
+		delete( fig );
+    end
+
+    function plotstats5( plotfile )
+		logger.log( 'plot distribution statistics ''%s''...', plotfile );
+		
+		fig = style.figure( 'PaperPosition', plottile( 6, 8 ) );
+
+		h1 = subplot( 2, 1, 1 ); % detection
+		title( 'detection distribution' );
+		ylabel( 'rate' );
+        xlim( MAXLEN * [0, 1] );
+		bar( plenpos, plenns / nplens, ...
+			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
+        
+		h2 = subplot( 2, 1, 2 ); % labeling
+		title( 'labeling distribution' );
+		xlabel( 'vowel-length in milliseconds' );
+		ylabel( 'rate' );
+        xlim( MAXLEN * [0, 1] );
+		bar( preflenpos, preflenns / npreflens, ...
 			'BarWidth', 1, 'FaceColor', style.color( 'neutral', 0 ), 'EdgeColor', 'none' );
 		
         yl1 = ylim( h1 ); % adjust axes limits
@@ -583,6 +628,7 @@ function sip16( indir, ids, labels )
 % 		plotstats2( fullfile( subjdir, sprintf( 'sip16_fig2_%02d.png', i ) ) );
 % 		plotstats3( fullfile( subjdir, sprintf( 'sip16_fig3_%02d.png', i ) ) );
 % 		plotstats4( fullfile( subjdir, sprintf( 'sip16_fig4_%02d.png', i ) ) );
+% 		plotstats5( fullfile( subjdir, sprintf( 'sip16_fig5_%02d.png', i ) ) );
 
 			% cleanup
 		delete( run );
@@ -602,6 +648,7 @@ function sip16( indir, ids, labels )
 	plotstats2( fullfile( statsdir, 'sip16_fig2_all.png' ) );
 	plotstats3( fullfile( statsdir, 'sip16_fig3_all.png' ) );
 	plotstats4( fullfile( statsdir, 'sip16_fig4_all.png' ) );
+	plotstats5( fullfile( statsdir, 'sip16_fig5_all.png' ) );
 
         % pick best/worst detections
     d1 = abs( bos - refbos );
