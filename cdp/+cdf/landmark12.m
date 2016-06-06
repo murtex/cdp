@@ -115,7 +115,7 @@ function landmark11( run, cfg )
 		m = numel( respglottis );
 		pairlen = respglottis(2:2:m) - respglottis(1:2:m) + 1;
 
-		if numel( pairlen ) > 1 && pairlen(1) < pairlen(2) / 2 && respglottis(1) < (resprange(2)-resprange(1)) / 5
+		if numel( pairlen ) > 1 && pairlen(1) < pairlen(2) / 2 && respglottis(1) < (refrange(2)-refrange(1)) / 5
 			respglottis(1:2) = [];
 		end
 
