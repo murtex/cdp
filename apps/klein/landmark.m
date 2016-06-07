@@ -90,6 +90,12 @@ function landmark( indir, outdir, ids, dver )
 				cdf.landmark11( run, cfg );
 			case 12
 				cdf.landmark12( run, cfg );
+			case 13
+				cdf.landmark13( run, cfg );
+			case 14
+				cdf.landmark14( run, cfg );
+			case 15
+				cdf.landmark15( run, cfg );
 			otherwise
 				error( 'invalid argument: dver' );
 		end

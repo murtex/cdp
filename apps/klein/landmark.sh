@@ -4,7 +4,7 @@
 INDIR='../../data/klein/sync/'
 
 	# proceed detection versions
-for DVER in 12
+for DVER in 15
 do
 
 		# output directory

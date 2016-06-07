@@ -1,7 +1,7 @@
-function landmark12( run, cfg )
-% detect landmarks (version #12)
+function landmark14( run, cfg )
+% detect landmarks (version #14)
 %
-% LANDMARK12( run, cfg )
+% LANDMARK14( run, cfg )
 %
 % INPUT
 % run : run (scalar object)
@@ -9,6 +9,7 @@ function landmark12( run, cfg )
 %
 % REMARKS
 % w/o noise subtraction
+% improved glottal peak threshold
 % revised glottal peak pairing
 % pre-select glottal pairs
 % rescaled powers
@@ -100,7 +101,7 @@ function landmark12( run, cfg )
 		resppow = resppow(1:size( respser, 1 ));
 
 			% get ror and peaks
-		cfg.glottis_rorpeak = 9; % TODO: hard-coded value!
+		cfg.glottis_rorpeak = 4; % TODO: hard-coded value!
 		cfg.schwa_power = -18;
 
 		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );

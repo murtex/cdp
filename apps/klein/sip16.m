@@ -447,7 +447,7 @@ function sip16( indir, ids, labels )
         refrange = refrange + sta.msec2smp( 25, run.audiorate ) * [-1, 2];
         refrange(1) = max( 1, refrange(1) );
         refrange(2) = min( run.audiolen, refrange(2) );
-
+        
 		respser = run.audiodata(refrange(1):refrange(2), 1); % signal
         
 		frame = sta.msec2smp( cfg.sta_frame, run.audiorate ); % short-time fft
@@ -462,7 +462,7 @@ function sip16( indir, ids, labels )
 		resppow = sta.unframe( resppow, frame ); % smoothing
 		resppow = resppow(1:size( respser, 1 ));
 
-		cfg.glottis_rorpeak = 9; % ror and peaks
+		cfg.glottis_rorpeak = 4; % ror and peaks
 		cfg.schwa_power = -18;
 		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
 		respror = k15.ror( pow2db( resppow ), rordt );
@@ -481,9 +481,9 @@ function sip16( indir, ids, labels )
 			msec = sta.smp2msec( smp - refrange(1), run.audiorate );
 		end
         
-            % plot landmarks and landmarks
+            % plot landmarks and waveform
         h = subplot( 4, 1, 1 );
-        title( sprintf( 'syllable: ''%s'', sex: %s', trial.labeled.label, run.sex ) );
+        title( sprintf( '''%s'' (%s)', trial.labeled.label, strrep( strrep( run.sex, 'm', 'male' ), 'w', 'female' ) ) );
         ylabel( 'amplitude' );
         xlim( smp2msec( [refrange(1), refrange(2)] ) );
 		yl = 1.2 * max( abs( respser ) ) * [-1, 1];
@@ -503,38 +503,34 @@ function sip16( indir, ids, labels )
         plot( smp2msec( refrange(1):refrange(2) ), respser, ... % waveform
             'Color', style.color( 'neutral', 0 ) );
         
-            % plot power
+            % plot plosion index
         subplot( 4, 1, 2 );
+        ylabel( 'plosion index' );
+        xlim( smp2msec( [refrange(1), refrange(2)] ) );
+        plot( smp2msec( refrange(1):refrange(2) ), resppi, ...
+            'Color', style.color( 'neutral', 0 ) );        
+
+            % plot power
+        subplot( 4, 1, 3 );
         ylabel( 'band power' );
         xlim( smp2msec( [refrange(1), refrange(2)] ) );
         plot( smp2msec( refrange(1):refrange(2) ), pow2db( resppow ), ...
             'Color', style.color( 'neutral', 0 ) );
         
             % plot peaks and ror
-        subplot( 4, 1, 3 );
+        subplot( 4, 1, 4 );
+        xlabel( 'time in milliseconds' );
         ylabel( 'rate-of-rise' );
         xlim( smp2msec( [refrange(1), refrange(2)] ) );
-        for i = 1:numel( resppeak ) % candidate peaks
-            stem( smp2msec( resppeak + refrange(1) - 1 ), respror(resppeak), ...
-                'Color', style.color( 'neutral', 0 ), 'LineStyle', '--', ...
-                'MarkerFaceColor', style.color( 'neutral', 0 ), 'MarkerSize', 1 );
-        end
-        for i = 1:numel( respglottis ) % glottal peaks
-            stem( smp2msec( respglottis + refrange(1) - 1 ), respror(respglottis), ...
-                'Color', style.color( 'neutral', 0 ), 'LineStyle', '-', ...
-                'MarkerFaceColor', style.color( 'neutral', 0 ), 'MarkerSize', 1 );
-        end
+        stem( smp2msec( respglottis + refrange(1) - 1 ), respror(respglottis), ... % glottal peaks
+            'Color', style.color( 'neutral', 0 ), 'LineStyle', '--', ...
+            'MarkerFaceColor', style.color( 'neutral', 0 ), 'MarkerSize', 1 );
+        stem( smp2msec( resppeak + refrange(1) - 1 ), respror(resppeak), ... % ror peaks
+            'Color', style.color( 'neutral', 0 ), 'LineStyle', '-', ...
+            'MarkerFaceColor', style.color( 'neutral', 0 ), 'MarkerSize', 1 );
         plot( smp2msec( refrange(1):refrange(2) ), respror, ... % ror
             'Color', style.color( 'neutral', 0 ) );
         
-            % plot plosion index
-        subplot( 4, 1, 4 );
-        xlabel( 'time in milliseconds' );
-        ylabel( 'plosion index' );
-        xlim( smp2msec( [refrange(1), refrange(2)] ) );
-        plot( smp2msec( refrange(1):refrange(2) ), resppi, ...
-            'Color', style.color( 'neutral', 0 ) );        
-
 		style.print( plotfile );
 		delete( fig );
     end
@@ -638,34 +634,22 @@ function sip16( indir, ids, labels )
 		logger.untab();
     end
 
-
-    
 		% log and plot global stats
 	stats( refbos(:), refvos(:), refvrs(:), refvots(:), reflens(:), ...
 		bos(:), vos(:), vrs(:), vots(:), lens(:) );
 	logstats();
+	logger.log( 'dubious trials: %d', ndubious );
 	plotstats1( fullfile( statsdir, 'sip16_fig1_all.png' ) );
 	plotstats2( fullfile( statsdir, 'sip16_fig2_all.png' ) );
 	plotstats3( fullfile( statsdir, 'sip16_fig3_all.png' ) );
 	plotstats4( fullfile( statsdir, 'sip16_fig4_all.png' ) );
 	plotstats5( fullfile( statsdir, 'sip16_fig5_all.png' ) );
 
-        % pick best/worst detections
-    d1 = abs( bos - refbos );
-    d2 = abs( vos - refvos );
-    d3 = abs( vrs - refvrs );
-    d4 = abs( vots - refvots );
-    d5 = abs( lens - reflens );
-    d = d1.^2 + d2.^2 + d3 + d4.^2 + d5;
-	d = d2.^2;
-    
-    %[d, ti] = min( d, [], 2 ); % best trials
-    %[d, order] = sort( d, 'ascend' );
-    [d, ti] = max( d, [], 2 ); % worst trials
-    [d, order] = sort( d, 'descend' );
+        % plot best/worst trials
+    nexamples = 10;
     
     ci = 1;
-    for i = si(order)
+    for i = ids
 		logger.tab( 'subject: %d', i );
 
 			% read cdf data
@@ -678,29 +662,34 @@ function sip16( indir, ids, labels )
 
 		logger.log( 'read cdf ''%s''...', infile );
 		load( infile, '-mat', 'run' );
-
+        
         read_audio( run, run.audiofile, false );
         
-            % plot chosen trial
-        t = ti(order);
-        trial = run.trials(t(ci));
+            % pick best/worst detections
+        d1 = abs( bos(ci, :) - refbos(ci, :) );
+        d2 = abs( vos(ci, :) - refvos(ci, :) );
+        d3 = abs( vrs(ci, :) - refvrs(ci, :) );
+        d4 = abs( vots(ci, :) - refvots(ci, :) );
+        d5 = abs( lens(ci, :) - reflens(ci, :) );
+        d = d1.^2 + d2.^2 + d3 + d4.^2 + d5;
         
-        if i ~= 47 && i ~= 38
-            plotfile = fullfile( statsdir, sprintf( 'example%02d_%02d_%04d.png', ci, i, t(ci) ) );
-            plottrial( plotfile, run, trial );
+        [d, tj] = sort( d, 'descend' );
+        tj(isnan( d )) = [];
+        tj(nexamples+1:end) = [];
+        
+        cj = 1;
+        for j = tj
+            plotfile = fullfile( statsdir, sprintf( 'example%02d_%02d_%04d.png', cj, i, j ) );
+            plottrial( plotfile, run, run.trials(j) );
+            cj = cj + 1;
         end
         
 			% cleanup
 		delete( run );
-
+    
             % continue
         ci = ci + 1;
-		logger.untab();
-        
-            % DEBUG
-        %if ci > 1
-            %break;
-        %end
+		logger.untab();        
     end
 
 		% cleanup

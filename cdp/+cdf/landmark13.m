@@ -1,13 +1,14 @@
-function landmark12( run, cfg )
-% detect landmarks (version #12)
+function landmark13( run, cfg )
+% detect landmarks (version #13)
 %
-% LANDMARK12( run, cfg )
+% LANDMARK13( run, cfg )
 %
 % INPUT
 % run : run (scalar object)
 % cfg : configuration (scalar object)
 %
 % REMARKS
+% dc offset removal
 % w/o noise subtraction
 % revised glottal peak pairing
 % pre-select glottal pairs
@@ -72,6 +73,7 @@ function landmark12( run, cfg )
 			% set signals
 		noiser = run.audiodata(trial.cue + (0:trial.soa-1), 1);
 		respser = run.audiodata(refrange(1):refrange(2), 1);
+		respser = respser - mean( respser ); % dc offset removal
 
 			% get subband fft
 		frame = sta.msec2smp( cfg.sta_frame, run.audiorate );

@@ -71,7 +71,20 @@ function pp = peakg( p, pow, ror, schwalen, schwapow )
 
 	while numel( pp ) > 0 && ror(pp(end)) >= 0
 		pp(end) = [];
-	end
+    end
+    
+        % remove low-powered pairs
+%     thresh = max( pow ) + schwapow;
+%     
+%     dels = [];
+%     for i = 1:numel( pp )/2
+%         r = pp(2*i-1):pp(2*i);
+%         if sum( pow(r) >= thresh ) < schwalen
+%             dels(end+1) = 2*i-1;
+%             dels(end+1) = 2*i;
+%         end
+%     end
+%     pp(dels) = [];
 
 end
 
