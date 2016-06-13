@@ -38,14 +38,16 @@ function p = plosion( ser, delta, width )
 		imax = zcs(i) + imax-1;
 
 			% region to average
-		li = max( 1, imax-delta-width );
-		ri = max( 1, imax-delta-1 );
+		li = imax-delta-width;
+		ri = imax-delta-1;
+
+		if li < 1 || ri < 1 % out of range
+			continue;
+		end
 
 			% plosion index
-		if imax > delta+1
-% 			p(imax) = hemax/mean( he(li:ri), 1 );
-            p(zcs(i)) = hemax/mean( he(li:ri), 1 ); % DEBUG: choose earliest position
-		end
+		%p(imax) = hemax/mean( he(li:ri), 1 );
+		p(zcs(i)) = hemax/mean( he(li:ri), 1 ); % choose earliest position
 
 	end
 

@@ -254,7 +254,7 @@ function sip16( indir, ids, labels )
 	function plotstats1( plotfile )
 		logger.log( 'plot detection statistics ''%s''...', plotfile );
 
-		fig = style.figure( 'PaperPosition', plottile( 6, 6 ) );
+		fig = style.figure( 'PaperPosition', plottile( 6, 4.5 ) );
 		
 		subplot( 3, 2, 1 ); % burst-onset
 		title( 'burst-onset (+b) detection' );
@@ -304,7 +304,7 @@ function sip16( indir, ids, labels )
 	function plotstats2( plotfile )
 		logger.log( 'plot detection statistics ''%s''...', plotfile );
 
-		fig = style.figure( 'PaperPosition', plottile( 6, 4 ) );
+		fig = style.figure( 'PaperPosition', plottile( 6, 3 ) );
 		
 		subplot( 2, 2, 1 ); % voice-onset time
 		title( 'voice-onset time detection' );
@@ -341,7 +341,7 @@ function sip16( indir, ids, labels )
 	function plotstats3( plotfile )
 		logger.log( 'plot accuracy statistics ''%s''...', plotfile );
 		
-		fig = style.figure( 'PaperPosition', plottile( 6, 8 ) );
+		fig = style.figure( 'PaperPosition', plottile( 6, 6 ) );
 
 		subplot( 2, 1, 1 ); % landmarks
 		title( 'landmark accuracy (+/-5ms)' );
@@ -380,7 +380,7 @@ function sip16( indir, ids, labels )
     function plotstats4( plotfile )
 		logger.log( 'plot distribution statistics ''%s''...', plotfile );
 		
-		fig = style.figure( 'PaperPosition', plottile( 6, 8 ) );
+		fig = style.figure( 'PaperPosition', plottile( 6, 6 ) );
 
 		h1 = subplot( 2, 1, 1 ); % detection
 		title( 'detection distribution' );
@@ -620,11 +620,11 @@ function sip16( indir, ids, labels )
 		stats( refbos(end, :), refvos(end, :), refvrs(end, :), refvots(end, :), reflens(end, :), ...
 			bos(end, :), vos(end, :), vrs(end, :), vots(end, :), lens(end, :) );
 		logstats();
-% 		plotstats1( fullfile( subjdir, sprintf( 'sip16_fig1_%02d.png', i ) ) );
-% 		plotstats2( fullfile( subjdir, sprintf( 'sip16_fig2_%02d.png', i ) ) );
-% 		plotstats3( fullfile( subjdir, sprintf( 'sip16_fig3_%02d.png', i ) ) );
-% 		plotstats4( fullfile( subjdir, sprintf( 'sip16_fig4_%02d.png', i ) ) );
-% 		plotstats5( fullfile( subjdir, sprintf( 'sip16_fig5_%02d.png', i ) ) );
+		plotstats1( fullfile( subjdir, sprintf( 'sip16_fig1_%02d.eps', i ) ) );
+		plotstats2( fullfile( subjdir, sprintf( 'sip16_fig2_%02d.eps', i ) ) );
+		plotstats3( fullfile( subjdir, sprintf( 'sip16_fig3_%02d.eps', i ) ) );
+		plotstats4( fullfile( subjdir, sprintf( 'sip16_fig4_%02d.eps', i ) ) );
+		plotstats5( fullfile( subjdir, sprintf( 'sip16_fig5_%02d.eps', i ) ) );
 
 			% cleanup
 		delete( run );
@@ -639,11 +639,11 @@ function sip16( indir, ids, labels )
 		bos(:), vos(:), vrs(:), vots(:), lens(:) );
 	logstats();
 	logger.log( 'dubious trials: %d', ndubious );
-	plotstats1( fullfile( statsdir, 'sip16_fig1_all.png' ) );
-	plotstats2( fullfile( statsdir, 'sip16_fig2_all.png' ) );
-	plotstats3( fullfile( statsdir, 'sip16_fig3_all.png' ) );
-	plotstats4( fullfile( statsdir, 'sip16_fig4_all.png' ) );
-	plotstats5( fullfile( statsdir, 'sip16_fig5_all.png' ) );
+	plotstats1( fullfile( statsdir, 'sip16_fig1_all.eps' ) );
+	plotstats2( fullfile( statsdir, 'sip16_fig2_all.eps' ) );
+	plotstats3( fullfile( statsdir, 'sip16_fig3_all.eps' ) );
+	plotstats4( fullfile( statsdir, 'sip16_fig4_all.eps' ) );
+	plotstats5( fullfile( statsdir, 'sip16_fig5_all.eps' ) );
 
         % plot best/worst trials
     nexamples = 10;
@@ -673,13 +673,13 @@ function sip16( indir, ids, labels )
         d5 = abs( lens(ci, :) - reflens(ci, :) );
         d = d1.^2 + d2.^2 + d3 + d4.^2 + d5;
         
-        [d, tj] = sort( d, 'descend' );
+        [d, tj] = sort( d, 'ascend' );
         tj(isnan( d )) = [];
         tj(nexamples+1:end) = [];
         
         cj = 1;
         for j = tj
-            plotfile = fullfile( statsdir, sprintf( 'example%02d_%02d_%04d.png', cj, i, j ) );
+            plotfile = fullfile( statsdir, sprintf( 'example%02d_%02d_%04d.eps', cj, i, j ) );
             plottrial( plotfile, run, run.trials(j) );
             cj = cj + 1;
         end
