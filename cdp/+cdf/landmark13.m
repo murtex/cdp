@@ -8,8 +8,8 @@ function landmark13( run, cfg )
 % cfg : configuration (scalar object)
 %
 % REMARKS
-% dc offset removal
 % w/o noise subtraction
+% unbalanced ror region
 % revised glottal peak pairing
 % pre-select glottal pairs
 % rescaled powers
@@ -73,7 +73,6 @@ function landmark13( run, cfg )
 			% set signals
 		noiser = run.audiodata(trial.cue + (0:trial.soa-1), 1);
 		respser = run.audiodata(refrange(1):refrange(2), 1);
-		respser = respser - mean( respser ); % dc offset removal
 
 			% get subband fft
 		frame = sta.msec2smp( cfg.sta_frame, run.audiorate );
@@ -107,7 +106,7 @@ function landmark13( run, cfg )
 
 		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
 
-		respror = k15.ror( pow2db( resppow ), rordt );
+		respror = k15.ror( pow2db( resppow ), rordt, 7/15 );
 
 		resppeak = k15.peak( respror, cfg.glottis_rorpeak );
 		respglottis = k15.peakg( resppeak, pow2db( resppow ), respror, ...

@@ -55,8 +55,8 @@ do
 
 		# statistics
 	matlab -nosplash -nodesktop -r "sip16( '$OUTDIR', 1:47 ); exit();" &
-	matlab -nosplash -nodesktop -r "sip16( '$OUTDIR', 1:47, {'ta'} ); exit();" &
-	matlab -nosplash -nodesktop -r "sip16( '$OUTDIR', 1:47, {'ka'} ); exit();" &
+	#matlab -nosplash -nodesktop -r "sip16( '$OUTDIR', 1:47, {'ta'} ); exit();" &
+	#matlab -nosplash -nodesktop -r "sip16( '$OUTDIR', 1:47, {'ka'} ); exit();" &
 
 	wait
 
