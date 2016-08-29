@@ -452,6 +452,284 @@ function sip16( indir, ids, labels )
 		delete( fig );
     end
 
+	function plottrial1( plotfile, run, trial )
+		logger.log( 'plot example trial ''%s''...', plotfile );
+		
+		fig = style.figure( 'PaperPosition', [0, 0, PLOTWIDTH, (1/2 + 1/2) * PLOTWIDTH/PLOTRATIO] );
+        
+            % prepare data
+        refrange = trial.labeled.range; % range
+        refrange = refrange + sta.msec2smp( 25, run.audiorate ) * [-1, 2];
+        refrange(1) = max( 1, refrange(1) );
+        refrange(2) = min( run.audiolen, refrange(2) );
+        
+		respser = run.audiodata(refrange(1):refrange(2), 1); % signal
+        
+		frame = sta.msec2smp( cfg.sta_frame, run.audiorate ); % short-time fft
+		respft = sta.framing( respser, frame, cfg.sta_wnd );
+		[respft, respfreqs] = sta.fft( respft, run.audiorate );
+		respft(:, 2:end) = 2*respft(:, 2:end);
+		[respft, respfreqs] = sta.banding( respft, respfreqs, cfg.glottis_band );
+        
+        frame2 = sta.msec2smp( [10, 10/3], run.audiorate );
+        respftorg = sta.framing( respser, frame2, cfg.sta_wnd );
+        [respftorg, respfreqsorg] = sta.fft( respftorg, run.audiorate );
+        respftorg(:, 2:end) = 2*respftorg(:, 2:end);
+        respftorg(respftorg < eps) = eps;
+        
+		respft(respft < eps) = eps; % maximum power
+		resppow = max( respft, [], 2 );
+        
+		resppow = sta.unframe( resppow, frame ); % smoothing
+		resppow = resppow(1:size( respser, 1 ));
+
+		cfg.glottis_rorpeak = 9; % ror and peaks
+		cfg.schwa_power = -18;
+		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
+		respror = k15.ror( pow2db( resppow ), rordt );
+		resppeak = k15.peak( respror, cfg.glottis_rorpeak );
+		%respglottis = k15.peak_glottis( resppeak, pow2db( resppow ), respror, ...
+			%sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+		respglottis = k15.peakg( resppeak, pow2db( resppow ), respror, ...
+			sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+        
+		resppi = k15.plosion( ... % plosion index
+			k15.replaygain( respser, run.audiorate ), ...
+			sta.msec2smp( cfg.plosion_delta, run.audiorate ), sta.msec2smp( cfg.plosion_width, run.audiorate ) );
+
+			% helper functions
+		function msec = smp2msec( smp )
+			msec = sta.smp2msec( smp - refrange(1), run.audiorate );
+		end
+        
+            % plot landmarks and waveform
+        title( sprintf( 'syllable /%s/, %s speaker', trial.labeled.label, strrep( strrep( run.sex, 'm', 'male' ), 'w', 'female' ) ) );
+        xlabel( 'time in milliseconds' );
+        ylabel( 'amplitude' );
+        xlim( smp2msec( [refrange(1), refrange(2)] ) );
+		yl = 1.2 * max( abs( respser ) ) * [-1, 1];
+		ylim( yl );
+        plot( smp2msec( trial.detected.bo * [1, 1] ), [0, yl(2)], ... % detected landmarks
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( trial.detected.vo * [1, 1] ), [0, yl(2)], ...
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( trial.detected.vr * [1, 1] ), [0, yl(2)], ...
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( trial.labeled.bo * [1, 1] ), [yl(1), 0], ... % labeled landmarks
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( trial.labeled.vo * [1, 1] ), [yl(1), 0], ...
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( trial.labeled.vr * [1, 1] ), [yl(1), 0], ...
+            'Color', style.color( 'neutral', 0 ) );
+        plot( smp2msec( refrange(1):refrange(2) ), respser, ... % waveform
+            'Color', style.color( 'neutral', 0 ) );
+        
+		style.print( plotfile );
+		delete( fig );
+	end
+
+    function plottrial2( plotfile, run, trial )
+		logger.log( 'plot example trial ''%s''...', plotfile );
+		
+		fig = style.figure( 'PaperPosition', [0, 0, PLOTWIDTH, (1/2 + 1/2) * PLOTWIDTH/PLOTRATIO] );
+        
+            % prepare data
+        refrange = trial.labeled.range; % range
+        refrange = refrange + sta.msec2smp( 25, run.audiorate ) * [-1, 2];
+        refrange(1) = max( 1, refrange(1) );
+        refrange(2) = min( run.audiolen, refrange(2) );
+        
+		respser = run.audiodata(refrange(1):refrange(2), 1); % signal
+        
+		frame = sta.msec2smp( cfg.sta_frame, run.audiorate ); % short-time fft
+		respft = sta.framing( respser, frame, cfg.sta_wnd );
+		[respft, respfreqs] = sta.fft( respft, run.audiorate );
+		respft(:, 2:end) = 2*respft(:, 2:end);
+		[respft, respfreqs] = sta.banding( respft, respfreqs, cfg.glottis_band );
+        
+        frame2 = sta.msec2smp( [10, 10/3], run.audiorate );
+        respftorg = sta.framing( respser, frame2, cfg.sta_wnd );
+        [respftorg, respfreqsorg] = sta.fft( respftorg, run.audiorate );
+        respftorg(:, 2:end) = 2*respftorg(:, 2:end);
+        respftorg(respftorg < eps) = eps;
+        
+		respft(respft < eps) = eps; % maximum power
+		resppow = max( respft, [], 2 );
+        
+		resppow = sta.unframe( resppow, frame ); % smoothing
+		resppow = resppow(1:size( respser, 1 ));
+
+		cfg.glottis_rorpeak = 9; % ror and peaks
+		cfg.schwa_power = -18;
+		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
+		respror = k15.ror( pow2db( resppow ), rordt );
+		resppeak = k15.peak( respror, cfg.glottis_rorpeak );
+		%respglottis = k15.peak_glottis( resppeak, pow2db( resppow ), respror, ...
+			%sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+		respglottis = k15.peakg( resppeak, pow2db( resppow ), respror, ...
+			sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+        
+		resppi = k15.plosion( ... % plosion index
+			k15.replaygain( respser, run.audiorate ), ...
+			sta.msec2smp( cfg.plosion_delta, run.audiorate ), sta.msec2smp( cfg.plosion_width, run.audiorate ) );
+
+			% helper functions
+		function msec = smp2msec( smp )
+			msec = sta.smp2msec( smp - refrange(1), run.audiorate );
+		end
+        
+            % plot plosion index
+        title( sprintf( 'syllable /%s/, %s speaker', trial.labeled.label, strrep( strrep( run.sex, 'm', 'male' ), 'w', 'female' ) ) );
+        xlabel( 'time in milliseconds' );
+        ylabel( 'plosion index' );
+        xlim( smp2msec( [refrange(1), refrange(2)] ) );
+        plot( smp2msec( refrange(1):refrange(2) ), resppi, ...
+            'Color', style.color( 'neutral', 0 ) );        
+
+		style.print( plotfile );
+		delete( fig );
+    end
+
+    function plottrial3( plotfile, run, trial )
+		logger.log( 'plot example trial ''%s''...', plotfile );
+		
+		fig = style.figure( 'PaperPosition', [0, 0, PLOTWIDTH, (1/2 + 1/2) * PLOTWIDTH/PLOTRATIO] );
+        
+            % prepare data
+        refrange = trial.labeled.range; % range
+        refrange = refrange + sta.msec2smp( 25, run.audiorate ) * [-1, 2];
+        refrange(1) = max( 1, refrange(1) );
+        refrange(2) = min( run.audiolen, refrange(2) );
+        
+		respser = run.audiodata(refrange(1):refrange(2), 1); % signal
+        
+		frame = sta.msec2smp( cfg.sta_frame, run.audiorate ); % short-time fft
+		respft = sta.framing( respser, frame, cfg.sta_wnd );
+		[respft, respfreqs] = sta.fft( respft, run.audiorate );
+		respft(:, 2:end) = 2*respft(:, 2:end);
+		[respft, respfreqs] = sta.banding( respft, respfreqs, cfg.glottis_band );
+        
+        frame2 = sta.msec2smp( [10, 10/3], run.audiorate );
+        respftorg = sta.framing( respser, frame2, cfg.sta_wnd );
+        [respftorg, respfreqsorg] = sta.fft( respftorg, run.audiorate );
+        respftorg(:, 2:end) = 2*respftorg(:, 2:end);
+        respftorg(respftorg < eps) = eps;
+        
+		respft(respft < eps) = eps; % maximum power
+		resppow = max( respft, [], 2 );
+        
+		resppow = sta.unframe( resppow, frame ); % smoothing
+		resppow = resppow(1:size( respser, 1 ));
+
+		cfg.glottis_rorpeak = 9; % ror and peaks
+		cfg.schwa_power = -18;
+		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
+		respror = k15.ror( pow2db( resppow ), rordt );
+		resppeak = k15.peak( respror, cfg.glottis_rorpeak );
+		%respglottis = k15.peak_glottis( resppeak, pow2db( resppow ), respror, ...
+			%sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+		respglottis = k15.peakg( resppeak, pow2db( resppow ), respror, ...
+			sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+        
+		resppi = k15.plosion( ... % plosion index
+			k15.replaygain( respser, run.audiorate ), ...
+			sta.msec2smp( cfg.plosion_delta, run.audiorate ), sta.msec2smp( cfg.plosion_width, run.audiorate ) );
+
+			% helper functions
+		function msec = smp2msec( smp )
+			msec = sta.smp2msec( smp - refrange(1), run.audiorate );
+		end
+        
+            % plot spectrogram
+        title( sprintf( 'syllable /%s/, %s speaker', trial.labeled.label, strrep( strrep( run.sex, 'm', 'male' ), 'w', 'female' ) ) );
+        xlabel( 'time in milliseconds' );
+        ylabel( 'frequency' );
+        xlim( smp2msec( [refrange(1), refrange(2)] ) );
+        ylim( [0, 8000] );
+        colormap( repmat( transpose( linspace( 1, 0, 256 ) ), 1, 3 ) );
+        imagesc( smp2msec( linspace( refrange(1), refrange(2), size( respftorg, 1 ) ) + frame(1)/2 ), ...
+            respfreqsorg, transpose( ( respftorg .^ 0.15 ) ) );
+        
+		style.print( plotfile );
+		delete( fig );
+    end
+
+    function plottrial4( plotfile, run, trial )
+		logger.log( 'plot example trial ''%s''...', plotfile );
+		
+		fig = style.figure( 'PaperPosition', [0, 0, PLOTWIDTH, (1/2 + 1/2) * PLOTWIDTH/PLOTRATIO] );
+        
+            % prepare data
+        refrange = trial.labeled.range; % range
+        refrange = refrange + sta.msec2smp( 25, run.audiorate ) * [-1, 2];
+        refrange(1) = max( 1, refrange(1) );
+        refrange(2) = min( run.audiolen, refrange(2) );
+        
+		respser = run.audiodata(refrange(1):refrange(2), 1); % signal
+        
+		frame = sta.msec2smp( cfg.sta_frame, run.audiorate ); % short-time fft
+		respft = sta.framing( respser, frame, cfg.sta_wnd );
+		[respft, respfreqs] = sta.fft( respft, run.audiorate );
+		respft(:, 2:end) = 2*respft(:, 2:end);
+		[respft, respfreqs] = sta.banding( respft, respfreqs, cfg.glottis_band );
+        
+        frame2 = sta.msec2smp( [10, 10/3], run.audiorate );
+        respftorg = sta.framing( respser, frame2, cfg.sta_wnd );
+        [respftorg, respfreqsorg] = sta.fft( respftorg, run.audiorate );
+        respftorg(:, 2:end) = 2*respftorg(:, 2:end);
+        respftorg(respftorg < eps) = eps;
+        
+		respft(respft < eps) = eps; % maximum power
+		resppow = max( respft, [], 2 );
+        
+		resppow = sta.unframe( resppow, frame ); % smoothing
+		resppow = resppow(1:size( respser, 1 ));
+
+		cfg.glottis_rorpeak = 9; % ror and peaks
+		cfg.schwa_power = -18;
+		rordt = sta.msec2smp( cfg.glottis_rordt, run.audiorate );
+		respror = k15.ror( pow2db( resppow ), rordt );
+		resppeak = k15.peak( respror, cfg.glottis_rorpeak );
+		%respglottis = k15.peak_glottis( resppeak, pow2db( resppow ), respror, ...
+			%sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+		respglottis = k15.peakg( resppeak, pow2db( resppow ), respror, ...
+			sta.msec2smp( cfg.schwa_length, run.audiorate ), cfg.schwa_power );
+        
+		resppi = k15.plosion( ... % plosion index
+			k15.replaygain( respser, run.audiorate ), ...
+			sta.msec2smp( cfg.plosion_delta, run.audiorate ), sta.msec2smp( cfg.plosion_width, run.audiorate ) );
+
+			% helper functions
+		function msec = smp2msec( smp )
+			msec = sta.smp2msec( smp - refrange(1), run.audiorate );
+		end
+        
+            % plot power
+        subplot( 2, 1, 1 );
+        title( sprintf( 'syllable /%s/, %s speaker', trial.labeled.label, strrep( strrep( run.sex, 'm', 'male' ), 'w', 'female' ) ) );
+        ylabel( 'subband power' );
+        xlim( smp2msec( [refrange(1), refrange(2)] ) );
+        plot( smp2msec( refrange(1):refrange(2) ), pow2db( resppow ), ...
+            'Color', style.color( 'neutral', 0 ) );
+        
+            % plot peaks and ror
+        subplot( 2, 1, 2 );
+        xlabel( 'time in milliseconds' );
+        ylabel( 'rate-of-rise' );
+        xlim( smp2msec( [refrange(1), refrange(2)] ) );
+        stem( smp2msec( respglottis + refrange(1) - 1 ), respror(respglottis), ... % glottal peaks
+            'Color', style.color( 'neutral', 0 ), 'LineStyle', '--', ...
+            'MarkerFaceColor', style.color( 'neutral', 0 ), 'MarkerSize', 1 );
+        stem( smp2msec( resppeak + refrange(1) - 1 ), respror(resppeak), ... % ror peaks
+            'Color', style.color( 'neutral', 0 ), 'LineStyle', '-', ...
+            'MarkerFaceColor', style.color( 'neutral', 0 ), 'MarkerSize', 1 );
+        plot( smp2msec( refrange(1):refrange(2) ), respror, ... % ror
+            'Color', style.color( 'neutral', 0 ) );
+        
+		style.print( plotfile );
+		delete( fig );
+    end
+
     function plottrial( plotfile, run, trial )
 		logger.log( 'plot example trial ''%s''...', plotfile );
 		
@@ -734,6 +1012,14 @@ function sip16( indir, ids, labels )
         for j = tj
             plotfile = fullfile( statsdir, sprintf( 'example%02d_%02d_%04d.%s', cj, i, j, PLOTEXT ) );
             plottrial( plotfile, run, run.trials(j) );
+            plotfile = fullfile( statsdir, sprintf( 'example%02d_%01d_%02d_%04d.%s', cj, 1, i, j, PLOTEXT ) );
+            plottrial1( plotfile, run, run.trials(j) );
+            plotfile = fullfile( statsdir, sprintf( 'example%02d_%01d_%02d_%04d.%s', cj, 2, i, j, PLOTEXT ) );
+            plottrial2( plotfile, run, run.trials(j) );
+            plotfile = fullfile( statsdir, sprintf( 'example%02d_%01d_%02d_%04d.%s', cj, 3, i, j, PLOTEXT ) );
+            plottrial3( plotfile, run, run.trials(j) );
+            plotfile = fullfile( statsdir, sprintf( 'example%02d_%01d_%02d_%04d.%s', cj, 4, i, j, PLOTEXT ) );
+            plottrial4( plotfile, run, run.trials(j) );
             cj = cj + 1;
         end
         
