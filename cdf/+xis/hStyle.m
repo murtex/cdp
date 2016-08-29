@@ -36,13 +36,18 @@ classdef (Sealed = true) hStyle < handle
 				'Visible', 'off', ...
 				'Color', this.color( 'grey', this.scale( -1/3 ) ), ...
 				'InvertHardCopy', 'off', ...
+				'PaperUnits', 'points', ...
 				'defaultTextInterpreter', 'none', ...
-				'defaultTextFontName', 'Courier', ...
-				'defaultAxesFontName', 'Courier', ...
+				'defaultTextFontName', 'Courier', 'defaultAxesFontName', 'Courier', ...
+				'defaultTextFontSize', 12, 'defaultAxesFontSize', 9, ...
 				'defaultAxesNextPlot', 'add', ...
 				'defaultAxesBox', 'on', 'defaultAxesLayer', 'top', ...
 				'defaultAxesXGrid', 'on', 'defaultAxesYGrid', 'on', ...
 				varargin{:} );
+
+				%'defaultTextInterpreter', 'none', ...
+				%'defaultTextFontName', 'Courier', ...
+				%'defaultAxesFontName', 'Courier', ...
 
 				%'defaultTextboxshapeFontSize', 7, 'defaultTextboxshapeFontName', 'Courier', ...
 				%'GraphicsSmoothing', 'off', ...
@@ -75,7 +80,25 @@ classdef (Sealed = true) hStyle < handle
 			end
 
 				% print figure
-			print( figfile, '-dpng', '-r128' );
+			[~, name, ext] = fileparts( figfile );
+
+			switch lower( ext )
+
+				case '.png' % bitmaps
+					fmtopts = {'-dpng', '-r300'};
+				case '.jpg'
+					fmtopts = {'-djpeg', '-r300'};
+
+				case '.eps' % vectorized
+					fmtopts = {'-depsc2', '-loose'};
+				case '.pdf'
+					fmtopts = {'-dpdf'};
+
+				otherwise
+					error( 'invalid value: ext' );
+			end
+
+			print( figfile, fmtopts{:} );
 
 			%imwrite( hardcopy( gcf(), '-dzbuffer', '-r120' ), sprintf( '%s.png', figfile ), 'png' );
 
@@ -308,6 +331,32 @@ classdef (Sealed = true) hStyle < handle
 
 				% choose maximum number of bins
 			k = max( ks );
+
+		end
+
+		function h = bandwidth( this, data )
+		% optimal bandwidth for kernel density estimates
+		%
+		% h = bandwidth( this, data )
+		%
+		% INPUT
+		% this : style (scalar object)
+		% data : data (vector numeric)
+		%
+		% OUTPUT
+		% h : bandwidth (scalar numeric)
+
+				% safeguard
+			if ~isscalar( this )
+				error( 'invalid argument: this' );
+			end
+
+			if nargin < 2 || ~isvector( data ) || ~isnumeric( data )
+				error( 'invalid argument: data' );
+			end
+
+				% optimal bandwidth
+			h = (4*std( data ) / (3*numel( data )))^(1/5);
 
 		end
 
