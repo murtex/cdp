@@ -209,30 +209,50 @@ function landmarks( run, cfg )
 				end
 
 				cp = trial.range(1) + get( src, 'CurrentPoint' ) / 1000;
-				switch get( fig, 'SelectionType' )
 
-					case 'normal' % landmarks adjustment
-						switch src
-							case hdet1
+				switch src
+					case hovr
+						switch get( fig, 'SelectionType' )
+							case 'normal'
 								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
 									resplab.bo = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(1) );
 									fredo = cdf.audit.disp_update( fig, false );
 								end
-							case hdet2
+							case 'extend'
 								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
 									resplab.vo = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(2) );
 									fredo = cdf.audit.disp_update( fig, false );
 								end
-							case hdet3
+							case 'alt'
 								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
 									resplab.vr = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(3) );
 									fredo = cdf.audit.disp_update( fig, false );
 								end
 						end
-
-					case 'alt' % landmarks setting
-						full_landmarks();
-
+					case hdet1
+						switch get( fig, 'SelectionType' )
+							case 'normal'
+								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
+									resplab.bo = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(1) );
+									fredo = cdf.audit.disp_update( fig, false );
+								end
+						end
+					case hdet2
+						switch get( fig, 'SelectionType' )
+							case 'normal'
+								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
+									resplab.vo = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(2) );
+									fredo = cdf.audit.disp_update( fig, false );
+								end
+						end
+					case hdet3
+						switch get( fig, 'SelectionType' )
+							case 'normal'
+								if cp(1) >= resplab.range(1) && cp(2) <= resplab.range(2)
+									resplab.vr = snap( ovrts, resplab.range(1), cp(1), cfg.landmarks_zcsnap(3) );
+									fredo = cdf.audit.disp_update( fig, false );
+								end
+						end
 				end
 
 		end
@@ -251,7 +271,7 @@ function landmarks( run, cfg )
 			set( fig, 'Color', style.color( 'signal', +2 ) );
 		end
 
-		[ovrts, spects, hdet1, hdet2, hdet3] = cdf.audit.plot_landmarks( ... % plot overview and details
+		[ovrts, spects, hovr, hdet1, hdet2, hdet3] = cdf.audit.plot_landmarks( ... % plot overview and details
 			run, cfg, trial, [fredo, fdet, flog], ...
 			sprintf( 'LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );

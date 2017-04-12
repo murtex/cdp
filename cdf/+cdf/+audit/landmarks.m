@@ -71,7 +71,7 @@ function landmarks( run, cfg )
 			% plot
 		clf( fig ); % clear figure
 
-		[ovrts, spects, ~, ~, ~] = cdf.audit.plot_landmarks( ... % plot overview and details
+		[ovrts, spects, ~, ~, ~, ~] = cdf.audit.plot_landmarks( ... % plot overview and details
 			run, cfg, trial, [fredo, fdet, flog], ...
 			sprintf( 'LANDMARKS (trial: #%d [%d/%d])', itrials(itrial), itrial, ntrials ), ...
 			{@disp_commands, 'buttondown'} );

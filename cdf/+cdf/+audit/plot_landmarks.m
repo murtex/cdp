@@ -1,7 +1,7 @@
-function [ovrts, spects, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, stitle, callback )
+function [ovrts, spects, hovr, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial, flags, stitle, callback )
 % plot landmarks
 %
-% [ovrts, spects, hdet1, hdet2, hdet3] = PLOT_LANDMARKS( run, cfg, trial, flags, stitle, callback )
+% [ovrts, spects, hovr, hdet1, hdet2, hdet3] = PLOT_LANDMARKS( run, cfg, trial, flags, stitle, callback )
 %
 % INPUT
 % run : cue-distractor run (scalar object)
@@ -14,6 +14,7 @@ function [ovrts, spects, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial,
 % OUTPUT
 % ovrts : overview signal (column numeric)
 % spects : specific signal (column numeric)
+% hovr : overview axis handle (intern)
 % hdet1 : detail #1 (burst onset) axis handle (intern)
 % hdet2 : detail #2 (voice onset) axis handle (intern)
 % hdet3 : detail #3 (voice release) axis handle (intern)
@@ -169,6 +170,7 @@ function [ovrts, spects, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial,
 	end
 
 		% return with detection view, TODO!
+	hovr = NaN;
 	hdet1 = NaN;
 	hdet2 = NaN;
 	hdet3 = NaN;
@@ -178,7 +180,7 @@ function [ovrts, spects, hdet1, hdet2, hdet3] = plot_landmarks( run, cfg, trial,
 	end
 
 		% plot overview
-	subplot( 4, 3, [1, 3], 'ButtonDownFcn', callback );
+	hovr = subplot( 4, 3, [1, 3], 'ButtonDownFcn', callback );
 
 	title( stitle );
 	xlabel( 'trial time in milliseconds' );
