@@ -189,18 +189,41 @@ function [ovrts, spects] = plot_formants( run, cfg, trial, flags, stitle, callba
 	plot_marks( true, true );
 
 		% plot spectrogram #2 (f0)
-	subplot( 4, 1, 3, 'ButtonDownFcn', callback );
+	%subplot( 4, 1, 3, 'ButtonDownFcn', callback );
 
-	xlabel( 'trial time in milliseconds' );
-	ylabel( 'frequency in hertz' );
+	%xlabel( 'trial time in milliseconds' );
+	%ylabel( 'frequency in hertz' );
 
-	xlim( ([...
-		min( resplab.range(1), respdet.range(1) ), ...
-		max( resplab.range(2), respdet.range(2) )] - trial.range(1)) * 1000 );
-	ylim( cfg.formants_f0_freqband(1:2) );
+	%xlim( ([...
+		%min( resplab.range(1), respdet.range(1) ), ...
+		%max( resplab.range(2), respdet.range(2) )] - trial.range(1)) * 1000 );
+	%ylim( cfg.formants_f0_freqband(1:2) );
 
-	plot_signal( times2, freqs2, stft2, cfg.formants_f0_gamma );
-	plot_marks( false, false );
+	%plot_signal( times2, freqs2, stft2, cfg.formants_f0_gamma );
+	%plot_marks( false, false );
+
+		% plot spectra
+	subplot( 4, 1, 3 );
+
+	xlabel( 'frequency in hertz' );
+	ylabel( 'power in decibel' );
+
+	xlim( cfg.formants_fx_freqband(1:2) );
+
+	N = numel( ovrts );
+	N2 = ceil(N/2);
+	fS = run.audiorate;
+
+	Xk = fft( ovrts ); % fourier spectrum
+	fk = (0:N-1)*fS/N;
+	Pk = 2*abs( Xk )/(2*pi);
+	plot( fk(1:N2), Pk(1:N2) );
+
+	order = round( N/150 ); % lpc spectrum
+	[a, g] = lpc( ovrts, order );
+	[h, f] = freqz( sqrt( g ), a, N, fS );
+	hk = 2*order*abs( h )/(2*pi);
+	plot( f, hk, 'r');
 
 end
 
